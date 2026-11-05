@@ -43,6 +43,10 @@ jobs:
       - uses: actions/checkout@v6
         with: {persist-credentials: false}
       - uses: helm/kind-action@v1.14.0
+      - name: Install Ingress controller
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml
+          kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=600s
       - name: Load exact published images into ephemeral cluster
         env:
           HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -58,17 +62,16 @@ jobs:
       - run: kubectl apply -k k8s/overlays/dev
       - run: kubectl wait -n rahbar --for=condition=complete job/initial-index --timeout=600s
       - run: kubectl rollout status -n rahbar deployment/api --timeout=600s
-      - name: Smoke the deployed API
+      - name: Smoke through the Ingress
         run: |
-          kubectl port-forward -n rahbar svc/api 8000:8000 &
+          kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 18080:80 &
           forward_pid=$!
           trap 'kill "$forward_pid"' EXIT
           for attempt in $(seq 1 30); do
-            if curl -fsS http://localhost:8000/readyz; then break; fi
+            if curl -fsS -o /dev/null -H 'Host: rahbar.local' http://localhost:18080/; then break; fi
             sleep 2
           done
-          curl -fsS http://localhost:8000/healthz
-          curl -fsS -X POST http://localhost:8000/api/ask \
+          curl -fsS -H 'Host: rahbar.local' -X POST http://localhost:18080/api/ask \
             -H 'Content-Type: application/json' \
             -d '{"question":"What is the attendance requirement?"}' \
             | python -c 'import json,sys; x=json.load(sys.stdin); assert x["citations"] and x["answered_from_context"]'
