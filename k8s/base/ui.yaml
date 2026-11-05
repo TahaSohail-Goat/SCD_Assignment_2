@@ -11,6 +11,7 @@ spec:
       labels: {app: ui}
     spec:
       serviceAccountName: rahbar-ui
+      enableServiceLinks: false
       automountServiceAccountToken: false
       securityContext: {runAsNonRoot: true, runAsUser: 101, runAsGroup: 101}
       containers:

@@ -12,6 +12,7 @@ spec:
       labels: {app: chroma}
     spec:
       serviceAccountName: rahbar-data
+      enableServiceLinks: false
       automountServiceAccountToken: false
       securityContext: {fsGroup: 10001}
       containers:

@@ -21,6 +21,7 @@ spec:
       labels: {app: redis}
     spec:
       serviceAccountName: rahbar-data
+      enableServiceLinks: false
       automountServiceAccountToken: false
       containers:
         - name: redis
