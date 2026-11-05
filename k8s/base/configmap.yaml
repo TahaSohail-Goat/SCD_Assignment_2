@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rahbar-config
+data:
+  RETRIEVER: chroma
+  LLM_PROVIDER: ollama-host
+  EMBED_MODEL: nomic-embed-text
+  LLM_MODEL: llama3.2:3b
+  CHROMA_HOST: chroma
+  CHROMA_PORT: "8000"
+  CHROMA_COLLECTION: rahbar
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  OLLAMA_URL: http://host.docker.internal:11434
+  TOP_K: "5"
+  RELEVANCE_FLOOR: "0.55"
+  CACHE_THRESHOLD: "0.95"
+  CACHE_TTL_SECONDS: "86400"
+  TEMPERATURE: "0.2"
+  LOG_LEVEL: INFO
+  CORPUS_DIR: /corpus
+  CHUNK_SIZE: "400"
+  CHUNK_OVERLAP: "50"

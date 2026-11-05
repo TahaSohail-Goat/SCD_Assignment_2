@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: initial-index
+spec:
+  template:
+    spec:
+      containers:
+        - name: indexer
+          command: [python, -m, pipeline.run, --dummy]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reindex
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: indexer
+              command: [python, -m, pipeline.run, --dummy]
