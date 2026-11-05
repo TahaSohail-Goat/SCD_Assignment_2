@@ -1,0 +1,5 @@
+NAME           ADDRESSTYPE   PORTS   ENDPOINTS                                   AGE
+api-dm994      IPv4          8000    10.244.120.82,10.244.120.87,10.244.120.88   5m11s
+chroma-lwd9c   IPv4          8000    10.244.120.86                               5m11s
+redis-zvkc6    IPv4          6379    10.244.120.85                               5m11s
+ui-lmn5g       IPv4          8080    10.244.120.84                               5m11s
