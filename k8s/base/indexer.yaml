@@ -13,6 +13,18 @@ spec:
       automountServiceAccountToken: false
       restartPolicy: Never
       securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
+      initContainers:
+        - name: wait-for-data
+          image: busybox:1.37.0
+          command: [sh, -ec, "until nc -z chroma 8000 && nc -z redis 6379; do sleep 2; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {cpu: 50m, memory: 32Mi}
       containers:
         - name: indexer
           image: rahbar-indexer:dev
@@ -48,6 +60,18 @@ spec:
           automountServiceAccountToken: false
           restartPolicy: Never
           securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
+          initContainers:
+            - name: wait-for-data
+              image: busybox:1.37.0
+              command: [sh, -ec, "until nc -z chroma 8000 && nc -z redis 6379; do sleep 2; done"]
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {cpu: 10m, memory: 16Mi}
+                limits: {cpu: 50m, memory: 32Mi}
           containers:
             - name: indexer
               image: rahbar-indexer:dev

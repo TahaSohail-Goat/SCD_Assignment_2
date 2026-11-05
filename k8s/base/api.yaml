@@ -25,10 +25,19 @@ spec:
             - {name: http, containerPort: 8000}
           envFrom:
             - configMapRef: {name: rahbar-config}
+          env:
+            - name: LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rahbar-secret
+                  key: LLM_API_KEY
+                  optional: true
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
-            capabilities: {drop: [ALL]}
+            capabilities:
+              drop:
+                - ALL
           startupProbe:
             httpGet: {path: /healthz, port: http}
             failureThreshold: 30
@@ -41,8 +50,12 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
           resources:
-            requests: {cpu: 200m, memory: 256Mi}
-            limits: {cpu: "1", memory: 1Gi}
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
 ---
 apiVersion: v1
 kind: Service

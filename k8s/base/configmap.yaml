@@ -7,6 +7,7 @@ data:
   LLM_PROVIDER: ollama-host
   EMBED_MODEL: nomic-embed-text
   LLM_MODEL: llama3.2:3b
+  HOSTED_BASE_URL: ""
   CHROMA_HOST: chroma
   CHROMA_PORT: "8000"
   CHROMA_COLLECTION: rahbar
