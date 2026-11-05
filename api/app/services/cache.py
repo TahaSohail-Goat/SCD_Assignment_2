@@ -41,6 +41,7 @@ class SemanticCache:
         return bool(self.client.ping())
 
     def _prefix(self) -> str:
+        """A completed reindex increments this key to invalidate older cache entries."""
         generation = self.client.get(GENERATION_KEY) or "0"
         return f"rahbar:cache:{generation}:"
 

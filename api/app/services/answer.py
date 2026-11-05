@@ -72,7 +72,7 @@ def answer_question(
     else:
         answer = Answer(reasoning="model output unavailable", answer=_FALLBACK, citations=[],
                         answered_from_context=False, confidence="low")
-        for attempt in range(2):
+        for attempt in range(2):  # retry once on invalid JSON, citations or provider failure
             generated_at = time.perf_counter()
             try:
                 result = provider.generate(question, grounded)
