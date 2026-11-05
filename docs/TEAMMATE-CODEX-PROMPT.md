@@ -4,6 +4,8 @@
 
 Student A owns the FastAPI retrieval and generation path, Redis cache, validation, readiness, images, Kubernetes, CI/CD, deployment evidence, and integration. Student B owns the real document corpus, OCR and extraction, cleaning, chunking, embeddings, Chroma writes, fixture and real evaluation, measured tuning, and failure analysis. Both students should make their own substantive commits. Student B can write and test on a modest laptop without Docker, WSL, or a local LLM; Student A runs the cluster and Ollama and shares actual results for Student B to analyze.
 
+The starter checker looks for at least 25 non-merge commits overall and at least 35% of those commits from each partner. Treat this as a real collaboration target: make small, coherent commits for extraction, OCR, cleaning, chunking, embeddings, storage, tests, corpus selection, golden questions, evaluator, tuning, and documentation. Do not split one change into meaningless commits just to reach a count.
+
 ## Start on the teammate laptop
 
 Install Git and Python 3.12. Codex is optional for the commands but is part of this collaboration. Clone the repo, fetch `dev`, create your own branch, and install Python dependencies. In PowerShell:

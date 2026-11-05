@@ -1,5 +1,7 @@
 # RAHBAR: grounded policy answers on Kubernetes
 
+![CI](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/workflows/ci.yml/badge.svg?branch=dev)
+
 RAHBAR answers questions about university policy documents with retrieved evidence and citations. The API refuses unsupported answers, validates model JSON, checks citations against retrieved passages, and exposes health and Prometheus endpoints. The indexer runs as a separate Kubernetes Job. The dev overlay uses a three chunk dummy index and stub model to prove the deployment before the real corpus is integrated.
 
 ## Team and status
@@ -31,13 +33,20 @@ kubectl get pods,svc,ingress,hpa -n rahbar
 kubectl top pods -n rahbar
 ```
 
-For Windows with the Docker driver, run `minikube tunnel` in another WSL terminal, then `make ask INGRESS_IP=127.0.0.1 Q="What is the attendance rule?"`. If the ingress address is unavailable, use `kubectl port-forward -n rahbar svc/api 8000:8000` and POST directly to `http://localhost:8000/api/ask`.
+The exact clean-clone apply order is: start Minikube and enable ingress/metrics (`make cluster`), build and load images (`make images`), apply namespace/data services/Job/API/UI (`make apply`), wait for `job/initial-index`, then wait for `deployment/api`. The dev Job writes the dummy index, so readiness only becomes true after it finishes. For Windows with the Docker driver, run `minikube tunnel` in another WSL terminal, then `make ask INGRESS_IP=127.0.0.1 Q="What is the attendance rule?"`. If the ingress address is unavailable, use `kubectl port-forward -n rahbar svc/api 8000:8000` and POST directly to `http://localhost:8000/api/ask`.
 
 The production overlay switches to Chroma retrieval and Ollama. Apply it only after the teammate's indexer image contains the corpus and the real Job has completed. The same `EMBED_MODEL` must configure indexer and API. Reindexing must increment Redis key `rahbar:index_generation` only after successful Chroma writes, which expires old cache entries logically.
 
 ## API contract
 
-`POST /api/ask` takes `{"question":"..."}` with 3 to 500 characters. The response has `answer`, `citations`, `answered_from_context`, `confidence`, `retrieved`, `provider`, `cached`, and `request_id`. A citation must name a returned source, section, and page. `GET /healthz` checks the process only. `GET /readyz` returns 503 if Chroma is unavailable or empty, Redis is unavailable, or the index embedding pin differs. `GET /metrics` exposes Prometheus counters and latency histograms.
+`POST /api/ask` takes `{"question":"..."}` with 3 to 500 characters. The response has `answer`, `citations`, `answered_from_context`, `confidence`, `retrieved`, `provider`, `cached`, and `request_id`. A citation must name a returned source, section, and page.
+
+| Endpoint | Purpose | Failure behavior |
+| --- | --- | --- |
+| `POST /api/ask` | Grounded answer with retrieved references | 422 for invalid question; fallback on invalid model output |
+| `GET /healthz` | Process liveness | No dependency checks |
+| `GET /readyz` | Chroma count and pin plus Redis readiness | 503 if any check fails |
+| `GET /metrics` | Prometheus metrics | Request, latency, cache, abstention, tokens |
 
 ## Architecture
 
