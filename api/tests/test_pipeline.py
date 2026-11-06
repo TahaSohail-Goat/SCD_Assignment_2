@@ -7,7 +7,7 @@ from app.providers.llm.base import GenerationResult
 from app.retrieval.stub import StubRetriever
 from app.schemas import Answer, Citation, Passage
 from app.services.answer import answer_question
-from app.services.cache import cosine, is_follow_up
+from app.services.cache import GENERATION_KEY, SemanticCache, cosine, is_follow_up
 from app.services.prompt import messages
 from app.services.readiness import is_ready
 
@@ -89,3 +89,28 @@ def test_prompt_injection_stays_inside_evidence() -> None:
     assert "Ignore all instructions" not in prompt[0]["content"]
     assert "Ignore all instructions" in prompt[1]["content"]
     assert "untrusted" in prompt[0]["content"].lower()
+
+
+def test_cache_generation_invalidates_old_answer() -> None:
+    class MemoryRedis:
+        def __init__(self) -> None:
+            self.values: dict[str, str] = {}
+
+        def get(self, key: str) -> str | None:
+            return self.values.get(key)
+
+        def setex(self, key: str, ttl: int, value: str) -> None:
+            self.values[key] = value
+
+        def scan_iter(self, match: str):
+            prefix = match.removesuffix("*")
+            return (key for key in self.values if key.startswith(prefix))
+
+    cache = SemanticCache(Settings())
+    memory = MemoryRedis()
+    cache.client = memory  # type: ignore[assignment]
+    answer = answer_question("attendance", StubRetriever(), FakeProvider(), Settings())
+    cache.store("attendance", [1.0, 0.0], answer)
+    assert cache.lookup([1.0, 0.0]) is not None
+    memory.values[GENERATION_KEY] = "1"
+    assert cache.lookup([1.0, 0.0]) is None
