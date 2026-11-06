@@ -6,6 +6,7 @@ import logging
 from typing import Any
 from uuid import uuid4
 
+import redis
 from chromadb.errors import NotFoundError
 
 from .config import IndexerSettings
@@ -13,6 +14,7 @@ from .models import Chunk
 
 _LOG = logging.getLogger(__name__)
 _WRITE_BATCH = 128
+GENERATION_KEY = "rahbar:index_generation"
 
 
 def get_client(settings: IndexerSettings) -> Any:
@@ -47,8 +49,6 @@ def _publish(client: Any, staging: Any, name: str, backup: str) -> None:
             # rejects the rollback because the live name is already occupied.
             old.modify(name=name)
         raise
-    if old is not None:
-        _discard(client, backup)
 
 
 def store(chunks: list[Chunk], vectors: list[list[float]], settings: IndexerSettings) -> int:
@@ -80,7 +80,19 @@ def store(chunks: list[Chunk], vectors: list[list[float]], settings: IndexerSett
         count = staging.count()
         if count != len(chunks):
             raise RuntimeError(f"Chroma counted {count} of {len(chunks)} chunks")
-        _publish(client, staging, settings.collection, backup)
+        cache = redis.Redis(
+            host=settings.redis_host, port=settings.redis_port,
+            socket_connect_timeout=5, socket_timeout=5,
+        )
+        try:
+            # Only complete collections compete for the live name. Manual Jobs
+            # can overlap the CronJob even with concurrencyPolicy: Forbid.
+            with cache.lock("rahbar:index_publish", timeout=120, blocking_timeout=30):
+                _publish(client, staging, settings.collection, backup)
+                cache.incr(GENERATION_KEY)
+                _discard(client, backup)
+        finally:
+            cache.close()
     except Exception:
         _discard(client, pending)
         raise
