@@ -15,7 +15,7 @@ questions:
     type: ordinary
     question: When is a student placed on academic warning?
     relevant:
-      - {source: missing-policy.md, section: "2. Academic warning"}
+      - {source: academic-rules-2026.md, section: "2. Academic warning"}
     expect: "2.00"
 
   - id: f02
