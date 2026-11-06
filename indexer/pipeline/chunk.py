@@ -46,15 +46,16 @@ def chunk(doc: Document, size: int, overlap: int) -> list[Chunk]:
 
     pieces = []
     section = "Document"
+    markdown = doc.source.lower().endswith(".md")
     for page in doc.pages:
         sections: list[tuple[str, list[str]]] = [(section, [])]
         for line in page.text.splitlines():
             stripped = line.strip()
             if heading := _MARKDOWN.fullmatch(stripped):
                 section = heading[1]
-            elif clause := _CLAUSE.match(stripped):
+            elif not markdown and (clause := _CLAUSE.match(stripped)):
                 section = clause[1]
-            elif _SECTION.fullmatch(stripped):
+            elif not markdown and _SECTION.fullmatch(stripped):
                 section = stripped
             else:
                 sections[-1][1].append(line)

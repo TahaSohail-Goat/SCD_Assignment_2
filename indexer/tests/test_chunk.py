@@ -35,3 +35,12 @@ def test_overlap_is_bounded_and_ids_are_stable() -> None:
 def test_chunk_settings_must_allow_forward_progress(size: int, overlap: int) -> None:
     with pytest.raises(ValueError, match="overlap"):
         chunk(Document("rules.pdf", "2026", False), size, overlap)
+
+
+def test_markdown_numbered_items_remain_under_explicit_heading() -> None:
+    doc = Document("rules.md", "2026", False, [
+        Page("rules.md", 1, "## 1. Attendance\n\n1.1 All students must attend."),
+    ])
+    [piece] = chunk(doc, 50, 5)
+    assert piece.section == "1. Attendance"
+    assert "1.1 All students must attend." in piece.text
