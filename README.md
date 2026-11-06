@@ -6,7 +6,7 @@ RAHBAR answers questions about university policy documents with retrieved eviden
 
 ## Team and status
 
-This is a two person assignment. The platform/API branch implements the API, images, Kubernetes platform, and CI/CD scaffolding. The indexer/evaluation branch is assigned to the teammate; see [docs/TEAMMATE-CODEX-PROMPT.md](docs/TEAMMATE-CODEX-PROMPT.md). The verified FAST-NUCES snapshot, OCR indexer, 15 real golden questions and deterministic fixture gates are implemented. Real-model retrieval measurements and final deployment evidence are pending. See the [integration handoff](docs/PIPELINE.md#stronger-laptop-handoff).
+This is a two person assignment. The platform/API work and the indexer/evaluation work are merged into `dev`. The six verified FAST-NUCES publications, OCR indexer, 15 real golden questions, and deterministic fixture gates are implemented. The live Ollama comparison selected 400/50 chunks and recorded 100% recall@5, 100% citation-reference validity, and 2/2 correct abstentions. See [the measurements and answer-quality limits](docs/PIPELINE.md) and [local deployment evidence](docs/evidence/real-corpus-integration-2026-11-06.md). The final `dev` to `main` PR, Docker Hub secrets, and CD run remain to be completed.
 
 ## Requirements
 
@@ -79,6 +79,6 @@ Kubernetes uses namespace `rahbar`, ClusterIP data services, restricted service 
 
 ## CI/CD and repository flow
 
-CI on pull requests and `dev` runs lint, tests with API coverage, Kubernetes schema checks, image builds, and Trivy. CD on `main` tests again, pushes three immutable `sha-<commit>` tags to Docker Hub using `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` GitHub secrets, and deploys those exact images to an ephemeral Kind cluster for an Ingress smoke test. The fixture gate runs both offline and on Kind with deterministic model doubles. The real-corpus results and baseline belong in `eval/` after the live run. The repository owner must enable branch protection on `main` and capture a blocked merge plus green checks as assignment evidence; a WRITE collaborator cannot set that rule.
+CI on pull requests and `dev` runs lint, tests with API coverage, Kubernetes schema checks, image builds, and Trivy. CD on `main` tests again, pushes three immutable `sha-<commit>` tags to Docker Hub using `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` GitHub secrets, and deploys those exact images to an ephemeral Kind cluster for an Ingress smoke test. The fixture gate runs both offline and on Kind with deterministic model doubles. The real-corpus results and baseline are in `eval/`. The repository owner has enabled protection on `main`; the final PR still needs the required approval. The team must capture the assignment's failing-evaluation and green-check screenshots, the successful CD run, and links to the SHA-tagged images before submission.
 
 Work on feature branches, commit small logical units, push the branch, open a PR into `dev`, then integrate into `main` after the two-person review. Never commit `.env*`, API keys, kubeconfig, or `corpus/raw/`.
