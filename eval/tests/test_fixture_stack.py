@@ -3,6 +3,7 @@
 import json
 import os
 from contextlib import nullcontext
+from dataclasses import replace
 from pathlib import Path
 
 import chromadb
@@ -11,6 +12,7 @@ import redis
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.prompt import messages
 from eval.fixtures.fake_ollama import reply
 from eval.run_eval import evaluate, gate, load_golden, write_results
 from indexer.tests.test_store import Client, Collection
@@ -87,7 +89,34 @@ def test_fixture_evaluation_gate(monkeypatch, tmp_path):
     assert memory.get("rahbar:index_generation") == "1"
     with TestClient(app) as api:
         assert api.get("/readyz").status_code == 200
-        results = evaluate(api, "http://testserver", load_golden(FIXTURES / "golden.fixture.yaml"))
+        golden = load_golden(FIXTURES / "golden.fixture.yaml")
+        results = evaluate(api, "http://testserver", golden)
+        probes = {row["id"]: row["question"] for row in golden}
+
+        with monkeypatch.context() as fault:
+            fault.setattr(app.state, "settings", replace(app.state.settings, embed_model="wrong"))
+            response = api.get("/readyz")
+            assert response.status_code == 503
+            assert "embedding_pin" in response.text
+
+        with monkeypatch.context() as fault:
+            def unfiltered(self, **kwargs):
+                return query(self, **{**kwargs, "where": None})
+
+            fault.setattr(Collection, "query", unfiltered)
+            response = api.post("/api/ask", json={"question": probes["f02"]}).json()
+            assert any(ref["source"] == "academic-rules-2023.md" for ref in response["retrieved"])
+
+        with monkeypatch.context() as fault:
+            def without_boundary(question, passages):
+                payload = messages(question, passages)
+                payload[0]["content"] = "Answer the question."
+                return payload
+
+            fault.setattr("app.providers.llm.ollama.messages", without_boundary)
+            response = api.post("/api/ask", json={"question": probes["f06"]}).json()
+            assert response["answered_from_context"] is False
+            assert "could not verify" in response["answer"]
 
     results["golden"] = "eval/fixtures/golden.fixture.yaml"
     results["environment"] = "offline fixture doubles"
