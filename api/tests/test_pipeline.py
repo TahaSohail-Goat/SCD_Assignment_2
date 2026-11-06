@@ -60,6 +60,23 @@ def test_invalid_citation_twice_falls_back() -> None:
     assert result.citations == []
 
 
+def test_schema_failure_retries_then_falls_back() -> None:
+    class InvalidSchemaProvider:
+        name = "invalid-schema"
+        calls = 0
+
+        def generate(self, question, passages):
+            self.calls += 1
+            raise ValueError("model response failed schema validation")
+
+    provider = InvalidSchemaProvider()
+    result = answer_question("attendance", StubRetriever(), provider, Settings())
+    assert provider.calls == 2
+    assert result.answered_from_context is False
+    assert result.citations == []
+    assert "could not verify" in result.answer
+
+
 def test_follow_up_and_cosine() -> None:
     assert is_follow_up("What about its 2023 policy?")
     assert not is_follow_up("What is the attendance requirement?")

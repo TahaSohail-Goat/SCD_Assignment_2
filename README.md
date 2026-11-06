@@ -26,7 +26,7 @@ make dev
 ```bash
 make cluster
 make images
-make apply
+kubectl apply -k k8s/overlays/dev
 kubectl wait -n rahbar --for=condition=complete job/initial-index --timeout=300s
 kubectl rollout status -n rahbar deployment/api --timeout=300s
 kubectl get pods,svc,ingress,hpa -n rahbar
@@ -41,12 +41,12 @@ The production overlay switches to Chroma retrieval and Ollama. Apply it only af
 
 `POST /api/ask` takes `{"question":"..."}` with 3 to 500 characters. The response has `answer`, `citations`, `answered_from_context`, `confidence`, `retrieved`, `provider`, `cached`, and `request_id`. A citation must name a returned source, section, and page.
 
-| Endpoint | Purpose | Failure behavior |
-| --- | --- | --- |
-| `POST /api/ask` | Grounded answer with retrieved references | 422 for invalid question; fallback on invalid model output |
-| `GET /healthz` | Process liveness | No dependency checks |
-| `GET /readyz` | Chroma count and pin plus Redis readiness | 503 if any check fails |
-| `GET /metrics` | Prometheus metrics | Request, latency, cache, abstention, tokens |
+| Method | Endpoint | Purpose | Failure behavior |
+| --- | --- | --- | --- |
+| POST | `/api/ask` | Grounded answer with retrieved references | 422 for invalid question; fallback on invalid model output |
+| GET | `/healthz` | Process liveness | No dependency checks |
+| GET | `/readyz` | Chroma count and pin plus Redis readiness | 503 if any check fails |
+| GET | `/metrics` | Prometheus metrics | Request, latency, cache, abstention, tokens |
 
 ## Architecture
 
