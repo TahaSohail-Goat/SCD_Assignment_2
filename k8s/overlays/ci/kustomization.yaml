@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: rahbar
+resources:
+  - ../../base
+  - fixture-network.yaml
+patches:
+  - target:
+      kind: ConfigMap
+      name: rahbar-config
+    patch: |-
+      - op: replace
+        path: /data/EMBED_MODEL
+        value: fixture-hash
+      - op: replace
+        path: /data/OLLAMA_URL
+        value: http://fixture-ollama:11434
+      - op: replace
+        path: /data/RELEVANCE_FLOOR
+        value: "0.08"
+      - op: replace
+        path: /data/CACHE_THRESHOLD
+        value: "1.01"
+      - op: replace
+        path: /data/CHUNK_SIZE
+        value: "240"
+      - op: replace
+        path: /data/CHUNK_OVERLAP
+        value: "35"
+  - target:
+      kind: CronJob
+      name: reindex
+    patch: |-
+      - op: add
+        path: /spec/suspend
+        value: true

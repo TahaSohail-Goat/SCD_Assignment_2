@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 from .config import IndexerSettings, get_settings
-from .models import Chunk
+from .models import Chunk, Document
 
 
 def log(msg: str, **fields: object) -> None:
@@ -53,7 +53,7 @@ def discover(corpus_dir: str) -> list[tuple[Path, str, bool]]:
                  bool(e.get("superseded", False))) for e in entries]
     found = []
     for path in sorted(root.glob("*")):
-        if path.suffix.lower() not in {".pdf", ".md", ".html", ".txt"}:
+        if path.suffix.lower() not in {".pdf", ".md", ".txt"}:
             continue
         if path.name.lower().startswith("readme"):
             continue
@@ -63,29 +63,63 @@ def discover(corpus_dir: str) -> list[tuple[Path, str, bool]]:
     return found
 
 
-def run_pipeline(settings: IndexerSettings) -> int:
-    from .chunk import chunk
+def prepare(corpus_dir: str) -> list[Document]:
     from .clean import clean
-    from .embed import embed
     from .extract import extract
+
+    sources = discover(corpus_dir)
+    if not sources:
+        raise ValueError(f"no documents found in {corpus_dir}")
+    documents = []
+    for path, doc_version, superseded in sources:
+        doc = clean(extract(str(path), doc_version, superseded))
+        readable = sum(bool(p.text) for p in doc.pages)
+        if not readable:
+            raise ValueError(f"{path.name}: no readable pages after cleaning")
+        log("extracted", source=path.name, pages=len(doc.pages),
+            ocr_pages=sum(p.ocr for p in doc.pages),
+            empty_pages=[p.page for p in doc.pages if not p.text])
+        documents.append(doc)
+    return documents
+
+
+def build_chunks(documents: list[Document], size: int, overlap: int) -> list[Chunk]:
+    from .chunk import chunk
+
+    chunks = [piece for doc in documents for piece in chunk(doc, size, overlap)]
+    original_words = sum(len(p.text.split()) for doc in documents for p in doc.pages)
+    stored_words = sum(len(c.text.split()) for c in chunks)
+    log("chunked", size=size, overlap=overlap, chunks=len(chunks), original_words=original_words,
+        stored_words=stored_words, amplification=round(stored_words / original_words, 4))
+    return chunks
+
+
+def run_pipeline(settings: IndexerSettings) -> int:
+    from .embed import embed
     from .store import store
 
-    documents = discover(settings.corpus_dir)
-    if not documents:
-        raise SystemExit(f"no documents found in {settings.corpus_dir}")
-    all_chunks: list[Chunk] = []
-    for path, doc_version, superseded in documents:
-        doc = clean(extract(str(path), doc_version, superseded))
-        pieces = chunk(doc, settings.chunk_size, settings.chunk_overlap)
-        log("chunked", source=path.name, chunks=len(pieces))
-        all_chunks.extend(pieces)
-    vectors = embed([c.text for c in all_chunks], settings)
-    return store(all_chunks, vectors, settings)
+    documents = prepare(settings.corpus_dir)
+    chunks = build_chunks(documents, settings.chunk_size, settings.chunk_overlap)
+    vectors = embed([c.text for c in chunks], settings)
+    return store(chunks, vectors, settings)
+
+
+def _plan_pair(value: str) -> tuple[int, int]:
+    try:
+        size, overlap = map(int, value.split(":"))
+        if not 0 <= overlap < size:
+            raise ValueError
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("expected SIZE:OVERLAP with 0 <= OVERLAP < SIZE") from exc
+    return size, overlap
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the RAHBAR index, then exit.")
-    parser.add_argument("--dummy", action="store_true", help="write three fake chunks")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dummy", action="store_true", help="write three fake chunks")
+    mode.add_argument("--plan", nargs="+", type=_plan_pair, metavar="SIZE:OVERLAP",
+                      help="measure chunk counts and amplification without services")
     args = parser.parse_args()
     settings = get_settings()
     log("indexer starting", dummy=args.dummy, embed_model=settings.embed_model,
@@ -93,6 +127,11 @@ def main() -> int:
         pod=os.environ.get("HOSTNAME", "-"))
     started = time.perf_counter()
     try:
+        if args.plan:
+            documents = prepare(settings.corpus_dir)
+            for size, overlap in args.plan:
+                build_chunks(documents, size, overlap)
+            return 0
         if args.dummy:
             from .dummy import write_dummy_index
             from .store import get_client
@@ -100,9 +139,9 @@ def main() -> int:
             count = write_dummy_index(settings, get_client(settings))
         else:
             count = run_pipeline(settings)
-    except NotImplementedError as exc:
-        log("indexer stage not implemented yet", error=str(exc))
-        return 2
+    except Exception as exc:
+        log("indexer failed", error_type=type(exc).__name__, error=str(exc))
+        return 1
     log("indexer finished", chunks=count, seconds=round(time.perf_counter() - started, 1))
     return 0
 

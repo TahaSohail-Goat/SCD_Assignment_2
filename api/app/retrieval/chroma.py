@@ -5,24 +5,101 @@ Connection details are already here; the query is not.
 
 from __future__ import annotations
 
+import re
+from typing import Any
+
+import httpx
+
 from ..config import Settings
 from ..schemas import Passage
+
+_HISTORICAL = re.compile(
+    r"\b(?:old|older|previous|prior|superseded|historical|former) "
+    r"(?:edition|handbook|policy|regulations|rules|version)\b|\b20[0-2][0-5]\b",
+    re.I,
+)
+_YEAR = re.compile(r"\b(20\d{2})\b")
+
+
+def is_historical_question(question: str) -> bool:
+    return bool(_HISTORICAL.search(question))
+
+
+def _heading_only(passage: Passage) -> bool:
+    """A standalone section title is navigation, not evidence for an answer."""
+    text = " ".join(passage.text.split())
+    section = " ".join(passage.section.split())
+    return len(text.split()) <= 8 and (
+        text == section or bool(re.fullmatch(re.escape(section) + r"\s+\d+", text))
+    )
 
 
 class ChromaRetriever:
     name = "chroma"
 
     def __init__(self, settings: Settings) -> None:
-        import chromadb  # the thin client, from chromadb-client in requirements.txt
-        from chromadb.config import Settings as ChromaSettings
-
         self.settings = settings
-        self.client = chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port,
-                                          settings=ChromaSettings(anonymized_telemetry=False))
+        self._client: Any = None
 
-    def retrieve(self, question: str, k: int) -> list[Passage]:
-        # STARTER-TODO(3.2): embed the question with settings.embed_model (the same model
-        # the indexer used), query the collection for the top k, filter out superseded
-        # documents, and map each hit to a Passage. Chroma returns cosine *distance*;
-        # Passage.score expects similarity, so convert: similarity = 1 - distance.
-        raise NotImplementedError("ChromaRetriever.retrieve: see STARTER-TODO(3.2)")
+    @property
+    def client(self) -> Any:
+        if self._client is None:
+            import chromadb
+            from chromadb.config import Settings as ChromaSettings
+
+            self._client = chromadb.HttpClient(
+                host=self.settings.chroma_host,
+                port=self.settings.chroma_port,
+                settings=ChromaSettings(anonymized_telemetry=False),
+            )
+        return self._client
+
+    def embed(self, question: str) -> list[float]:
+        with httpx.Client(timeout=30) as client:
+            response = client.post(
+                self.settings.ollama_url.rstrip("/") + "/api/embed",
+                json={"model": self.settings.embed_model, "input": question},
+            )
+            response.raise_for_status()
+            embeddings = response.json()["embeddings"]
+        if not embeddings or not embeddings[0]:
+            raise ValueError("embedding provider returned no vector")
+        return [float(value) for value in embeddings[0]]
+
+    def retrieve(self, question: str, k: int, embedding: list[float] | None = None) -> list[Passage]:
+        collection = self.client.get_collection(self.settings.collection)
+        historical = is_historical_question(question)
+        count = int(collection.count())
+        if count == 0:
+            return []
+        query: dict[str, Any] = {
+            "query_embeddings": [embedding if embedding is not None else self.embed(question)],
+            "n_results": min(count, k * 3),
+            "include": ["documents", "metadatas", "distances"],
+        }
+        if not historical:
+            query["where"] = {"superseded": False}
+        result = collection.query(**query)
+        ids = result["ids"][0]
+        documents = result["documents"][0]
+        metadatas = result["metadatas"][0]
+        distances = result["distances"][0]
+        passages: list[Passage] = []
+        for chunk_id, document, metadata, distance in zip(ids, documents, metadatas, distances):
+            meta = metadata or {}
+            passages.append(Passage(
+                chunk_id=str(chunk_id), text=str(document or ""),
+                source=str(meta.get("source", "unknown")),
+                section=str(meta.get("section", "unknown")),
+                page=int(meta["page"]) if meta.get("page") is not None else None,
+                score=1.0 - float(distance),
+                doc_version=str(meta.get("doc_version", "")),
+                superseded=bool(meta.get("superseded", False)),
+            ))
+        if historical and (year := _YEAR.search(question)):
+            passages.sort(key=lambda p: (year.group(1) not in p.doc_version,
+                                         -p.score))
+        substantive = [passage for passage in passages if not _heading_only(passage)]
+        if len(substantive) < k:
+            substantive.extend(passage for passage in passages if _heading_only(passage))
+        return substantive[:k]

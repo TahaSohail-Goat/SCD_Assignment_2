@@ -16,6 +16,8 @@ class IndexerSettings:
     chunk_size: int
     chunk_overlap: int
     ollama_url: str
+    redis_host: str = "redis"
+    redis_port: int = 6379
 
 
 def get_settings() -> IndexerSettings:
@@ -27,5 +29,7 @@ def get_settings() -> IndexerSettings:
         corpus_dir=os.environ.get("CORPUS_DIR", "/corpus"),
         chunk_size=int(os.environ.get("CHUNK_SIZE", 400)),
         chunk_overlap=int(os.environ.get("CHUNK_OVERLAP", 50)),
+        redis_host=os.environ.get("REDIS_HOST", "redis"),
+        redis_port=int(os.environ.get("REDIS_PORT", 6379)),
         ollama_url=os.environ.get("OLLAMA_URL", "http://host.minikube.internal:11434"),
     )

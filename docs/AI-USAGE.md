@@ -1,6 +1,9 @@
 # AI usage
 
-<!-- STARTER-TODO: list every AI tool you used. A specific disclosure carries no penalty. -->
-
-| Tool | What it wrote or shaped | What we changed afterwards, and why |
+| Tool | Work it shaped | Human verification and changes |
 | --- | --- | --- |
+| OpenAI Codex | API grounding and cache code, Kubernetes manifests, Dockerfiles, workflows, ADRs, documentation, team handoff | Codex read the assignment and code, ran lint, tests, coverage and a Minikube deployment. The deployment exposed a `CHROMA_PORT` service-variable collision; the manifests were fixed and the Job rerun. Trivy findings led to updated bases and dependencies. Student A must review the implementation and final real-corpus results. |
+| Ollama `llama3.2:3b` | Runtime answer generation after the real index is integrated | API validates JSON and citations; ungrounded responses must abstain. No model-written answer is treated as policy authority. |
+| Ollama `nomic-embed-text` | Runtime query and corpus embeddings after integration | API checks collection model and dimension; indexer tests and evaluation will measure retrieval quality. |
+| OpenAI Codex (Student B workflow) | Corpus verification, PDF crop and table extraction, OCR fallback, cleaning and chunking, Ollama batching, Chroma publication, cache generation, real golden questions, evaluator, fixture tests, CI, and documentation | Codex verified the six source files and page counts, compared source passages against the golden references, ran local Tesseract on the scans, and ran the deterministic fixture gate and local tooling. Source review revealed off-page text in the 2026 handbooks, so the indexer was changed to clip to the visible crop. Student B should review the code and verify any later human edits and live measurements before submission. |
+| OpenAI Codex (Student A integration) | Live cluster integration, heading-only retrieval filter, prompt and citation validation, chunk comparison, evaluation baseline, Ingress and pod-recovery checks | Codex ran the real PDFs and Ollama models in Minikube, reviewed all 15 answers against the golden expectations, and recorded both passing reference-level metrics and the model's incomplete answers. The team should review those limits before submission; the generated answers are not policy authority. |

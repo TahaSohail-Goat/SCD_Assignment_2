@@ -1,0 +1,100 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: initial-index
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels: {app: indexer}
+    spec:
+      serviceAccountName: rahbar-indexer
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
+      volumes:
+        - name: ocr-tmp
+          emptyDir: {sizeLimit: 128Mi}
+      initContainers:
+        - name: wait-for-data
+          image: busybox:1.37.0
+          command: [sh, -ec, "until nc -z chroma 8000 && nc -z redis 6379; do sleep 2; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits: {cpu: 50m, memory: 32Mi}
+      containers:
+        - name: indexer
+          image: rahbar-indexer:dev
+          imagePullPolicy: IfNotPresent
+          command: [python, -m, pipeline.run]
+          volumeMounts:
+            - {name: ocr-tmp, mountPath: /tmp}
+          envFrom:
+            - configMapRef: {name: rahbar-config}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 200m, memory: 512Mi}
+            limits: {cpu: "2", memory: 2Gi}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reindex
+spec:
+  schedule: "0 2 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels: {app: indexer}
+        spec:
+          serviceAccountName: rahbar-indexer
+          enableServiceLinks: false
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
+          volumes:
+            - name: ocr-tmp
+              emptyDir: {sizeLimit: 128Mi}
+          initContainers:
+            - name: wait-for-data
+              image: busybox:1.37.0
+              command: [sh, -ec, "until nc -z chroma 8000 && nc -z redis 6379; do sleep 2; done"]
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 10001
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {cpu: 10m, memory: 16Mi}
+                limits: {cpu: 50m, memory: 32Mi}
+          containers:
+            - name: indexer
+              image: rahbar-indexer:dev
+              imagePullPolicy: IfNotPresent
+              command: [python, -m, pipeline.run]
+              volumeMounts:
+                - {name: ocr-tmp, mountPath: /tmp}
+              envFrom:
+                - configMapRef: {name: rahbar-config}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: [ALL]}
+              resources:
+                requests: {cpu: 200m, memory: 512Mi}
+                limits: {cpu: "2", memory: 2Gi}

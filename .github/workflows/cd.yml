@@ -1,0 +1,77 @@
+name: CD
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
+      - run: ruff check api indexer eval corpus
+      - run: cd api && pytest -q --cov=app --cov-branch --cov-fail-under=60
+      - run: cd indexer && pytest -q
+  build-push:
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push immutable SHA tags
+        env:
+          HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          for component in api indexer ui; do
+            docker build -t "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}" "$component"
+            docker push "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}"
+          done
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: helm/kind-action@v1.14.0
+      - name: Install Ingress controller
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml
+          kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=600s
+      - name: Load exact published images into ephemeral cluster
+        env:
+          HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          for component in api indexer ui; do
+            image="$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}"
+            docker pull "$image"
+            kind load docker-image --name chart-testing "$image"
+            sed -i "s|rahbar-$component:dev|$image|g" k8s/base/$component.yaml
+          done
+          sed -i "s|rahbar-indexer:dev|$HUB_USER/rahbar-indexer:sha-${COMMIT_SHA}|g" k8s/base/indexer.yaml
+      - run: kubectl apply -k k8s/overlays/dev
+      - run: kubectl wait -n rahbar --for=condition=complete job/initial-index --timeout=600s
+      - run: kubectl rollout status -n rahbar deployment/api --timeout=600s
+      - name: Smoke through the Ingress
+        run: |
+          kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 18080:80 &
+          forward_pid=$!
+          trap 'kill "$forward_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS -o /dev/null -H 'Host: rahbar.local' http://localhost:18080/; then break; fi
+            sleep 2
+          done
+          curl -fsS -H 'Host: rahbar.local' -X POST http://localhost:18080/api/ask \
+            -H 'Content-Type: application/json' \
+            -d '{"question":"What is the attendance requirement?"}' \
+            | python -c 'import json,sys; x=json.load(sys.stdin); assert x["citations"] and x["answered_from_context"]'

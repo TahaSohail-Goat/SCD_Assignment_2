@@ -1,0 +1,7 @@
+NAME                     CPU(cores)   MEMORY(bytes)   
+api-7b755c4ccb-9g2bc     5m           73Mi            
+api-7b755c4ccb-cvzx2     6m           73Mi            
+api-7b755c4ccb-kwmxr     7m           72Mi            
+chroma-0                 2m           56Mi            
+redis-7fbcdbd5b8-pcqp8   4m           3Mi             
+ui-5cb48568f6-lw44m      1m           2Mi             

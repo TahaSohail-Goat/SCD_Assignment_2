@@ -1,0 +1,9 @@
+2026-11-06 PKT, dev overlay, stub API.
+
+Command: kubectl delete pod api-7b755c4ccb-9g2bc -n rahbar --wait=false
+Result: pod deletion accepted. Immediately afterward, a POST through the Ingress
+to /api/ask returned answered_from_context=true while the two remaining API pods
+were Ready and a replacement pod was being created.
+
+This proves the dev stub route survived deletion of one API pod. It does not
+measure real-model latency or real-corpus retrieval quality.

@@ -1,0 +1,109 @@
+name: CI
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev]
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            api/requirements-dev.txt
+            indexer/requirements-dev.txt
+      - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
+      - run: ruff check api indexer eval corpus
+      - run: cd api && mypy app
+      - run: cd indexer && mypy pipeline
+      - run: cd api && pytest -q --cov=app --cov-branch --cov-fail-under=60
+      - run: cd indexer && pytest -q
+      - run: python -m pytest -q -c eval/pyproject.toml eval/tests
+      - run: python scripts/check_submission.py
+        continue-on-error: true # final submission also needs measured real-corpus results and evidence
+  manifests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: azure/setup-kubectl@v4
+        with: {version: v1.33.0}
+      - run: kubectl kustomize k8s/overlays/prod | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
+      - run: kubectl kustomize k8s/overlays/dev | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
+  images:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        component: [api, indexer, ui]
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - run: docker build -t rahbar-${{ matrix.component }}:ci ${{ matrix.component }}
+      - uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: rahbar-${{ matrix.component }}:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: HIGH,CRITICAL
+  e2e-eval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - uses: helm/kind-action@v1.14.0
+      - run: python -m pip install httpx==0.28.1 pyyaml==6.0.2
+      - name: Load API, UI and fixture indexer images
+        run: |
+          docker build -t rahbar-api:dev api
+          docker build -t rahbar-ui:dev ui
+          docker build -t rahbar-indexer:fixture-base indexer
+          docker build -t rahbar-indexer:dev -f - eval/fixtures <<'DOCKERFILE'
+          FROM rahbar-indexer:fixture-base
+          COPY --chown=10001:10001 *.md /corpus/
+          COPY --chown=10001:10001 fake_ollama.py /app/fake_ollama.py
+          DOCKERFILE
+          kind load docker-image --name chart-testing rahbar-api:dev rahbar-ui:dev rahbar-indexer:dev
+      - name: Index fixtures and wait for the API
+        run: |
+          kubectl apply -f k8s/base/namespace.yaml
+          kubectl -n rahbar create deployment fixture-ollama --image=rahbar-indexer:dev -- \
+            python /app/fake_ollama.py
+          kubectl -n rahbar expose deployment fixture-ollama --port=11434
+          kubectl -n rahbar rollout status deployment/fixture-ollama --timeout=120s
+          kubectl apply -k k8s/overlays/ci
+          kubectl -n rahbar wait --for=condition=complete job/initial-index --timeout=300s
+          kubectl -n rahbar rollout status deployment/api --timeout=300s
+      - name: Enforce the fixture baseline
+        run: |
+          kubectl -n rahbar port-forward svc/api 18000:8000 &
+          forward_pid=$!
+          trap 'kill "$forward_pid"' EXIT
+          curl --fail --silent --retry 15 --retry-connrefused --retry-delay 1 \
+            http://127.0.0.1:18000/readyz
+          python eval/run_eval.py --api http://127.0.0.1:18000 \
+            --golden eval/fixtures/golden.fixture.yaml --baseline eval/fixtures/baseline.fixture.json \
+            --out /tmp/rahbar-fixture-results.json
+      - name: Diagnostics
+        if: failure()
+        run: |
+          kubectl -n rahbar get pods,svc,endpointslices,pvc
+          kubectl -n rahbar get events --sort-by=.lastTimestamp
+          kubectl -n rahbar logs -l job-name=initial-index --all-containers=true --tail=60 || true
+          kubectl -n rahbar logs -l app=api --tail=30 || true
+          kubectl -n rahbar logs -l app=fixture-ollama --tail=30 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fixture-eval-results
+          path: /tmp/rahbar-fixture-results.json

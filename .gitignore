@@ -14,9 +14,11 @@ corpus/raw/
 # Python
 __pycache__/
 *.pyc
-.venv/
+.venv
 venv/
 .pytest_cache/
+.coverage
+.coverage.*
 .mypy_cache/
 .ruff_cache/
 
