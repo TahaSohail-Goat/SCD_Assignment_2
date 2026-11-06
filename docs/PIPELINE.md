@@ -24,11 +24,11 @@ Word counts use whitespace-delimited words after cleaning. Amplification is stor
 
 | Chunk size | Overlap | Chunks | Original words | Stored words | Amplification | Real recall@5 |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 120 | 20 | 804 | 37,512 | 40,252 | 1.0730× | Pending |
-| 240 | 35 | 693 | 37,512 | 38,422 | 1.0243× | Pending |
-| 400 | 50 | 671 | 37,512 | 37,712 | 1.0053× | Pending |
+| 120 | 20 | 802 | 37,508 | 40,248 | 1.0731× | 100% |
+| 240 | 35 | 690 | 37,508 | 38,383 | 1.0233× | 100% |
+| 400 | 50 | 669 | 37,508 | 37,708 | 1.0053× | 100% |
 
-Keep the starter's `400/50` as the provisional deployment setting. It produced the fewest vectors and least duplicated text in the local comparison. Select the final setting after measuring recall@5 overall and by type, with preference for the smaller index when retrieval and grounding are comparable. Repeat the local storage calculation with:
+The live comparison used the six verified PDFs, `nomic-embed-text`, `llama3.2:3b`, top-k 5, and the same 15 golden questions for each setting. All three scored 100% recall@5 in every answerable question type, 100% citation-reference validity, and 2/2 correct abstentions. Recall@3 was 12/13 for each; the current summer-semester rule appeared at rank four or five. We chose `400/50` because it tied on measured recall with the fewest vectors and least duplication. The table uses the real Job's chunk log, which differs slightly from the earlier local planning count. The API's heading-only filtering was held constant across these live runs. Repeat the local storage calculation with:
 
 ```powershell
 $env:PYTHONPATH = 'indexer'
@@ -40,7 +40,9 @@ $env:CORPUS_DIR = 'corpus/raw'
 
 Each golden reference names a source and optionally an exact section, physical page, or chunk ID. Recall measures the fraction of distinct references found in the first three or five results and macro-averages across questions with relevant evidence. Citation validity requires exact source, section and page triples and counts a grounded answer with no citation as a failure. Every abstention probe must be declined with no citations. The gate rejects a recall@5 drop above five percentage points, validity below 95%, or any failed required abstention. Expected answers in the real golden set support manual grounding review, especially for q09/q10 and q15.
 
-The seven-question fixture test indexed the three checked-in Markdown files through the real stage runner and sent requests through FastAPI, with mocked Ollama, Chroma, Redis and HTTP. It measured 100% recall@3 and recall@5, six valid citations out of six, and one correct abstention out of one. The fixture checks both policy editions and confirms a planted instruction reached the prompt while the response retained the attendance rule. `eval/fixtures/baseline.fixture.json` records these fixture measurements. The CI Kind job uses the same fixture and model double with real Chroma and Redis. The offline and Kind gates measure deterministic fixture behavior. The real model's answer quality, real-corpus baseline, relevance-floor calibration, and resource measurements are pending. A cache threshold above 1 is used for evaluation to force fresh retrieval.
+The seven-question fixture test indexed the three checked-in Markdown files through the real stage runner and sent requests through FastAPI, with mocked Ollama, Chroma, Redis and HTTP. It measured 100% recall@3 and recall@5, six valid citations out of six, and one correct abstention out of one. The fixture checks both policy editions and confirms a planted instruction reached the prompt while the response retained the attendance rule. `eval/fixtures/baseline.fixture.json` records these fixture measurements. The CI Kind job uses the same fixture and model double with real Chroma and Redis. The offline and Kind gates measure deterministic fixture behavior. The live results and baseline are in `eval/results.json` and `eval/baseline.json`. A cache threshold above 1 was used for evaluation to force fresh retrieval.
+
+The gate validates citation *references*, not whether every phrase of an answer is complete or supported. Manual review of the saved `llama3.2:3b` output found omitted qualifications: q06 said only “No” without explaining that AI can assist preparatory research but cannot be the sole source; q08 omitted the online DOI and NUCES affiliation conditions; q11 omitted the F/A grade; and q15 omitted the HoD's possible 20% condonement. These are answer-quality limits despite passing recall and citation gates. The q13/q14 abstentions gave no citations. Do not treat a valid citation triple as proof of full semantic grounding.
 
 ## Stronger-laptop handoff
 
@@ -75,7 +77,7 @@ The derived indexer image stays in the local Docker/Minikube stores. Both Job te
 ```bash
 set -euo pipefail
 mkdir -p /tmp/rahbar-corpus-eval
-export INDEX_OLLAMA_URL=http://host.minikube.internal:11434
+export INDEX_OLLAMA_URL=http://host.docker.internal:11434
 kubectl --context=minikube delete job initial-index -n rahbar --ignore-not-found
 kubectl --context=minikube kustomize k8s/overlays/prod | python -c '
 import os, sys, yaml
@@ -140,4 +142,4 @@ After choosing a setting, patch it into the shared ConfigMap and run one more Jo
 python eval/run_eval.py --api http://127.0.0.1:18000 --update-baseline
 ```
 
-Commit `eval/results.json`, `eval/baseline.json`, the filled measurement table, and the chosen ConfigMap values only after reviewing the live run. Restore the normal cache threshold in the deployed ConfigMap, restart the API, and resume the CronJob with `kubectl --context=minikube -n rahbar patch cronjob reindex --type=merge -p '{"spec":{"suspend":false}}'`. Collect the real Job's memory usage during indexing in another terminal with `kubectl --context=minikube -n rahbar top pods -l app=indexer`. Record Ingress, pod-recovery and failure-analysis evidence on the stronger laptop.
+The 2026-11-06 live run followed these steps and selected 400/50. For a later rerun, restore the normal cache threshold in the deployed ConfigMap, restart the API, and resume the CronJob with `kubectl --context=minikube -n rahbar patch cronjob reindex --type=merge -p '{"spec":{"suspend":false}}'`. Collect the real Job's memory usage during indexing in another terminal with `kubectl --context=minikube -n rahbar top pods -l app=indexer`.
