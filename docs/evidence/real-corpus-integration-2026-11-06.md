@@ -1,0 +1,11 @@
+# Real-corpus integration — 2026-11-06
+
+Local Windows 11 / WSL2 / Docker Desktop / Minikube deployment, with Ollama on the Windows host. The six FAST-NUCES PDFs were fetched into ignored `corpus/raw/`; their hashes and page counts matched `corpus/sources.yaml`. Raw PDFs and the derived corpus-bearing indexer image remained local. The cluster used `http://host.docker.internal:11434` for Ollama, `nomic-embed-text` embeddings (768 dimensions), and `llama3.2:3b` generation.
+
+The initial real Job and all three tuning Jobs completed. The final 400/50 Job logged 669 chunks from 37,508 original words and 37,708 stored words (1.0053 amplification). The shared Chroma collection passed the API readiness model and dimension checks. Three API replicas were ready, and HPA reported 4% CPU utilization against its 70% target. The CronJob was resumed after evaluation; its schedule is `0 2 * * 0`.
+
+The final `eval/results.json` and `eval/baseline.json` were produced against the running cluster with the cache threshold temporarily set to 1.01. The result was recall@3 12/13, recall@5 13/13, 23/23 valid citation references, and 2/2 correct abstentions. Separate 120/20 and 240/35 live runs each also scored 13/13 recall@5 and passed the same citation and abstention gates. The real model's incomplete answers are documented in `docs/PIPELINE.md`.
+
+Ingress smoke through `ingress-nginx-controller` with `Host: rahbar.local`: `GET /readyz` returned 200, `GET /` returned 200 with the UI title, and `POST /api/ask` for the current summer-semester duration returned `8 weeks`, grounded with two citations. Deleting API pod `api-77d499bcdf-4557p` briefly left two available replicas; Deployment reconciliation created `api-77d499bcdf-dxfh8` and returned to 3/3 ready in about six seconds. This was a single-pod recovery probe, not a node failure test.
+
+`kubectl top pod` sampled the running 120/20 indexer every eight seconds; the highest observed memory was 157Mi. It is a sampled maximum, not an instrumented peak, against a 2Gi limit. After the experiments, the direct API `CACHE_THRESHOLD=1.01` override was removed, the deployment rolled out to 3/3, and `cronjob/reindex` showed `suspend=false`. The repository ConfigMap retains the normal 0.95 threshold and chosen 400/50 setting.

@@ -14,11 +14,11 @@ With a Chroma-dependent liveness probe, Kubernetes would restart healthy API pro
 
 ## 4. Indexer peak memory and limit
 
-The indexer limit is 2Gi and request is 512Mi in `k8s/base/indexer.yaml:40-42`. Peak real-corpus memory is **not measured yet** because the teammate's OCR pipeline and corpus are pending. During integration, record `kubectl top pod -n rahbar` while the Job is running and compare peak to 2Gi. Exceeding the limit causes an OOMKilled container (exit code 137) and a nonzero Job, not a quiet partial success.
+The indexer limit is 2Gi and request is 512Mi in `k8s/base/indexer.yaml:40-42`. During the real 120/20 reindex, `kubectl top pod` samples every eight seconds reached 157Mi. This is the highest *observed sample*, not an exact peak; it is well below the 2Gi limit. Exceeding the limit causes an OOMKilled container (exit code 137) and a nonzero Job, not a quiet partial success.
 
 ## 5. Which question type has worst recall@5?
 
-Unknown until the teammate implements `eval/run_eval.py` and runs the real golden set. `docs/PIPELINE.md` will hold the measured breakdown. Exact terms and tables are expected risks, but this is a hypothesis rather than a reported result.
+The three real-corpus settings tied at 100% recall@5 in every answerable type, so none has the worst recall@5. Version questions were weakest at recall@3: q10's current eight-week rule appeared at rank four or five. Section-title-only hits were ahead of the actual rule before the API filtered heading-only passages. The final `eval/results.json` retains the per-type breakdown.
 
 ## 6. What if API EMBED_MODEL changes alone?
 

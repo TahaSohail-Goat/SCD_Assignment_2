@@ -1,6 +1,6 @@
 # Failure analysis
 
-The table separates observations from experiments that still need the real model. The same verified corpus, golden references, and model settings should be used for each isolated cluster fault. Restore the healthy configuration after each fault and keep the resulting JSON or logs next to its matching control run.
+The table separates observed faults from counterfactual experiments. The healthy real-model control used six verified PDFs and all 15 golden questions in Minikube; its saved metrics are in `eval/results.json`. The three chunk settings were compared live, and the final deployment used 400/50. The fixture experiments below isolate faults deterministically. The optional live fault contrasts described in the table were not run, so their effects are not presented as measured real-model results.
 
 | Stage and isolated fault | Symptom and diagnosis | Remedy and signal |
 | --- | --- | --- |
