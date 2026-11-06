@@ -129,5 +129,17 @@ def test_cache_generation_invalidates_old_answer() -> None:
     answer = answer_question("attendance", StubRetriever(), FakeProvider(), Settings())
     cache.store("attendance", [1.0, 0.0], answer)
     assert cache.lookup([1.0, 0.0]) is not None
+    in_flight = cache.generation_id()
     memory.values[GENERATION_KEY] = "1"
+    cache.store("in-flight question", [1.0, 0.0], answer, generation_id=in_flight)
     assert cache.lookup([1.0, 0.0]) is None
+    assert len(list(memory.scan_iter("rahbar:cache:0:*"))) == 2
+
+
+def test_historical_questions_require_a_version_signal() -> None:
+    from app.retrieval.chroma import is_historical_question
+
+    assert is_historical_question("What did the August 2023 rules say?")
+    assert is_historical_question("What was the previous policy?")
+    assert not is_historical_question("What if I failed a course in the previous semester?")
+    assert not is_historical_question("Can a former student apply for readmission?")
