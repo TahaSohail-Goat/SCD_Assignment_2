@@ -13,6 +13,7 @@ class Collection:
     def __init__(self, client, name, metadata):
         self.client = client
         self.name = name
+        self.id = object()
         self.metadata = metadata
         self.rows = {}
 
@@ -33,6 +34,8 @@ class Collection:
         del self.client.collections[self.name]
         self.client.collections[name] = self
         self.name = name
+        if name == self.client.lost_ack:
+            raise RuntimeError("rename acknowledgement lost")
 
 
 class Client:
@@ -40,6 +43,7 @@ class Client:
         self.collections = {}
         self.fail_after = None
         self.fail_publish = False
+        self.lost_ack = None
 
     def create_collection(self, *, name, metadata, embedding_function=None):
         col = self.collections[name] = Collection(self, name, metadata)
@@ -117,3 +121,12 @@ def test_store_validates_shape_before_writing(chroma):
     with pytest.raises(ValueError, match="dimensions"):
         stage.store(CHUNKS, [[1.0], [1.0, 2.0]], get_settings())
     assert chroma.collections == {}
+
+
+def test_rename_acknowledgement_loss_checks_live_collection_id(chroma):
+    settings = get_settings()
+    chroma.create_collection(name=settings.collection, metadata={})
+    chroma.lost_ack = settings.collection
+    assert stage.store(CHUNKS, VECTORS, settings) == 2
+    assert chroma.get_collection(settings.collection).count() == 2
+    assert chroma.generation == 1

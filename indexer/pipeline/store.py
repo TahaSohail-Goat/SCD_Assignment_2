@@ -39,15 +39,20 @@ def _publish(client: Any, staging: Any, name: str, backup: str) -> None:
         old = client.get_collection(name)
     except NotFoundError:
         old = None
-    if old is not None:
-        old.modify(name=backup)
     try:
+        if old is not None:
+            old.modify(name=backup)
         staging.modify(name=name)
     except Exception:
-        if old is not None:
-            # If the staging rename took effect but its response was lost, Chroma
-            # rejects the rollback because the live name is already occupied.
-            old.modify(name=name)
+        try:
+            live = client.get_collection(name)
+        except NotFoundError:
+            if old is not None:
+                client.get_collection(backup).modify(name=name)
+        else:
+            # A rename can succeed even when its response never reaches the Job.
+            if live.id == staging.id:
+                return
         raise
 
 
