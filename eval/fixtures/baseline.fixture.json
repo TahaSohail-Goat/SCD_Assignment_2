@@ -1,0 +1,64 @@
+{
+  "recall@3": 1.0,
+  "recall@5": 1.0,
+  "citation_validity": 1.0,
+  "valid_citations": 6,
+  "checked_citations": 6,
+  "abstention_correctness": 1,
+  "must_abstain_questions": 1,
+  "questions": 7,
+  "by_type": {
+    "abstain": {
+      "recall@3": null,
+      "recall@5": null,
+      "citation_validity": null,
+      "valid_citations": 0,
+      "checked_citations": 0,
+      "abstention_correctness": 1,
+      "must_abstain_questions": 1,
+      "questions": 1
+    },
+    "exact": {
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "citation_validity": 1.0,
+      "valid_citations": 1,
+      "checked_citations": 1,
+      "abstention_correctness": null,
+      "must_abstain_questions": 0,
+      "questions": 1
+    },
+    "injection": {
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "citation_validity": 1.0,
+      "valid_citations": 1,
+      "checked_citations": 1,
+      "abstention_correctness": null,
+      "must_abstain_questions": 0,
+      "questions": 1
+    },
+    "ordinary": {
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "citation_validity": 1.0,
+      "valid_citations": 1,
+      "checked_citations": 1,
+      "abstention_correctness": null,
+      "must_abstain_questions": 0,
+      "questions": 1
+    },
+    "version": {
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "citation_validity": 1.0,
+      "valid_citations": 3,
+      "checked_citations": 3,
+      "abstention_correctness": null,
+      "must_abstain_questions": 0,
+      "questions": 3
+    }
+  },
+  "golden": "eval/fixtures/golden.fixture.yaml",
+  "environment": "offline fixture doubles"
+}
