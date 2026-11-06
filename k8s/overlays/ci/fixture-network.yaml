@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fixture-ollama-ingress
+spec:
+  podSelector:
+    matchLabels: {app: fixture-ollama}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - {key: app, operator: In, values: [api, indexer]}
+      ports:
+        - {protocol: TCP, port: 11434}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fixture-ollama-egress
+spec:
+  podSelector:
+    matchExpressions:
+      - {key: app, operator: In, values: [api, indexer]}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: {app: fixture-ollama}
+      ports:
+        - {protocol: TCP, port: 11434}

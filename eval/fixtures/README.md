@@ -15,3 +15,9 @@ expects the service to decline.
 Each file starts with front matter (`doc_version`, `superseded`). The indexer's
 `discover()` reads it when there is no `_index.json`, so your extract stage
 needs to handle `.md` files as well as PDFs.
+
+Run the local gate from the repository root with
+`python -m pytest -q -c eval/pyproject.toml eval/tests/test_fixture_stack.py`.
+The test uses the real indexer and API with in-process Chroma, Redis, Ollama, and HTTP
+doubles. The Kind gate uses actual Chroma and Redis with the same deterministic model
+double. The fixture baseline records a local offline run of seven questions.

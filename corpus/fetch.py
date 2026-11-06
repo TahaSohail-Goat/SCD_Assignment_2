@@ -24,13 +24,14 @@ import json
 import re
 import sys
 import time
-from datetime import datetime, timezone
 from html.parser import HTMLParser
+from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote, urljoin, urlsplit
 
 import httpx
 import yaml
+from pypdf import PdfReader
 
 HERE = Path(__file__).resolve().parent
 RAW = HERE / "raw"
@@ -54,16 +55,6 @@ def slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:80] or "document"
 
 
-def guess_extension(url: str, content_type: str) -> str:
-    content_type = content_type.lower()
-    if "pdf" in content_type:
-        return ".pdf"
-    if "html" in content_type:
-        return ".html"
-    suffix = Path(urlsplit(url).path).suffix.lower()
-    return suffix if suffix in {".pdf", ".html", ".htm", ".docx", ".txt", ".md"} else ".bin"
-
-
 def get(client: httpx.Client, url: str, attempts: int = 3) -> httpx.Response:
     for attempt in range(1, attempts + 1):
         try:
@@ -81,104 +72,74 @@ def get(client: httpx.Client, url: str, attempts: int = 3) -> httpx.Response:
 
 
 def load_sources() -> list[dict]:
-    if not SOURCES.exists():
-        sys.exit("corpus/sources.yaml not found. Copy corpus/sources.example.yaml to "
-                 "corpus/sources.yaml and keep the documents you want.")
-    data = yaml.safe_load(SOURCES.read_text(encoding="utf-8")) or {}
-    docs = data.get("documents") or []
-    for i, doc in enumerate(docs):
-        if not doc.get("name") or not doc.get("url"):
-            sys.exit(f"sources.yaml entry {i + 1} needs both name and url")
+    data = yaml.safe_load(SOURCES.read_text(encoding="utf-8"))
+    docs = data["documents"]
+    if not docs or len({slug(doc["name"]) for doc in docs}) != len(docs):
+        raise ValueError("sources.yaml requires a nonempty set of unique document names")
     return docs
 
 
-def fetch(force: bool) -> int:
-    docs = load_sources()
+def fetch(force: bool, verify_only: bool = False) -> int:
     RAW.mkdir(exist_ok=True)
-    index_path = RAW / "_index.json"
-    previous = {e["name"]: e for e in json.loads(index_path.read_text())} \
-        if index_path.exists() else {}
-    entries, failures = [], []
+    entries = []
     with httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True,
                       timeout=httpx.Timeout(60.0, connect=15.0)) as client:
-        for doc in docs:
-            name, url = doc["name"], normalise(doc["url"])
-            old = previous.get(name)
-            if old and not force and (RAW / old["file"]).exists() and old["url"] == url:
-                print(f"  have    {old['file']}")
-                entries.append({**old, "doc_version": doc.get("doc_version", "unknown"),
-                                "superseded": bool(doc.get("superseded", False))})
-                continue
-            print(f"  fetch   {name}")
-            try:
-                response = get(client, url)
-                if response.status_code != 200:
-                    raise RuntimeError(f"HTTP {response.status_code}")
-                content_type = response.headers.get("content-type", "")
-                if "drive.google.com" in url and "html" in content_type:
-                    raise RuntimeError("Google Drive returned a web page, not the file "
-                                       "(too large for direct download, or not shared publicly)")
-                file = slug(name) + guess_extension(url, content_type)
-                (RAW / file).write_bytes(response.content)
-                entries.append({
-                    "name": name, "url": url, "file": file, "bytes": len(response.content),
-                    "sha256": hashlib.sha256(response.content).hexdigest(),
-                    "content_type": content_type.split(";")[0],
-                    "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                    "doc_version": doc.get("doc_version", "unknown"),
-                    "superseded": bool(doc.get("superseded", False)),
-                })
-                print(f"          {file}, {len(response.content):,} bytes")
-            except Exception as exc:  # report every failure, keep going
-                failures.append((name, str(exc)))
-                print(f"  FAILED  {name}: {exc}")
-            time.sleep(PAUSE_SECONDS)
+        for doc in load_sources():
+            url = normalise(doc["url"])
+            path = RAW / (slug(doc["name"]) + ".pdf")
+            if verify_only or (path.is_file() and not force):
+                body = path.read_bytes()
+            else:
+                try:
+                    response = get(client, url)
+                    response.raise_for_status()
+                    body = response.content
+                finally:
+                    time.sleep(PAUSE_SECONDS)
+            digest = hashlib.sha256(body).hexdigest()
+            if digest != doc["sha256"] or not body.startswith(b"%PDF-"):
+                raise ValueError(f"{path.name}: expected pinned PDF SHA-256 {doc['sha256']}, got {digest}")
+            pages = len(PdfReader(BytesIO(body)).pages)
+            if pages != doc["pages"]:
+                raise ValueError(f"{path.name}: expected {doc['pages']} pages, got {pages}")
+            if not verify_only and (force or not path.is_file()):
+                pending = path.with_suffix(".part")
+                pending.write_bytes(body)
+                pending.replace(path)
+            print(f"  verified {path.name} ({pages} pages)")
+            entries.append({**doc, "url": url, "file": path.name, "bytes": len(body)})
 
-    index_path.write_text(json.dumps(entries, indent=2), encoding="utf-8")
-    write_manifest(entries)
-    print(f"\n{len(entries)} documents in corpus/raw, manifest written to corpus/MANIFEST.md")
-    if failures:
-        print(f"{len(failures)} failed; fix their URLs in sources.yaml and run again:")
-        for name, reason in failures:
-            print(f"  - {name}: {reason}")
-        return 1
+    manifest = render_manifest(entries)
+    if verify_only:
+        if MANIFEST.read_text(encoding="utf-8") != manifest:
+            raise ValueError("MANIFEST.md differs from the verified corpus")
+        local_index = json.loads((RAW / "_index.json").read_text(encoding="utf-8"))
+        if local_index != entries:
+            raise ValueError("_index.json differs from the verified corpus; run fetch again")
+    else:
+        pending = RAW / "_index.tmp"
+        pending.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
+        pending.replace(RAW / "_index.json")
+        MANIFEST.write_text(manifest, encoding="utf-8")
+    print(f"{len(entries)} verified PDFs, {sum(e['pages'] for e in entries)} pages")
     return 0
 
 
-def write_manifest(entries: list[dict]) -> None:
+def render_manifest(entries: list[dict]) -> str:
     lines = [
         "# Corpus manifest",
         "",
-        "Generated by `corpus/fetch.py`. The documents themselves live in `corpus/raw/`, "
-        "which is gitignored; run the script to download them, then `--verify` to check "
-        "you have the same bytes.",
+        "Generated by `python corpus/fetch.py`. Public FAST-NUCES publications remain "
+        "in the ignored `corpus/raw/` directory. Use `--verify` to check this snapshot.",
         "",
-        "| Document | Version | Superseded | File | Bytes | SHA-256 | URL |",
-        "| --- | --- | --- | --- | ---: | --- | --- |",
+        "| Document | Version | Superseded | File | Pages | Bytes | SHA-256 | URL | Notes |",
+        "| --- | --- | --- | --- | ---: | ---: | --- | --- | --- |",
     ]
     for e in entries:
         lines.append(f"| {e['name']} | {e['doc_version']} | {'yes' if e['superseded'] else 'no'} "
-                     f"| `{e['file']}` | {e['bytes']:,} | `{e['sha256']}` | <{e['url']}> |")
-    MANIFEST.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def verify() -> int:
-    if not MANIFEST.exists():
-        sys.exit("no corpus/MANIFEST.md yet; run fetch first")
-    rows = re.findall(r"\| `([^`]+)` \| [\d,]+ \| `([0-9a-f]{64})` \|", MANIFEST.read_text())
-    bad = 0
-    for file, expected in rows:
-        path = RAW / file
-        if not path.exists():
-            print(f"  missing   {file}")
-            bad += 1
-        elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
-            print(f"  changed   {file}  (the website may have published a new version)")
-            bad += 1
-        else:
-            print(f"  ok        {file}")
-    print(f"\n{len(rows) - bad} of {len(rows)} match the manifest")
-    return 1 if bad else 0
+                     f"| `{e['file']}` | {e['pages']} | {e['bytes']:,} | `{e['sha256']}` "
+                     f"| <{e['url']}> | {e['notes']} |")
+    return "\n".join(lines) + "\n"
 
 
 class _Links(HTMLParser):
@@ -230,11 +191,12 @@ def main() -> int:
     group.add_argument("--verify", action="store_true", help="check local files against MANIFEST.md")
     group.add_argument("--list", metavar="URL", help="list document links on an index page")
     args = parser.parse_args()
-    if args.verify:
-        return verify()
     if args.list:
         return list_documents(args.list)
-    return fetch(force=args.force)
+    try:
+        return fetch(force=args.force, verify_only=args.verify)
+    except (OSError, ValueError, httpx.HTTPError, RuntimeError) as exc:
+        parser.exit(1, f"corpus verification failed: {exc}\n")
 
 
 if __name__ == "__main__":

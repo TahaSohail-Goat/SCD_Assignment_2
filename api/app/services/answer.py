@@ -9,6 +9,7 @@ from ..config import Settings
 from ..logjson import request_id_var
 from ..providers.llm.base import LLMProvider
 from ..retrieval.base import Retriever
+from ..retrieval.chroma import is_historical_question
 from ..routes import metrics
 from ..schemas import Answer, AskResponse, Passage, RetrievedRef
 from .cache import SemanticCache, is_follow_up
@@ -43,12 +44,14 @@ def answer_question(
     cache: SemanticCache | None = None,
 ) -> AskResponse:
     embedding: list[float] | None = None
-    use_cache = retriever.name == "chroma" and cache is not None and not is_follow_up(question)
+    generation_id = None
+    skip_cache = is_follow_up(question) or is_historical_question(question)
     if retriever.name == "chroma":
         embedding = retriever.embed(question)
-    if use_cache and embedding is not None and cache is not None:
+    if not skip_cache and embedding is not None and cache is not None:
         try:
-            cached = cache.lookup(embedding)
+            generation_id = cache.generation_id()
+            cached = cache.lookup(embedding, generation_id=generation_id)
             if cached is not None:
                 metrics.record_cache_lookup("hit")
                 log.info("cache hit", extra={"provider": cached.provider})
@@ -85,8 +88,8 @@ def answer_question(
                 valid_generation = True
                 break
             except Exception as exc:
-                log.warning("invalid generation", extra={"attempt": attempt + 1,
-                                                         "error": type(exc).__name__})
+                log.warning("retrying invalid generation" if attempt == 0 else "invalid generation",
+                            extra={"attempt": attempt + 1, "error": type(exc).__name__})
             finally:
                 metrics.GENERATION_LATENCY.observe(time.perf_counter() - generated_at)
         if not valid_generation:
@@ -95,9 +98,10 @@ def answer_question(
     if not answer.answered_from_context:
         metrics.ABSTENTIONS.inc()
     response = _response(answer, passages, provider.name)
-    if use_cache and valid_generation and answer.answered_from_context and embedding and cache:
+    if (generation_id is not None and valid_generation and answer.answered_from_context
+            and embedding is not None and cache is not None):
         try:
-            cache.store(question, embedding, response)
+            cache.store(question, embedding, response, generation_id=generation_id)
         except Exception as exc:
             log.warning("cache store failed", extra={"error": type(exc).__name__})
     log.info("answered", extra={

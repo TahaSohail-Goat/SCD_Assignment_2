@@ -13,8 +13,16 @@ import httpx
 from ..config import Settings
 from ..schemas import Passage
 
-_HISTORICAL = re.compile(r"\b(old|older|previous|prior|superseded|historical|former|20[0-2][0-5])\b", re.I)
+_HISTORICAL = re.compile(
+    r"\b(?:old|older|previous|prior|superseded|historical|former) "
+    r"(?:edition|handbook|policy|regulations|rules|version)\b|\b20[0-2][0-5]\b",
+    re.I,
+)
 _YEAR = re.compile(r"\b(20\d{2})\b")
+
+
+def is_historical_question(question: str) -> bool:
+    return bool(_HISTORICAL.search(question))
 
 
 class ChromaRetriever:
@@ -51,7 +59,7 @@ class ChromaRetriever:
 
     def retrieve(self, question: str, k: int, embedding: list[float] | None = None) -> list[Passage]:
         collection = self.client.get_collection(self.settings.collection)
-        historical = bool(_HISTORICAL.search(question))
+        historical = is_historical_question(question)
         count = int(collection.count())
         if count == 0:
             return []

@@ -40,13 +40,15 @@ class SemanticCache:
     def ping(self) -> bool:
         return bool(self.client.ping())
 
-    def _prefix(self) -> str:
+    def generation_id(self) -> str:
         """A completed reindex increments this key to invalidate older cache entries."""
-        generation = self.client.get(GENERATION_KEY) or "0"
-        return f"rahbar:cache:{generation}:"
+        return str(self.client.get(GENERATION_KEY) or "0")
 
-    def lookup(self, embedding: list[float]) -> AskResponse | None:
-        prefix = self._prefix()
+    def _prefix(self, generation_id: str | None) -> str:
+        return f"rahbar:cache:{generation_id if generation_id is not None else self.generation_id()}:"
+
+    def lookup(self, embedding: list[float], *, generation_id: str | None = None) -> AskResponse | None:
+        prefix = self._prefix(generation_id)
         best_score = self.settings.cache_threshold
         best: AskResponse | None = None
         for key in self.client.scan_iter(match=prefix + "*"):
@@ -60,7 +62,10 @@ class SemanticCache:
                 best = AskResponse.model_validate(entry["response"])
         return best
 
-    def store(self, question: str, embedding: list[float], response: AskResponse) -> None:
-        key = self._prefix() + hashlib.sha256(question.strip().lower().encode()).hexdigest()
+    def store(
+        self, question: str, embedding: list[float], response: AskResponse,
+        *, generation_id: str | None = None,
+    ) -> None:
+        key = self._prefix(generation_id) + hashlib.sha256(question.strip().lower().encode()).hexdigest()
         payload = {"embedding": embedding, "response": response.model_dump(mode="json")}
         self.client.setex(key, self.settings.cache_ttl_seconds, json.dumps(payload))
