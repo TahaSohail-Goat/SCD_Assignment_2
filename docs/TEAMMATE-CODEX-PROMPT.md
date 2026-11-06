@@ -36,7 +36,7 @@ If `py -3.12` is unavailable, install Python 3.12 and use its full path. The tea
 
 ### Acceptance checklist for the teammate PR
 
-- No `STARTER-TODO` or `NotImplementedError` remains in owned files.
+- No starter placeholders or unimplemented stages remains in owned files.
 - Offline tests cover scanned-page OCR fallback, section/page propagation, table preservation, overlap, stable IDs, superseded metadata, embedding dimensions, Redis invalidation, recall@5, citation validity, and gate failures.
 - `ruff check indexer eval corpus` and `mypy pipeline` pass; `pytest -q indexer/tests` passes. No network is needed for unit tests.
 - At least 15 committed real-corpus golden questions, source manifest, and substantive corpus/pipeline/failure documents.
