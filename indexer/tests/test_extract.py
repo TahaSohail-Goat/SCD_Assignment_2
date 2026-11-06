@@ -57,3 +57,37 @@ def test_unreadable_pdf_identifies_file(tmp_path: Path, body: bytes) -> None:
     path.write_bytes(body)
     with pytest.raises(ExtractionError, match=r"broken\.pdf"):
         extract(str(path), "2026", False)
+
+
+def test_empty_pdf_page_calls_mock_ocr(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "scanned.pdf"
+    write_pdf(path, "Native text", "")
+    calls = []
+
+    def fake_ocr(image, *, lang, timeout):
+        calls.append((image.size, lang, timeout))
+        return "Read by OCR"
+
+    monkeypatch.setattr("pipeline.extract.pytesseract.image_to_string", fake_ocr)
+    doc = extract(str(path), "2023", True)
+    assert [(page.text, page.ocr) for page in doc.pages] == [
+        ("Native text", False), ("Read by OCR", True),
+    ]
+    assert len(calls) == 1
+    assert calls[0][1] == "eng"
+
+
+@pytest.mark.parametrize("failure", ["missing-engine", "empty"])
+def test_ocr_failure_or_wholly_unreadable_scan_fails(tmp_path, monkeypatch, failure) -> None:
+    path = tmp_path / "scanned.pdf"
+    write_pdf(path, "")
+
+    def fake_ocr(*_args, **_kwargs):
+        if failure == "missing-engine":
+            raise RuntimeError("engine missing")
+        return "   "
+
+    monkeypatch.setattr("pipeline.extract.pytesseract.image_to_string", fake_ocr)
+    match = "page 1: engine missing" if failure == "missing-engine" else "no readable text"
+    with pytest.raises(ExtractionError, match=match):
+        extract(str(path), "2023", True)

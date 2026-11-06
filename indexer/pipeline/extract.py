@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pdfplumber
+import pytesseract
+from pdfplumber.page import Page as PDFPage
 
 from .models import Document, Page
 
@@ -13,13 +15,27 @@ class ExtractionError(ValueError):
     """A document or one of its pages could not be read."""
 
 
+def _ocr(page: PDFPage) -> str:
+    image = page.to_image(resolution=280, antialias=True).original
+    try:
+        return str(pytesseract.image_to_string(image, lang="eng", timeout=60)).strip()
+    finally:
+        image.close()
+
+
 def _pdf_pages(path: Path) -> list[Page]:
     pages = []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
             try:
                 text = (page.extract_text() or "").strip()
-                pages.append(Page(path.name, page.page_number, text))
+                # Some scans have a stray digital footer or watermark.
+                needs_ocr = not text or (len(text) < 70 and bool(page.images))
+                if needs_ocr:
+                    text = _ocr(page) or text
+                pages.append(Page(path.name, page.page_number, text, ocr=needs_ocr))
+            except Exception as exc:
+                raise ExtractionError(f"page {page.page_number}: {exc}") from exc
             finally:
                 page.close()
     return pages
