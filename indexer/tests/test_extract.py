@@ -102,3 +102,10 @@ def test_ruled_pdf_table_retains_column_and_row_order(tmp_path) -> None:
     write_pdf(path, "Grade points", operators=operators)
     doc = extract(str(path), "2026", False)
     assert doc.pages[0].text == "Grade points\n| Grade | Points |\n| B+ | 3.33 |"
+
+
+def test_text_outside_visible_page_is_not_retrievable(tmp_path) -> None:
+    path = tmp_path / "booklet.pdf"
+    write_pdf(path, "Rule A", operators="BT /F1 12 Tf 330 170 Td (Adjacent page) Tj ET")
+    doc = extract(str(path), "2026", False)
+    assert doc.pages[0].text == "Rule A"

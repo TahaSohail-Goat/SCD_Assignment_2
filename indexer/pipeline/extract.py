@@ -54,12 +54,30 @@ def _ocr(page: PDFPage) -> str:
         image.close()
 
 
+def _visible_text(page: PDFPage, source: str) -> str:
+    # Some handbook PDFs contain objects from the facing page off-canvas.
+    visible = page.crop(page.cropbox, strict=False)
+    if source != "prospectus-2026-academic-rules-and-regulations.pdf":
+        return _native_text(visible)
+    # This pinned FAST prospectus uses three fixed columns. Trim the decorative
+    # header and footer before reading each column in visual order.
+    x0, top, x1, bottom = visible.bbox
+    width, height = x1 - x0, bottom - top
+    top_edge = top + height * (0.097 if page.page_number == 1 else 0.061)
+    bottom_edge = top + height * 0.939
+    cuts = [x0 + width * part for part in (0.0, 0.355, 0.645, 1.0)]
+    return "\n\n".join(
+        _native_text(visible.crop((left, top_edge, right, bottom_edge)))
+        for left, right in zip(cuts[:-1], cuts[1:], strict=True)
+    ).strip()
+
+
 def _pdf_pages(path: Path) -> list[Page]:
     pages = []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
             try:
-                text = _native_text(page) if page.chars else ""
+                text = _visible_text(page, path.name) if page.chars else ""
                 # Some scans have a stray digital footer or watermark.
                 needs_ocr = not text or (len(text) < 70 and bool(page.images))
                 if needs_ocr:
