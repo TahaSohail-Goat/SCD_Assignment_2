@@ -97,7 +97,8 @@ jobs:
       - name: Diagnostics
         if: failure()
         run: |
-          kubectl -n rahbar get pods,svc,pvc
+          kubectl -n rahbar get pods,svc,endpointslices,pvc
+          kubectl -n rahbar get events --sort-by=.lastTimestamp
           kubectl -n rahbar logs -l job-name=initial-index --all-containers=true --tail=60 || true
           kubectl -n rahbar logs -l app=api --tail=30 || true
           kubectl -n rahbar logs -l app=fixture-ollama --tail=30 || true
