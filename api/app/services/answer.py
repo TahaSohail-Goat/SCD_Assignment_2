@@ -21,7 +21,9 @@ _FALLBACK = "I could not verify a grounded answer. Please try again later."
 
 def _citations_valid(answer: Answer, passages: list[Passage]) -> bool:
     if not answer.answered_from_context:
-        return not answer.citations
+        return not answer.citations and answer.answer.strip().casefold() not in {
+            "true", "false", "yes", "no",
+        }
     allowed = {(p.source, p.section, p.page) for p in passages}
     return bool(answer.citations) and all(
         (c.source, c.section, c.page) in allowed for c in answer.citations

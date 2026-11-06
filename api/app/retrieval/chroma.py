@@ -25,6 +25,15 @@ def is_historical_question(question: str) -> bool:
     return bool(_HISTORICAL.search(question))
 
 
+def _heading_only(passage: Passage) -> bool:
+    """A standalone section title is navigation, not evidence for an answer."""
+    text = " ".join(passage.text.split())
+    section = " ".join(passage.section.split())
+    return len(text.split()) <= 8 and (
+        text == section or bool(re.fullmatch(re.escape(section) + r"\s+\d+", text))
+    )
+
+
 class ChromaRetriever:
     name = "chroma"
 
@@ -65,7 +74,7 @@ class ChromaRetriever:
             return []
         query: dict[str, Any] = {
             "query_embeddings": [embedding if embedding is not None else self.embed(question)],
-            "n_results": min(count, k * 3 if historical else k),
+            "n_results": min(count, k * 3),
             "include": ["documents", "metadatas", "distances"],
         }
         if not historical:
@@ -90,4 +99,7 @@ class ChromaRetriever:
         if historical and (year := _YEAR.search(question)):
             passages.sort(key=lambda p: (year.group(1) not in p.doc_version,
                                          -p.score))
-        return passages[:k]
+        substantive = [passage for passage in passages if not _heading_only(passage)]
+        if len(substantive) < k:
+            substantive.extend(passage for passage in passages if _heading_only(passage))
+        return substantive[:k]
