@@ -11,7 +11,7 @@ from pypdf.generic import (
 from pipeline.extract import ExtractionError, extract
 
 
-def write_pdf(path: Path, *texts: str) -> None:
+def write_pdf(path: Path, *texts: str, operators: str = "") -> None:
     writer = PdfWriter()
     for text in texts:
         writer.add_blank_page(width=300, height=200)
@@ -27,7 +27,7 @@ def write_pdf(path: Path, *texts: str) -> None:
             NameObject("/Font"): DictionaryObject({NameObject("/F1"): font}),
         })
         stream = DecodedStreamObject()
-        stream.set_data(f"BT /F1 12 Tf 15 170 Td ({text}) Tj ET".encode())
+        stream.set_data(f"BT /F1 12 Tf 15 170 Td ({text}) Tj ET {operators}".encode())
         page.replace_contents(stream)
     writer.write(path)
 
@@ -91,3 +91,14 @@ def test_ocr_failure_or_wholly_unreadable_scan_fails(tmp_path, monkeypatch, fail
     match = "page 1: engine missing" if failure == "missing-engine" else "no readable text"
     with pytest.raises(ExtractionError, match=match):
         extract(str(path), "2023", True)
+
+
+def test_ruled_pdf_table_retains_column_and_row_order(tmp_path) -> None:
+    path = tmp_path / "table.pdf"
+    operators = "15 70 200 70 re S 15 105 m 215 105 l S 90 70 m 90 140 l S "
+    for text, x, y in [("Grade", 20, 120), ("Points", 100, 120),
+                       ("B+", 20, 85), ("3.33", 100, 85)]:
+        operators += f"BT /F1 12 Tf {x} {y} Td ({text}) Tj ET "
+    write_pdf(path, "Grade points", operators=operators)
+    doc = extract(str(path), "2026", False)
+    assert doc.pages[0].text == "Grade points\n| Grade | Points |\n| B+ | 3.33 |"

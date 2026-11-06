@@ -15,6 +15,37 @@ class ExtractionError(ValueError):
     """A document or one of its pages could not be read."""
 
 
+def _native_text(page: PDFPage) -> str:
+    # Preserve rows for ruled tables, skipping decorative grids and page frames.
+    tables = []
+    for table in page.find_tables():
+        x0, top, x1, bottom = table.bbox
+        if not (0 <= x0 < x1 <= page.width and 0 <= top < bottom <= page.height):
+            continue
+        rows = [[" ".join((cell or "").split()) for cell in row] for row in table.extract()]
+        if sum(sum(bool(cell) for cell in row) >= 2 for row in rows) < 2:
+            continue
+        text = "\n".join(
+            "| " + " | ".join(cell.replace("|", r"\|") for cell in row) + " |"
+            for row in rows if any(row)
+        )
+        tables.append((table.bbox, text))
+    if not tables:
+        return (page.extract_text() or "").strip()
+
+    def outside_tables(obj: dict) -> bool:
+        if obj["object_type"] != "char":
+            return True
+        x, y = (obj["x0"] + obj["x1"]) / 2, (obj["top"] + obj["bottom"]) / 2
+        return not any(x0 <= x < x1 and top <= y < bottom
+                       for (x0, top, x1, bottom), _ in tables)
+
+    blocks = [(line["top"], line["text"])
+              for line in page.filter(outside_tables).extract_text_lines(return_chars=False)]
+    blocks.extend((bbox[1], text) for bbox, text in tables)
+    return "\n".join(text for _, text in sorted(blocks)).strip()
+
+
 def _ocr(page: PDFPage) -> str:
     image = page.to_image(resolution=280, antialias=True).original
     try:
@@ -28,7 +59,7 @@ def _pdf_pages(path: Path) -> list[Page]:
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
             try:
-                text = (page.extract_text() or "").strip()
+                text = _native_text(page) if page.chars else ""
                 # Some scans have a stray digital footer or watermark.
                 needs_ocr = not text or (len(text) < 70 and bool(page.images))
                 if needs_ocr:
