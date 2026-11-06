@@ -1,0 +1,12 @@
+NAME                         READY   STATUS      RESTARTS   AGE    IP              NODE       NOMINATED NODE   READINESS GATES
+pod/api-7b755c4ccb-9g2bc     1/1     Running     0          2m6s   10.244.120.82   minikube   <none>           <none>
+pod/api-7b755c4ccb-cvzx2     1/1     Running     0          101s   10.244.120.87   minikube   <none>           <none>
+pod/api-7b755c4ccb-kwmxr     1/1     Running     0          95s    10.244.120.88   minikube   <none>           <none>
+pod/chroma-0                 1/1     Running     0          114s   10.244.120.86   minikube   <none>           <none>
+pod/initial-index-k92xb      0/1     Completed   0          2m6s   10.244.120.83   minikube   <none>           <none>
+pod/redis-7fbcdbd5b8-pcqp8   1/1     Running     0          2m5s   10.244.120.85   minikube   <none>           <none>
+pod/ui-5cb48568f6-lw44m      1/1     Running     0          2m6s   10.244.120.84   minikube   <none>           <none>
+
+NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE     VOLUMEMODE
+persistentvolumeclaim/chroma-data-chroma-0   Bound    pvc-dec95a62-1912-4580-8e51-17e6c6936c00   5Gi        RWO            standard       <unset>                 5m11s   Filesystem
+persistentvolumeclaim/redis-data             Bound    pvc-50a78946-1a37-4ea9-bdac-44881c951363   1Gi        RWO            standard       <unset>                 5m11s   Filesystem

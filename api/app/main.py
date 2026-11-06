@@ -21,6 +21,8 @@ from .logjson import configure_logging, request_id_var
 from .providers.llm import get_provider
 from .retrieval import get_retriever
 from .routes import ask, health, metrics
+from .services.cache import SemanticCache
+from .services.readiness import check_readiness
 
 log = logging.getLogger("rahbar.api")
 
@@ -32,9 +34,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.settings = settings
     app.state.retriever = get_retriever(settings)
     app.state.provider = get_provider(settings)
-    # STARTER-TODO(4.4): compare the collection's embedding-model metadata with
-    # settings.embed_model here, and make /readyz fail on a mismatch.
-    # This process only reads the index. The indexer Job writes it.
+    app.state.cache = SemanticCache(settings)
+    startup_checks = check_readiness(settings, app.state.cache)
+    if startup_checks.get("embedding_pin") not in (None, "ok"):
+        log.error("embedding pin conflict", extra={"conflict": startup_checks["embedding_pin"]})
     log.info(
         "api started",
         extra={"retriever": settings.retriever, "llm_provider": settings.llm_provider,
