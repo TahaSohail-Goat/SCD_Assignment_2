@@ -6,12 +6,16 @@ import argparse
 import hashlib
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+if __package__:
+    from .artifact_paths import artifact_path
+else:
+    from artifact_paths import artifact_path
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,7 +31,7 @@ def run(command, cwd=ROOT):
         # checker's own placeholder-marker vocabulary in a file it scans.
         output = "\n".join(line for line in output.splitlines() if
                            line.strip().startswith(("warn", "FAIL")) or
-                           re.search(r"\d+ passed.*\d+ failures", line)) + "\n"
+                           (" passed " in line and " failures" in line)) + "\n"
     print(f"{'PASS' if result.returncode == 0 else 'FAIL'}: {' '.join(command)}", flush=True)
     return {"command": command[1:] if command[0] == sys.executable else command,
             "exit_code": result.returncode, "output": output}
@@ -37,6 +41,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=Path("docs/evidence/local-validation.json"))
     args = parser.parse_args()
+    args.out = artifact_path(args.out)
     args.out.unlink(missing_ok=True) # replace this generated report, never source files
     checks = [
         run([sys.executable, "-m", "ruff", "check", "api", "indexer", "eval", "corpus", "scripts"]),
@@ -58,7 +63,7 @@ def main():
         paths = subprocess.check_output([git, "ls-files", "--cached", "--others", "--exclude-standard"],
                                         cwd=ROOT, text=True).splitlines()
         for path in sorted(set(paths)):
-            if path == args.out.as_posix() or not (ROOT / path).is_file():
+            if (ROOT / path).resolve() == args.out or not (ROOT / path).is_file():
                 continue
             fingerprint.update(path.encode() + b"\0" + (ROOT / path).read_bytes())
     report = {"timestamp": datetime.now(timezone.utc).isoformat(), "base_commit": commit,

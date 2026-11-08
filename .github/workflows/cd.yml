@@ -47,7 +47,11 @@ jobs:
       - uses: helm/kind-action@v1.14.0
       - name: Install Ingress controller
         run: |
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml \
+            --output /tmp/ingress-nginx-kind.yaml
+          echo '2a3ae008c8786431115502644e77ab398fdebfb721a5d1195ed3089cde3299df  /tmp/ingress-nginx-kind.yaml' | sha256sum --check --strict
+          kubectl apply -f /tmp/ingress-nginx-kind.yaml
           kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=600s
       - name: Load exact published images into ephemeral cluster
         env:

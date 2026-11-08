@@ -3,16 +3,39 @@
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import math
 import os
+import socket
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import httpx
 import yaml
 
 from api.app.services.cache import cosine
+from scripts.artifact_paths import artifact_path, cases_path
+
+
+def local_ollama_url(value: str) -> str:
+    """Calibration may contact only the configured local/private Ollama server."""
+    url = urlsplit(value)
+    if (url.scheme not in {"http", "https"} or not url.hostname or url.username
+            or url.password or url.query or url.fragment or url.path not in {"", "/"}
+            or url.port != 11434):
+        raise ValueError("use an Ollama HTTP(S) origin on port 11434")
+    addresses = {item[4][0] for item in socket.getaddrinfo(url.hostname, url.port,
+                                                        type=socket.SOCK_STREAM)}
+    for address in addresses:
+        ip = ipaddress.ip_address(address)
+        if ip.is_link_local or ip.is_unspecified or ip.is_multicast or not ip.is_private:
+            raise ValueError("calibration requires a loopback or private Ollama address")
+    # Pin the checked IP to prevent DNS changes between validation and connect.
+    address = sorted(addresses)[0]
+    host = f"[{address}]" if ":" in address else address
+    return f"{url.scheme}://{host}:{url.port}"
 
 
 def summarise_pairs(pairs: list[dict]) -> dict:
@@ -43,13 +66,15 @@ def main() -> int:
     parser.add_argument("--cases", type=Path, default=Path("eval/cache_cases.yaml"))
     parser.add_argument("--out", type=Path, default=Path("eval/cache-calibration.json"))
     args = parser.parse_args()
-    cases = yaml.safe_load(args.cases.read_text(encoding="utf-8"))["cases"]
+    output = artifact_path(args.out)
+    cases = yaml.safe_load(cases_path(args.cases).read_text(encoding="utf-8"))["cases"]
+    origin = local_ollama_url(args.url)
     texts = list(dict.fromkeys(row[key] for row in cases for key in ("first", "second")))
     vectors = {}
-    with httpx.Client(timeout=180) as client:
+    with httpx.Client(timeout=180, follow_redirects=False, trust_env=False) as client:
         for start in range(0, len(texts), 16):
             batch = texts[start:start + 16]
-            result = client.post(args.url.rstrip("/") + "/api/embed", json={
+            result = client.post(origin + "/api/embed", json={
                 "model": args.model, "input": batch, "truncate": False,
             })
             result.raise_for_status()
@@ -61,9 +86,9 @@ def main() -> int:
              for row in cases]
     report = {"model": args.model, "timestamp": datetime.now(timezone.utc).isoformat(),
               "environment": "live Ollama embeddings", **summarise_pairs(pairs)}
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"out": str(args.out), "selected_threshold": report["selected_threshold"]}))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"out": str(output), "selected_threshold": report["selected_threshold"]}))
     return 0
 
 

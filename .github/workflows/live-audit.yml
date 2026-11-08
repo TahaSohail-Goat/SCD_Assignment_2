@@ -7,11 +7,13 @@ on:
       - 'api/**'
       - 'indexer/**'
       - 'eval/**'
+      - 'scripts/artifact_paths.py'
+      - 'requirements-audit.lock'
       - '.github/workflows/live-audit.yml'
 permissions:
   contents: read
 concurrency:
-  group: real-corpus-${{ github.ref }}
+  group: real-corpus-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 jobs:
   measure:
@@ -35,8 +37,8 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-python@v6
         with: {python-version: '3.12'}
-      - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
-      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+      - run: python -m pip install --only-binary=:all: --require-hashes -r requirements-audit.lock
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr=5.3.4-1build5
       - name: Start bounded real services
         run: |
           docker run -d --name chroma --cpus=1 --memory=2g -p 127.0.0.1:18001:8000 chromadb/chroma:1.0.12

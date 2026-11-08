@@ -29,6 +29,7 @@ from indexer.pipeline.config import get_settings
 from indexer.pipeline.embed import embed
 from indexer.pipeline.run import build_chunks, prepare
 from indexer.pipeline.store import store
+from scripts.artifact_paths import artifact_path
 
 
 def main() -> int:
@@ -36,6 +37,7 @@ def main() -> int:
     parser.add_argument("--out", type=Path, default=Path("eval/runs/current"))
     parser.add_argument("--publish", action="store_true")
     args = parser.parse_args()
+    args.out = artifact_path(args.out, directory=True)
     args.out.mkdir(parents=True, exist_ok=True)
     settings = get_settings()
     documents = prepare(settings.corpus_dir)

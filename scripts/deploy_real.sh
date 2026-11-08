@@ -23,7 +23,7 @@ for image in "rahbar-api:$TAG" "rahbar-ui:$TAG" "rahbar-indexer:$TAG"; do
 done
 ollama_host=$(OLLAMA_URL="$OLLAMA_URL" "$PYTHON" -c 'import os,urllib.parse; print(urllib.parse.urlsplit(os.environ["OLLAMA_URL"]).hostname)')
 ollama_ip=${OLLAMA_IP:-$(minikube ssh -- "getent ahostsv4 '$ollama_host' | head -n 1 | cut -d ' ' -f 1" | tr -d '\r')}
-test -n "$ollama_ip" || { echo 'Set OLLAMA_IP to the IPv4 address reachable inside Minikube.' >&2; exit 1; }
+[[ -n "$ollama_ip" ]] || { echo 'Set OLLAMA_IP to the IPv4 address reachable inside Minikube.' >&2; exit 1; }
 mkdir -p output/deployment
 kubectl kustomize k8s/overlays/prod | "$PYTHON" scripts/configure_deployment.py \
   --ollama-url "$OLLAMA_URL" --ollama-cidr "$ollama_ip/32" \

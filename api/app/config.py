@@ -10,6 +10,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
+# The assignment's host Ollama transport stays on the isolated Minikube bridge;
+# NetworkPolicy restricts it to the resolved host /32, never Internet egress.
+_LOCAL_OLLAMA_URL = "http://host.minikube.internal:11434"  # NOSONAR: reviewed local bridge transport; see docs/SECURITY-REVIEW.md.
 
 def _int(name: str, default: int) -> int:
     return int(os.environ.get(name, default))
@@ -40,7 +43,7 @@ class Settings:
     cache_ttl_seconds: int = 86400
     temperature: float = 0.2
     llm_model: str = "llama3.2:3b"
-    ollama_url: str = "http://host.minikube.internal:11434"
+    ollama_url: str = _LOCAL_OLLAMA_URL
     hosted_base_url: str = ""        # e.g. an OpenAI-compatible endpoint
     llm_api_key: str = field(default="", repr=False)   # from the Secret; never log it
 
@@ -64,7 +67,7 @@ def get_settings() -> Settings:
         cache_ttl_seconds=_int("CACHE_TTL_SECONDS", 86400),
         temperature=_float("TEMPERATURE", 0.2),
         llm_model=os.environ.get("LLM_MODEL", "llama3.2:3b"),
-        ollama_url=os.environ.get("OLLAMA_URL", "http://host.minikube.internal:11434"),
+        ollama_url=os.environ.get("OLLAMA_URL", _LOCAL_OLLAMA_URL),
         hosted_base_url=os.environ.get("HOSTED_BASE_URL", ""),
         llm_api_key=os.environ.get("LLM_API_KEY", ""),
         redis_host=os.environ.get("REDIS_HOST", "redis"),
