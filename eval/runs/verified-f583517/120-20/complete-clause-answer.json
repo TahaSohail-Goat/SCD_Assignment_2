@@ -1,0 +1,46 @@
+{
+  "request_id": "-",
+  "answer": "The available corpus does not contain enough evidence to answer this question.",
+  "citations": [],
+  "answered_from_context": false,
+  "confidence": "low",
+  "retrieved": [
+    {
+      "chunk_id": "629534a3f1016912450c01315a72be66f24651946e1a6435a78a30f39fda7f28",
+      "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
+      "section": "1. This Agreement will begin on and will remain in effect until",
+      "page": 6,
+      "score": 0.57175994
+    },
+    {
+      "chunk_id": "d98f7bc13c760ac0981d2fe835dc05644e6f835fad25c8fdb7d004a6602816aa",
+      "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
+      "section": "8. Failure to abide the rules and regulation will lead to the immediate termination of the",
+      "page": 7,
+      "score": 0.5512462300000001
+    },
+    {
+      "chunk_id": "0ffa53fce38d2e338d895eb69947f32af5af7b07c0eb110141fa807fa28d468f",
+      "source": "prospectus-2026-academic-rules-and-regulations.pdf",
+      "section": "34. Maximum Time Allowed to",
+      "page": 5,
+      "score": 0.54536998
+    },
+    {
+      "chunk_id": "73ca6b61a68aa1e0a13820d7138fc88f2bfd200cd06c36458c60e4de2d3ac39c",
+      "source": "student-handbook-jun-2026.pdf",
+      "section": "22. Social Media Etiquettes",
+      "page": 17,
+      "score": 0.52229488
+    },
+    {
+      "chunk_id": "436dd90411db75eaafdb1e644c68a8d56ae662361c76471a97a857d8cd480008",
+      "source": "academic-rules-handbook-jun-2026.pdf",
+      "section": "7.10",
+      "page": 31,
+      "score": 0.5152216000000001
+    }
+  ],
+  "provider": "ollama",
+  "cached": false
+}

@@ -1,0 +1,43 @@
+{
+  "run": "42514806458",
+  "commit": "f5835177565138f199da402abe93c87ee78b90dc",
+  "measurements": [
+    {
+      "size": 120,
+      "overlap": 20,
+      "chunks": 802,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 56251,
+      "amplification": 1.0919979810529585,
+      "recall@3": 0.9230769230769231,
+      "recall@5": 1.0,
+      "gate_failures": []
+    },
+    {
+      "size": 240,
+      "overlap": 35,
+      "chunks": 691,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 53725,
+      "amplification": 1.0429608634881193,
+      "recall@3": 0.9230769230769231,
+      "recall@5": 1.0,
+      "gate_failures": []
+    },
+    {
+      "size": 400,
+      "overlap": 50,
+      "chunks": 669,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 52720,
+      "amplification": 1.0234508464047212,
+      "recall@3": 0.9230769230769231,
+      "recall@5": 1.0,
+      "gate_failures": []
+    }
+  ],
+  "identical_model_digests": {
+    "llama3.2:3b": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+    "nomic-embed-text:latest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f"
+  }
+}

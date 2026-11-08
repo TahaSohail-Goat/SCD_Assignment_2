@@ -1,6 +1,6 @@
 # Engineering notes: seven questions
 
-Line references below were checked against the completion branch on 8 November 2026. Historical measurements are labelled; a successful static/test run is not a substitute for a real cluster sample.
+Line references below were checked against the completion branch on 9 November 2026 (Pakistan time). Historical measurements are labelled; a successful static/test run is not a substitute for a real cluster sample.
 
 ## 1. Three API replicas, one Chroma volume: why not index at startup?
 
@@ -18,25 +18,25 @@ A better signal is in-flight generation requests or backend queue depth, with p9
 
 ## 4. Indexer memory: limit, margin, and failure exit
 
-`k8s/base/indexer.yaml:47–48` sets a 512Mi request and 2Gi (2048Mi) limit; the CronJob uses the same values at lines 101–102. The November 6 real 120/20 run's eight-second `kubectl top` samples reached 157Mi. Observed margin to limit was 2048−157 = **1891Mi**, about 92.3% of the limit. Sparse samples can miss an instantaneous OCR spike, so this is a sampled maximum, not a proven peak. Over a CPU limit a process is throttled; over its memory limit the container can be OOMKilled with exit code **137**. Job retries must remain visible, never publish partial content, and retain the previous snapshot.
+`k8s/base/indexer.yaml:47–48` sets a 512Mi request and 2Gi (2048Mi) limit; the CronJob uses the same values at lines 101–102. The new real run recorded 39 five-second samples with maximum **170Mi**. Sampled margin is 2048?170 = **1878Mi**, about **91.7%** of the limit. The 512Mi request is roughly three times this sample. Sparse metrics-server samples can miss instantaneous OCR spikes. Over a CPU limit a process is throttled; over its memory limit the container can be OOMKilled with exit code **137**. Job retries must remain visible, never publish partial content, and retain the previous snapshot.
 
 Resource rationale and evidence limits:
 
 | Container | Requests / limits | Observed evidence and rationale |
 | --- | --- | --- |
 | API | 200m, 256Mi / 1 CPU, 1Gi | Earlier stub samples 5–7m and 72–73Mi; memory request >3× sampled resident use and CPU denominator supports HPA. These are not fresh real-load peaks. |
-| Chroma | 100m, 512Mi / 1 CPU, 2Gi | Earlier dummy-index sample 2m/56Mi; persistent real index/snapshots need additional headroom. Fresh real snapshot/query sampling is required before claiming these figures are tuned. |
-| Redis | 50m, 128Mi / 500m, 512Mi | Earlier sample 4m/3Mi; allowance covers cache, active pointer and expiring turns. Monitor under the expected one-hour turn retention. |
-| UI | 25m, 32Mi / 200m, 128Mi | Earlier sample 1m/2Mi; small nginx process with allowance for requests/buffers. |
-| Indexer | 200m, 512Mi / 2 CPU, 2Gi | Real sampled maximum 157Mi; conservative OCR/document-size allowance, not a measured 2Gi requirement. |
+| Chroma | 100m, 512Mi / 1 CPU, 2Gi | Fresh two-snapshot/669-chunk run showed 17m/52Mi after queries and pod recovery. Extra headroom covers larger indexes and transient work; this is not a measured optimum. |
+| Redis | 50m, 128Mi / 500m, 512Mi | Fresh sample 5m/4Mi after cache and turn probes; allowance covers pointer, cache and one-hour turns. Longer workloads still need monitoring. |
+| UI | 25m, 32Mi / 200m, 128Mi | Historical sample 1m/2Mi. The final metrics snapshot omitted the freshly restored UI pod, so no new UI memory measurement is claimed. |
+| Indexer | 200m, 512Mi / 2 CPU, 2Gi | New 39-sample maximum 170Mi; conservative OCR/document-size allowance, not a measured 2Gi requirement. |
 | Data-wait init | 10m, 16Mi / 50m, 32Mi | Bounded busybox connectivity wait; no independent sample captured yet. |
 | CI model double | 100m, 128Mi / 500m, 256Mi | Bounded stdlib fixture server, now explicitly limited; not real Ollama. |
 
-The raw older capture is `docs/evidence/local-resource-usage.txt`; the real sample is described in `real-corpus-integration-2026-11-06.md`. `make evidence` records raw samples for this branch. These limitations are kept explicit rather than labelling padded requests as measured optimums.
+New raw samples are in `docs/evidence/kubernetes-f583517/indexer-memory-samples.txt` and `resources-after.txt`, with a computed `summary.json`. Older figures remain in their dated records. Requests provide scheduling headroom and limits cap bursts; these finite observations do not establish optimal resource settings.
 
 ## 5. Where is recall@5 worst, and what technique addresses it?
 
-The released 15-question `eval/results.json` has a 100% recall@5 tie across answerable categories, so none is worst at k=5. Version questions are weaker at recall@3: 0.5, because q10's direct current summer rule was fourth/fifth. Heading-only navigation hits formerly outranked substantive evidence; `api/app/retrieval/chroma.py` now filters those candidates. Dense embeddings can blur a clause number, short code or closely related edition. A next experiment is lexical/BM25 plus dense retrieval or a reranker, measured against the same golden set. Hybrid retrieval is a proposed technique, not an implemented feature or a fabricated new result. A new live audit must confirm this branch's metrics.
+The new reviewed 15-question `eval/results.json` has a 100% recall@5 tie across answerable categories, so none is worst at k=5. Version questions are weaker at recall@3: 0.5, because q10's direct current summer rule was fourth/fifth. Heading-only navigation hits formerly outranked substantive evidence; `api/app/retrieval/chroma.py` now filters those candidates. Dense embeddings can blur a clause number, short code or closely related edition. A next experiment is lexical/BM25 plus dense retrieval or a reranker, measured against the same golden set. Hybrid retrieval is a proposed technique, not an implemented feature or a fabricated new result. The committed live comparison confirms these metrics for all three settings. The separate generation-context selector addresses distracting definitions; it does not claim to implement BM25 or improve the reported retrieval rank.
 
 ## 6. Change only the API embedding model: what happens?
 

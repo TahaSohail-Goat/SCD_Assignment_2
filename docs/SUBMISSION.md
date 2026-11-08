@@ -1,50 +1,43 @@
 # Submission and evidence status
 
-Updated 8 November 2026. The assignment requires repository Markdown documentation and seven hand-in links across four groups; it does not require a separate DOCX report.
+Updated 9 November 2026 (Pakistan time). The PDF requires repository Markdown documentation and seven hand-in links; no separate DOCX report is required.
 
-## Release distinction
+## Reviewed implementation and release status
 
-The prior public release is main commit `1818a03a23527e411865e4c6b25020d92eadfaf9`. Its successful [CD run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42273870473), [CI run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42272439538), real results and branch-protection/gate screenshots are historical evidence. The local `fix/assignment-completion` branch changes application and manifests. It must pass new CI, actual model measurements and cluster demonstrations before those old links can support a new release claim.
+[PR #11](https://github.com/TahaSohail-Goat/SCD_Assignment_2/pull/11) was peer-approved and squash-merged as `98ff1c5860823d378d470d7794dcf89089a86fb8`. Its [CD run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42514102089) published images but failed the deployment smoke: UI HTTP 200 preceded API readiness. This is a failed release check, not successful CD evidence.
 
-The GitHub connector returned HTTP 403 for branch/tree writes. GitHub CLI was then installed and authenticated interactively by the repository owner. The completion branch is pushed, with [PR #11](https://github.com/TahaSohail-Goat/SCD_Assignment_2/pull/11) now targeting protected `main` at the owner's request; their peer will review and merge. [Implementation CI](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42508130233) and [documentation CI](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42508420723) passed all six jobs. SonarCloud subsequently reported additional findings; fixes and the local transport review are recorded in `docs/SECURITY-REVIEW.md` and must pass a fresh analysis. The [real-corpus audit](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42508098303) is running; it is not yet passing evidence. No token belongs in chat, repository files or Git history.
+Follow-up [PR #12](https://github.com/TahaSohail-Goat/SCD_Assignment_2/pull/12) fixes answer-quality and deployment checks and retains reviewed real evidence. Its peer must review and merge. The corrected shared Ingress smoke already passed in [CI](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42515793120); actual corrected main CD can run only after that merge. The agent has not merged or supplied peer approval.
 
 ## Requirement/evidence ledger
 
-| Item | Current state |
+| Requirement | Verified result and evidence |
 | --- | --- |
-| Six real PDFs, 194 pages, checksums | Downloaded and independently verified in audit; raw PDFs stay ignored. |
-| Full local tests, lint/type checks | Run on this branch; latest machine-readable local validation is captured separately. |
-| Strict rendered Kubernetes schemas | Prod/dev/CI validated without skipped schemas. |
-| Four isolated failures | Fresh bounded fixture outputs in `docs/evidence/faults/offline-current.json`; no live-model hallucination claims. |
-| Fixture gate | Fresh seven-question outputs in `eval/fixtures/results.fixture.json`; deterministic doubles explicitly labelled. |
-| Inline citation/complete evidence, follow-up safety, dependency fallback | Implemented with regression tests; real model pass still needed. |
-| Three real chunk settings and token amplification | New live audit command/workflow implemented; run artifacts must be reviewed and retained. Prior table remains historical. |
-| Three cache thresholds and measured false hits | Labelled cases/calibrator implemented; production threshold must come from the new real embedding report. |
-| Hardened stateful data/fixture workloads | Explicit non-root, readonly root, capabilities, per-workload accounts/resources; new Kubernetes fixture CI passed. Real-corpus runtime evidence remains separate. |
-| Scoped host egress and real clean-clone runbook | Deployment renderer/helper implemented; fresh Minikube run needed. |
-| Visible image change/rollback and pod survival | Capture scripts ready; fresh real output must be collected. |
-| Real indexing resource samples | Older sampled 157Mi retained; collect current raw samples while indexing. |
-| New successful CD and Docker Hub tag links | Await reviewed merge to protected main and a successful new CD. |
-| Both students understand implementation | Human responsibility; cannot be certified by generated documentation. |
+| Corpus and required properties | Six hash-verified PDFs, 194 physical pages; seven properties mapped in CORPUS. PDFs remain ignored. |
+| Separate processes and safe publication | API readers and Job/CronJob writer; immutable Chroma snapshots with atomic Redis publication. |
+| Three real chunk settings | [Reviewed reports](../eval/runs/verified-f583517/): 802/691/669 chunks; actual model-token amplification 1.091998/1.042961/1.023451. Selected 400/50. |
+| Fifteen real questions | All three settings: recall@5 13/13, citation validity 13/13, abstentions 2/2, added qualification probes 5/5. Recall@3 12/13. All saved selected answers reviewed against existing expectations. |
+| Three cache thresholds | 0.85/0.90/0.95 measured on 10 labelled pairs. Selected 0.95: 0/6 false hits, but 0/4 paraphrase hits. Finite calibration, no universal guarantee. |
+| Four isolated failures | [Fixture faults](evidence/faults/offline-current.json), plus [actual ORIC OCR-disabled extraction](evidence/faults/real-scan-ocr-disabled.json). Scope and controls in FAILURE-ANALYSIS. |
+| Live Kubernetes | [Successful real run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42514806549), [raw evidence](evidence/kubernetes-f583517/): 15 Ingress questions; 101/101 readiness and grounded-answer samples during reindex; pointer changed without API template changes; API/Chroma pod replacement and persistent count checked. |
+| Isolation and visible rollback | Calico UI-to-Chroma denial with positive controls; blue-to-green-to-undo-blue HTML verified; original image restored. |
+| Indexer resources | 39 five-second samples; maximum 170Mi against 2048Mi limit. Sampled margin 1878Mi; not an instantaneous peak. |
+| Local checks and schemas | [Machine-readable verifier](evidence/local-validation.json); API coverage exceeds required 60%; prod/dev/CI strict schemas and security/resource contracts. |
+| CI and code analysis | Six CI jobs and Sonar passed on the implementation; final documentation/evidence commit must also pass its PR checks. |
+| New successful CD and exact image links | Pending peer merge of PR #12 and successful main CD. Do not substitute a failed deployment run. |
+| Student understanding and hand-in | Both students must review and explain the work; Classroom submission is a human step. |
 
-## Required Classroom links
+## Seven Classroom links
 
-1. Repository: <https://github.com/TahaSohail-Goat/SCD_Assignment_2> (public).
-2. A successful CD run **for the release actually submitted**; prior run is linked above.
-3. API image page with exact `sha-<full commit>` tag.
-4. Indexer image page with the same commit tag; published image must remain corpus-free.
-5. UI image page with the same commit tag.
-6. Committed `eval/results.json` for the selected reviewed real run.
-7. Committed matching `eval/baseline.json`.
+1. [Public repository](https://github.com/TahaSohail-Goat/SCD_Assignment_2).
+2. Successful CD run for the final submitted release, after PR #12 is merged.
+3. API Docker Hub page with that release's exact `sha-<full commit>` tag.
+4. Indexer Docker Hub page with the same tag; image remains corpus-free.
+5. UI Docker Hub page with the same tag.
+6. [Reviewed results on the completion branch](https://github.com/TahaSohail-Goat/SCD_Assignment_2/blob/fix/assignment-completion/eval/results.json), using the main/permalink version after merge.
+7. [Matching baseline on the completion branch](https://github.com/TahaSohail-Goat/SCD_Assignment_2/blob/fix/assignment-completion/eval/baseline.json), using the same submitted revision.
 
-Docker Hub namespace is not hard-coded because the workflow takes it from GitHub Secrets and masks it in logs. After a successful reviewed release, CD's `release-image-links` artifact records the exact three public image/tag URLs and full commit; it includes no registry token. Use those actual links after publishing. The prior README reports a November 6 Classroom hand-in, but this completion workflow has not independently opened Classroom or changed that submission.
+CD's `release-image-links` artifact records the three actual public Docker Hub tag URLs and full release commit, without registry credentials. Copy links from the successful final run. The historical [November 6 successful CD](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42273870473) demonstrates that older release only. Classroom has not been opened or altered by this completion work.
 
-## Final release sequence
+## Final peer handoff
 
-1. Finish real calibration/tuning run and review every saved response against original policy, especially q06/q08/q11/q15.
-2. Commit reviewed real results/baseline, all three configuration outputs, model token counts, selected threshold and the filled measured table. Preserve provenance of old vs new runs.
-3. Run the real clean-clone recipe and collect Ingress JSON, four failure outputs, negative UI→Chroma connectivity, pod recovery, resource samples and visible rollout/undo evidence.
-4. Run the full local verifier and submission checker. All checks on PR #11 must be green, then the owner's peer supplies the real review and merges to protected `main`. The existing `dev` branch remains available for development; its push CI trigger remains enabled. Do not push directly to main, merge on the peer's behalf or forge their approval.
-5. Wait for CD to test, publish SHA images, deploy and smoke. Record the successful run URL and three exact Docker Hub links, then use the matching results/baseline links in the one team hand-in.
-
-Only the instructor awards marks. A passing checker cannot establish answer quality, genuine live execution, publication permissions or a student's viva understanding.
+After all current PR checks pass, the peer reviews and merges PR #12 into protected main. Then verify all CD stages including Ingress smoke, collect the successful run and exact published image links, and submit the seven matching links. Keep one real approval and passing checks; do not push directly to main or weaken protection. Only the instructor awards marks, and automation cannot certify a student's viva understanding.

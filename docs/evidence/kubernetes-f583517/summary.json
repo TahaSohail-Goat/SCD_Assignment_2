@@ -1,0 +1,28 @@
+{
+  "source_commit": "f5835177565138f199da402abe93c87ee78b90dc",
+  "run": "https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42514806549",
+  "ingress_metrics": {
+    "recall@3": 0.9230769230769231,
+    "recall@5": 1.0,
+    "citation_validity": 1.0,
+    "valid_citations": 13,
+    "checked_citations": 13,
+    "abstention_correctness": 1,
+    "must_abstain_questions": 2,
+    "questions": 15,
+    "answer_check_correctness": 1,
+    "checked_answers": 5
+  },
+  "successful_readiness_samples": 101,
+  "successful_grounded_answer_samples": 101,
+  "cached_answer_samples": 100,
+  "pointer_changed": true,
+  "api_template_unchanged_during_reindex": true,
+  "api_replaced_pod": true,
+  "chroma_pod_replaced": true,
+  "persisted_chroma_count_unchanged": true,
+  "sampled_indexer_memory_max_Mi": 170,
+  "indexer_memory_samples": 39,
+  "memory_sampling_cadence_seconds": 5,
+  "limitation": "Discrete successful probes and metrics-server samples; not a proof of every instant or an instantaneous RSS peak"
+}

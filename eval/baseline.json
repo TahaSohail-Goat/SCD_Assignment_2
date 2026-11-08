@@ -2,11 +2,13 @@
   "recall@3": 0.9230769230769231,
   "recall@5": 1.0,
   "citation_validity": 1.0,
-  "valid_citations": 23,
-  "checked_citations": 23,
+  "valid_citations": 13,
+  "checked_citations": 13,
   "abstention_correctness": 1,
   "must_abstain_questions": 2,
   "questions": 15,
+  "answer_check_correctness": 1,
+  "checked_answers": 5,
   "by_type": {
     "abstain": {
       "recall@3": null,
@@ -16,7 +18,9 @@
       "checked_citations": 0,
       "abstention_correctness": 1,
       "must_abstain_questions": 2,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "exact": {
       "recall@3": 1.0,
@@ -26,7 +30,9 @@
       "checked_citations": 2,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": 1,
+      "checked_answers": 1
     },
     "injection": {
       "recall@3": 1.0,
@@ -36,28 +42,36 @@
       "checked_citations": 1,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": 1,
+      "checked_answers": 1
     },
     "ordinary": {
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "valid_citations": 16,
-      "checked_citations": 16,
+      "valid_citations": 8,
+      "checked_citations": 8,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 8
+      "questions": 8,
+      "answer_check_correctness": 1,
+      "checked_answers": 3
     },
     "version": {
       "recall@3": 0.5,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "valid_citations": 4,
-      "checked_citations": 4,
+      "valid_citations": 2,
+      "checked_citations": 2,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     }
   },
-  "golden": "eval/golden.yaml"
+  "golden": "eval/golden.yaml",
+  "environment": "GitHub Actions / Linux / real configured services / Ollama",
+  "commit": "f5835177565138f199da402abe93c87ee78b90dc"
 }

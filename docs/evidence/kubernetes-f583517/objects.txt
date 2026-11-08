@@ -1,0 +1,26 @@
+NAME                                READY   STATUS      RESTARTS   AGE    IP              NODE       NOMINATED NODE   READINESS GATES
+pod/api-695d7cc78c-7jdjk            1/1     Running     0          17m    10.244.120.83   minikube   <none>           <none>
+pod/api-695d7cc78c-qpdg9            1/1     Running     0          72s    10.244.120.86   minikube   <none>           <none>
+pod/api-695d7cc78c-tfk79            1/1     Running     0          17m    10.244.120.82   minikube   <none>           <none>
+pod/chroma-0                        1/1     Running     0          64s    10.244.120.87   minikube   <none>           <none>
+pod/initial-index-rwh4s             0/1     Completed   0          22m    10.244.120.80   minikube   <none>           <none>
+pod/live-reindex-1794167133-9lqsj   0/1     Completed   0          6m8s   10.244.120.85   minikube   <none>           <none>
+pod/redis-7f64d95fd5-jb9wl          1/1     Running     0          22m    10.244.120.78   minikube   <none>           <none>
+pod/ui-65bccc799c-dnq24             0/1     Completed   0          20s    10.244.120.90   minikube   <none>           <none>
+pod/ui-7f78f67bf4-bqz8k             1/1     Running     0          7s     10.244.120.91   minikube   <none>           <none>
+
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/api      ClusterIP   10.102.155.50    <none>        8000/TCP   22m   app=api
+service/chroma   ClusterIP   10.102.175.165   <none>        8000/TCP   22m   app=chroma
+service/redis    ClusterIP   10.107.33.38     <none>        6379/TCP   22m   app=redis
+service/ui       ClusterIP   10.101.206.11    <none>        8080/TCP   22m   app=ui
+
+NAME                                         STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE   VOLUMEMODE
+persistentvolumeclaim/chroma-data-chroma-0   Bound    pvc-b4080d42-fd18-4c5a-bd2f-42a7302c30a6   5Gi        RWO            standard       <unset>                 22m   Filesystem
+persistentvolumeclaim/redis-data             Bound    pvc-adb54022-1150-4755-9d99-3667f7cb5085   1Gi        RWO            standard       <unset>                 22m   Filesystem
+
+NAME                                      REFERENCE        TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/api   Deployment/api   cpu: 6%/70%   3         8         3          22m
+
+NAME                               CLASS   HOSTS          ADDRESS        PORTS   AGE
+ingress.networking.k8s.io/rahbar   nginx   rahbar.local   192.168.49.2   80      22m

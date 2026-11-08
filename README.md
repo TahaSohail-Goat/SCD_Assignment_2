@@ -87,6 +87,7 @@ The first question should return the actual summer rule with inline citations; t
 
 ```bash
 make eval INGRESS_IP=127.0.0.1
+# Calibrator connects only to loopback; forward the model service locally if needed.
 make calibrate-cache
 ```
 
@@ -131,6 +132,8 @@ Also configure hosted model/base URL and a narrowly scoped HTTPS egress policy. 
 ## CI/CD and hand-in
 
 CI on PRs and `dev` runs lint/type checks, API coverage ≥60%, all offline tests, strict manifest validation, three image builds, Trivy and the Kind fixture gate. The submission checker is required, not ignored. CD on `main` has `test → build-push → deploy` dependencies, publishes `sha-<full commit>` tags and smoke-tests their deployment through Ingress. `main` requires a PR, passing checks and one approval; never bypass that rule.
+
+The [reviewed real audit](eval/runs/verified-f583517/) passed all three chunk settings (recall@5 and citation validity 100%, both abstentions, five fact probes). [Real Kubernetes evidence](docs/evidence/kubernetes-f583517/) verifies reindex availability samples, isolation, recovery and visible rollback. Follow-up [PR #12](https://github.com/TahaSohail-Goat/SCD_Assignment_2/pull/12) awaits peer review/merge; corrected deployment smoke passed CI, while final main CD remains pending.
 
 The previous successful [CD run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42273870473) and [evaluation-gate demonstration](docs/evidence/eval-gate.md) remain historical evidence. They do not prove this unmerged completion branch. Record the new successful run and exact Docker Hub tag links in [SUBMISSION](docs/SUBMISSION.md) after this branch is reviewed and released.
 

@@ -1,0 +1,269 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "cni.projectcalico.org/containerID": "61d0af2c194dcebb8478ee776a8cadbc4d25dd90a6435f6c35cb25f1e47396d3",
+            "cni.projectcalico.org/podIP": "10.244.120.87/32",
+            "cni.projectcalico.org/podIPs": "10.244.120.87/32"
+        },
+        "creationTimestamp": "2026-11-08T19:50:38Z",
+        "generateName": "chroma-",
+        "generation": 1,
+        "labels": {
+            "app": "chroma",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "chroma-55477c68b9",
+            "statefulset.kubernetes.io/pod-name": "chroma-0"
+        },
+        "name": "chroma-0",
+        "namespace": "rahbar",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "chroma",
+                "uid": "08d29e62-9f11-4c59-9488-d036d276d034"
+            }
+        ],
+        "resourceVersion": "3168",
+        "uid": "15501b14-e2d6-4daf-81c1-148ae26ce654"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "env": [
+                    {
+                        "name": "HOME",
+                        "value": "/tmp"
+                    },
+                    {
+                        "name": "IS_PERSISTENT",
+                        "value": "TRUE"
+                    },
+                    {
+                        "name": "PERSIST_DIRECTORY",
+                        "value": "/data"
+                    },
+                    {
+                        "name": "ANONYMIZED_TELEMETRY",
+                        "value": "FALSE"
+                    }
+                ],
+                "image": "chromadb/chroma:1.0.12",
+                "imagePullPolicy": "IfNotPresent",
+                "livenessProbe": {
+                    "failureThreshold": 3,
+                    "httpGet": {
+                        "path": "/api/v2/heartbeat",
+                        "port": "http",
+                        "scheme": "HTTP"
+                    },
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "name": "chroma",
+                "ports": [
+                    {
+                        "containerPort": 8000,
+                        "name": "http",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "failureThreshold": 3,
+                    "httpGet": {
+                        "path": "/api/v2/heartbeat",
+                        "port": "http",
+                        "scheme": "HTTP"
+                    },
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "2Gi"
+                    },
+                    "requests": {
+                        "cpu": "100m",
+                        "memory": "512Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "failureThreshold": 30,
+                    "httpGet": {
+                        "path": "/api/v2/heartbeat",
+                        "port": "http",
+                        "scheme": "HTTP"
+                    },
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 1
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/data",
+                        "name": "chroma-data"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "tmp"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "hostname": "chroma-0",
+        "nodeName": "minikube",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 10001,
+            "runAsGroup": 10001,
+            "runAsNonRoot": true,
+            "runAsUser": 10001
+        },
+        "serviceAccount": "rahbar-chroma",
+        "serviceAccountName": "rahbar-chroma",
+        "subdomain": "chroma",
+        "terminationGracePeriodSeconds": 30,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "chroma-data",
+                "persistentVolumeClaim": {
+                    "claimName": "chroma-data-chroma-0"
+                }
+            },
+            {
+                "emptyDir": {
+                    "sizeLimit": "128Mi"
+                },
+                "name": "tmp"
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-11-08T19:50:39Z",
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-11-08T19:50:38Z",
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-11-08T19:50:44Z",
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-11-08T19:50:44Z",
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-11-08T19:50:38Z",
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "100m",
+                    "memory": "512Mi"
+                },
+                "containerID": "docker://c1697a287718661d03d2387ba9a02e8359d76f042b47bc0e8ed0436db0d70339",
+                "image": "chromadb/chroma:1.0.12",
+                "imageID": "docker-pullable://chromadb/chroma@sha256:28a3b2c05c74c83686c2273d4d0994b80c481805d0f47887f289c53a4616e592",
+                "lastState": {},
+                "name": "chroma",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "2Gi"
+                    },
+                    "requests": {
+                        "cpu": "100m",
+                        "memory": "512Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-11-08T19:50:39Z"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/data",
+                        "name": "chroma-data"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "tmp"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "192.168.49.2",
+        "hostIPs": [
+            {
+                "ip": "192.168.49.2"
+            }
+        ],
+        "phase": "Running",
+        "podIP": "10.244.120.87",
+        "podIPs": [
+            {
+                "ip": "10.244.120.87"
+            }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-11-08T19:50:38Z"
+    }
+}

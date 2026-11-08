@@ -1,0 +1,148 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                       MESSAGE
+22m         Warning   FailedScheduling               pod/chroma-0                                 0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+22m         Normal    Scheduled                      pod/api-7456dcb5d-lflrp                      Successfully assigned rahbar/api-7456dcb5d-lflrp to minikube
+22m         Normal    Scheduled                      pod/ui-7f78f67bf4-c7tq4                      Successfully assigned rahbar/ui-7f78f67bf4-c7tq4 to minikube
+6s          Normal    Scheduled                      pod/ui-7f78f67bf4-bqz8k                      Successfully assigned rahbar/ui-7f78f67bf4-bqz8k to minikube
+17m         Normal    Scheduled                      pod/api-695d7cc78c-tfk79                     Successfully assigned rahbar/api-695d7cc78c-tfk79 to minikube
+17m         Normal    Scheduled                      pod/api-695d7cc78c-7jdjk                     Successfully assigned rahbar/api-695d7cc78c-7jdjk to minikube
+19s         Normal    Scheduled                      pod/ui-65bccc799c-dnq24                      Successfully assigned rahbar/ui-65bccc799c-dnq24 to minikube
+22m         Normal    Scheduled                      pod/api-7456dcb5d-tp9qq                      Successfully assigned rahbar/api-7456dcb5d-tp9qq to minikube
+22m         Normal    Scheduled                      pod/redis-7f64d95fd5-jb9wl                   Successfully assigned rahbar/redis-7f64d95fd5-jb9wl to minikube
+63s         Normal    Scheduled                      pod/chroma-0                                 Successfully assigned rahbar/chroma-0 to minikube
+71s         Normal    Scheduled                      pod/api-695d7cc78c-qpdg9                     Successfully assigned rahbar/api-695d7cc78c-qpdg9 to minikube
+22m         Normal    Scheduled                      pod/api-7456dcb5d-svl6s                      Successfully assigned rahbar/api-7456dcb5d-svl6s to minikube
+33s         Normal    Scheduled                      pod/ui-85f8479b8d-j5xvw                      Successfully assigned rahbar/ui-85f8479b8d-j5xvw to minikube
+22m         Normal    Scheduled                      pod/chroma-0                                 Successfully assigned rahbar/chroma-0 to minikube
+51s         Normal    Scheduled                      pod/ui-65bccc799c-knhxr                      Successfully assigned rahbar/ui-65bccc799c-knhxr to minikube
+22m         Warning   FailedScheduling               pod/redis-7f64d95fd5-jb9wl                   0/1 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+6m8s        Normal    Scheduled                      pod/live-reindex-1794167133-9lqsj            Successfully assigned rahbar/live-reindex-1794167133-9lqsj to minikube
+21m         Normal    Scheduled                      pod/initial-index-rwh4s                      Successfully assigned rahbar/initial-index-rwh4s to minikube
+17m         Normal    Scheduled                      pod/api-695d7cc78c-494c2                     Successfully assigned rahbar/api-695d7cc78c-494c2 to minikube
+22m         Normal    ScalingReplicaSet              deployment/redis                             Scaled up replica set redis-7f64d95fd5 from 0 to 1
+22m         Normal    ScalingReplicaSet              deployment/api                               Scaled up replica set api-7456dcb5d from 0 to 3
+22m         Normal    ExternalProvisioning           persistentvolumeclaim/redis-data             Waiting for a volume to be created either by the external provisioner 'k8s.io/minikube-hostpath' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+22m         Normal    Provisioning                   persistentvolumeclaim/redis-data             External provisioner is provisioning volume for claim "rahbar/redis-data"
+22m         Normal    ProvisioningSucceeded          persistentvolumeclaim/redis-data             Successfully provisioned volume pvc-adb54022-1150-4755-9d99-3667f7cb5085
+22m         Normal    SuccessfulCreate               replicaset/api-7456dcb5d                     Created pod: api-7456dcb5d-lflrp
+22m         Normal    SuccessfulCreate               replicaset/api-7456dcb5d                     Created pod: api-7456dcb5d-tp9qq
+22m         Normal    SuccessfulCreate               replicaset/api-7456dcb5d                     Created pod: api-7456dcb5d-svl6s
+22m         Normal    SuccessfulCreate               replicaset/redis-7f64d95fd5                  Created pod: redis-7f64d95fd5-jb9wl
+22m         Normal    ExternalProvisioning           persistentvolumeclaim/chroma-data-chroma-0   Waiting for a volume to be created either by the external provisioner 'k8s.io/minikube-hostpath' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+22m         Normal    Pulled                         pod/api-7456dcb5d-lflrp                      Container image "rahbar-api:dev" already present on machine
+22m         Normal    Pulled                         pod/api-7456dcb5d-svl6s                      Container image "rahbar-api:dev" already present on machine
+22m         Normal    ProvisioningSucceeded          persistentvolumeclaim/chroma-data-chroma-0   Successfully provisioned volume pvc-b4080d42-fd18-4c5a-bd2f-42a7302c30a6
+22m         Normal    SuccessfulCreate               statefulset/chroma                           create Claim chroma-data-chroma-0 Pod chroma-0 in StatefulSet chroma success
+22m         Normal    Created                        pod/api-7456dcb5d-lflrp                      Created container: api
+22m         Normal    SuccessfulCreate               replicaset/ui-7f78f67bf4                     Created pod: ui-7f78f67bf4-c7tq4
+22m         Normal    Provisioning                   persistentvolumeclaim/chroma-data-chroma-0   External provisioner is provisioning volume for claim "rahbar/chroma-data-chroma-0"
+22m         Normal    SuccessfulCreate               job/initial-index                            Created pod: initial-index-rwh4s
+22m         Normal    Pulled                         pod/api-7456dcb5d-tp9qq                      Container image "rahbar-api:dev" already present on machine
+22m         Normal    Created                        pod/api-7456dcb5d-tp9qq                      Created container: api
+21m         Normal    Started                        pod/api-7456dcb5d-tp9qq                      Started container api
+21m         Normal    Started                        pod/ui-7f78f67bf4-c7tq4                      Started container ui
+21m         Normal    Created                        pod/ui-7f78f67bf4-c7tq4                      Created container: ui
+21m         Normal    Pulled                         pod/ui-7f78f67bf4-c7tq4                      Container image "rahbar-ui:dev" already present on machine
+21m         Normal    Pulling                        pod/chroma-0                                 Pulling image "chromadb/chroma:1.0.12"
+21m         Normal    Started                        pod/api-7456dcb5d-lflrp                      Started container api
+21m         Normal    Pulling                        pod/redis-7f64d95fd5-jb9wl                   Pulling image "redis:7.4.2-alpine"
+21m         Normal    Pulling                        pod/initial-index-rwh4s                      Pulling image "busybox:1.37.0"
+21m         Normal    Started                        pod/api-7456dcb5d-svl6s                      Started container api
+21m         Normal    Created                        pod/api-7456dcb5d-svl6s                      Created container: api
+21m         Normal    Created                        pod/redis-7f64d95fd5-jb9wl                   Created container: redis
+21m         Normal    Started                        pod/redis-7f64d95fd5-jb9wl                   Started container redis
+21m         Normal    Pulled                         pod/redis-7f64d95fd5-jb9wl                   Successfully pulled image "redis:7.4.2-alpine" in 2.539s (2.54s including waiting). Image size: 41385986 bytes.
+21m         Normal    Pulled                         pod/initial-index-rwh4s                      Successfully pulled image "busybox:1.37.0" in 1.333s (3.63s including waiting). Image size: 4421246 bytes.
+21m         Normal    Created                        pod/initial-index-rwh4s                      Created container: wait-for-data
+21m         Normal    Started                        pod/initial-index-rwh4s                      Started container wait-for-data
+21m         Normal    Sync                           ingress/rahbar                               Scheduled for sync
+21m         Normal    Pulled                         pod/chroma-0                                 Successfully pulled image "chromadb/chroma:1.0.12" in 6.415s (9.916s including waiting). Image size: 557660157 bytes.
+21m         Normal    Created                        pod/chroma-0                                 Created container: chroma
+21m         Normal    Started                        pod/chroma-0                                 Started container chroma
+21m         Normal    Created                        pod/initial-index-rwh4s                      Created container: indexer
+21m         Normal    Pulled                         pod/initial-index-rwh4s                      Container image "rahbar-indexer:dev" already present on machine
+21m         Normal    Started                        pod/initial-index-rwh4s                      Started container indexer
+21m         Warning   Unhealthy                      pod/api-7456dcb5d-svl6s                      Startup probe failed: Get "http://10.244.120.77:8000/healthz": dial tcp 10.244.120.77:8000: connect: connection refused
+21m         Warning   Unhealthy                      pod/api-7456dcb5d-lflrp                      Startup probe failed: Get "http://10.244.120.75:8000/healthz": dial tcp 10.244.120.75:8000: connect: connection refused
+21m         Warning   Unhealthy                      pod/api-7456dcb5d-tp9qq                      Startup probe failed: Get "http://10.244.120.76:8000/healthz": dial tcp 10.244.120.76:8000: connect: connection refused
+21m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/api                  failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+21m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/api                  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+19m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/api                  invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+17m         Warning   Unhealthy                      pod/api-7456dcb5d-lflrp                      Readiness probe failed: HTTP probe failed with statuscode: 503
+17m         Warning   Unhealthy                      pod/api-7456dcb5d-svl6s                      Readiness probe failed: HTTP probe failed with statuscode: 503
+17m         Warning   Unhealthy                      pod/api-7456dcb5d-tp9qq                      Readiness probe failed: HTTP probe failed with statuscode: 503
+17m         Normal    Created                        pod/api-695d7cc78c-tfk79                     Created container: api
+17m         Normal    SuccessfulCreate               replicaset/api-695d7cc78c                    Created pod: api-695d7cc78c-tfk79
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled up replica set api-695d7cc78c from 0 to 1
+17m         Normal    Completed                      job/initial-index                            Job completed
+17m         Normal    Pulled                         pod/api-695d7cc78c-tfk79                     Container image "rahbar-api:dev" already present on machine
+17m         Normal    Started                        pod/api-695d7cc78c-tfk79                     Started container api
+17m         Normal    SuccessfulDelete               replicaset/api-7456dcb5d                     Deleted pod: api-7456dcb5d-tp9qq
+17m         Normal    Created                        pod/api-695d7cc78c-7jdjk                     Created container: api
+17m         Normal    Killing                        pod/api-7456dcb5d-tp9qq                      Stopping container api
+17m         Normal    Pulled                         pod/api-695d7cc78c-7jdjk                     Container image "rahbar-api:dev" already present on machine
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled up replica set api-695d7cc78c from 1 to 2
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled down replica set api-7456dcb5d from 3 to 2
+17m         Normal    SuccessfulCreate               replicaset/api-695d7cc78c                    Created pod: api-695d7cc78c-7jdjk
+17m         Normal    Started                        pod/api-695d7cc78c-7jdjk                     Started container api
+17m         Normal    Killing                        pod/api-7456dcb5d-svl6s                      Stopping container api
+17m         Normal    SuccessfulDelete               replicaset/api-7456dcb5d                     Deleted pod: api-7456dcb5d-svl6s
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled down replica set api-7456dcb5d from 2 to 1
+17m         Normal    SuccessfulCreate               replicaset/api-695d7cc78c                    Created pod: api-695d7cc78c-494c2
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled up replica set api-695d7cc78c from 2 to 3
+17m         Normal    Started                        pod/api-695d7cc78c-494c2                     Started container api
+17m         Normal    Created                        pod/api-695d7cc78c-494c2                     Created container: api
+17m         Normal    Pulled                         pod/api-695d7cc78c-494c2                     Container image "rahbar-api:dev" already present on machine
+17m         Normal    Killing                        pod/api-7456dcb5d-lflrp                      Stopping container api
+17m         Normal    SuccessfulDelete               replicaset/api-7456dcb5d                     Deleted pod: api-7456dcb5d-lflrp
+17m         Normal    ScalingReplicaSet              deployment/api                               Scaled down replica set api-7456dcb5d from 1 to 0
+16m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/api                  failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+6m8s        Normal    Pulled                         pod/live-reindex-1794167133-9lqsj            Container image "busybox:1.37.0" already present on machine
+6m8s        Normal    SuccessfulCreate               job/live-reindex-1794167133                  Created pod: live-reindex-1794167133-9lqsj
+6m8s        Normal    Created                        pod/live-reindex-1794167133-9lqsj            Created container: wait-for-data
+6m8s        Normal    Started                        pod/live-reindex-1794167133-9lqsj            Started container wait-for-data
+6m7s        Normal    Pulled                         pod/live-reindex-1794167133-9lqsj            Container image "rahbar-indexer:dev" already present on machine
+6m7s        Normal    Started                        pod/live-reindex-1794167133-9lqsj            Started container indexer
+6m7s        Normal    Created                        pod/live-reindex-1794167133-9lqsj            Created container: indexer
+96s         Normal    Completed                      job/live-reindex-1794167133                  Job completed
+96s         Warning   UnexpectedJob                  cronjob/reindex                              Saw a job that the controller did not create or forgot: live-reindex-1794167133
+72s         Normal    SuccessfulCreate               replicaset/api-695d7cc78c                    Created pod: api-695d7cc78c-qpdg9
+72s         Normal    Killing                        pod/api-695d7cc78c-494c2                     Stopping container api
+71s         Normal    Pulled                         pod/api-695d7cc78c-qpdg9                     Container image "rahbar-api:dev" already present on machine
+71s         Normal    Created                        pod/api-695d7cc78c-qpdg9                     Created container: api
+71s         Normal    Started                        pod/api-695d7cc78c-qpdg9                     Started container api
+64s         Normal    Killing                        pod/chroma-0                                 Stopping container chroma
+64s         Normal    SuccessfulCreate               statefulset/chroma                           create Pod chroma-0 in StatefulSet chroma successful
+63s         Normal    Created                        pod/chroma-0                                 Created container: chroma
+63s         Normal    Pulled                         pod/chroma-0                                 Container image "chromadb/chroma:1.0.12" already present on machine
+63s         Normal    Started                        pod/chroma-0                                 Started container chroma
+58s         Warning   Unhealthy                      pod/api-695d7cc78c-7jdjk                     Readiness probe failed: Get "http://10.244.120.83:8000/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+52s         Normal    SuccessfulCreate               replicaset/ui-65bccc799c                     Created pod: ui-65bccc799c-knhxr
+51s         Normal    Pulled                         pod/ui-65bccc799c-knhxr                      Container image "rahbar-ui:demo-blue-f58351775651" already present on machine
+51s         Normal    Created                        pod/ui-65bccc799c-knhxr                      Created container: ui
+51s         Normal    Started                        pod/ui-65bccc799c-knhxr                      Started container ui
+46s         Normal    SuccessfulDelete               replicaset/ui-7f78f67bf4                     Deleted pod: ui-7f78f67bf4-c7tq4
+46s         Normal    Killing                        pod/ui-7f78f67bf4-c7tq4                      Stopping container ui
+46s         Normal    ScalingReplicaSet              deployment/ui                                Scaled down replica set ui-7f78f67bf4 from 1 to 0
+34s         Normal    SuccessfulCreate               replicaset/ui-85f8479b8d                     Created pod: ui-85f8479b8d-j5xvw
+34s         Normal    ScalingReplicaSet              deployment/ui                                Scaled up replica set ui-85f8479b8d from 0 to 1
+33s         Normal    Started                        pod/ui-85f8479b8d-j5xvw                      Started container ui
+33s         Normal    Created                        pod/ui-85f8479b8d-j5xvw                      Created container: ui
+33s         Normal    Pulled                         pod/ui-85f8479b8d-j5xvw                      Container image "rahbar-ui:demo-green-f58351775651" already present on machine
+28s         Normal    SuccessfulDelete               replicaset/ui-65bccc799c                     Deleted pod: ui-65bccc799c-knhxr
+28s         Normal    Killing                        pod/ui-65bccc799c-knhxr                      Stopping container ui
+20s         Normal    ScalingReplicaSet              deployment/ui                                Scaled up replica set ui-65bccc799c from 0 to 1
+20s         Normal    SuccessfulCreate               replicaset/ui-65bccc799c                     Created pod: ui-65bccc799c-dnq24
+19s         Normal    Started                        pod/ui-65bccc799c-dnq24                      Started container ui
+19s         Normal    Pulled                         pod/ui-65bccc799c-dnq24                      Container image "rahbar-ui:demo-blue-f58351775651" already present on machine
+19s         Normal    Created                        pod/ui-65bccc799c-dnq24                      Created container: ui
+14s         Normal    ScalingReplicaSet              deployment/ui                                Scaled down replica set ui-85f8479b8d from 1 to 0
+14s         Normal    SuccessfulDelete               replicaset/ui-85f8479b8d                     Deleted pod: ui-85f8479b8d-j5xvw
+14s         Normal    Killing                        pod/ui-85f8479b8d-j5xvw                      Stopping container ui
+7s          Normal    ScalingReplicaSet              deployment/ui                                Scaled up replica set ui-7f78f67bf4 from 0 to 1
+7s          Normal    SuccessfulCreate               replicaset/ui-7f78f67bf4                     Created pod: ui-7f78f67bf4-bqz8k
+6s          Normal    Created                        pod/ui-7f78f67bf4-bqz8k                      Created container: ui
+6s          Normal    Started                        pod/ui-7f78f67bf4-bqz8k                      Started container ui
+6s          Normal    Pulled                         pod/ui-7f78f67bf4-bqz8k                      Container image "rahbar-ui:dev" already present on machine
+1s          Normal    Killing                        pod/ui-65bccc799c-dnq24                      Stopping container ui
+1s          Normal    SuccessfulDelete               replicaset/ui-65bccc799c                     Deleted pod: ui-65bccc799c-dnq24
+1s          Normal    ScalingReplicaSet              deployment/ui                                Scaled down replica set ui-65bccc799c from 1 to 0

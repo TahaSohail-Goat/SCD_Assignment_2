@@ -7,6 +7,8 @@
   "abstention_correctness": 1,
   "must_abstain_questions": 1,
   "questions": 7,
+  "answer_check_correctness": null,
+  "checked_answers": 0,
   "by_type": {
     "abstain": {
       "recall@3": null,
@@ -16,7 +18,9 @@
       "checked_citations": 0,
       "abstention_correctness": 1,
       "must_abstain_questions": 1,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "exact": {
       "recall@3": 1.0,
@@ -26,7 +30,9 @@
       "checked_citations": 1,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "injection": {
       "recall@3": 1.0,
@@ -36,7 +42,9 @@
       "checked_citations": 1,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "ordinary": {
       "recall@3": 1.0,
@@ -46,7 +54,9 @@
       "checked_citations": 1,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "version": {
       "recall@3": 1.0,
@@ -56,7 +66,9 @@
       "checked_citations": 3,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 3
+      "questions": 3,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     }
   },
   "rows": [
@@ -72,8 +84,9 @@
         }
       ],
       "expect": "2.00",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "dffe606d63654fe792117eb9938f13a9",
+        "request_id": "c99f9b274f284a5992ef40ecfb8aa5c4",
         "answer": "2.1 A student whose cumulative grade point average (CGPA) falls below 2.00 at the end of a regular semester is placed on academic warning. [academic-rules-2026.md / 2. Academic warning]\n2.2 A student who remains on academic warning for three consecutive semesters is dropped from the programme. [academic-rules-2026.md / 2. Academic warning]",
         "citations": [
           {
@@ -124,11 +137,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.029,
+      "seconds": 0.038,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "f02",
@@ -142,8 +156,9 @@
         }
       ],
       "expect": "80",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "c826ca67a8914bc1999857fd0f9c91f2",
+        "request_id": "b8a0a23ff9dd405693a6bfcc44d2e1e7",
         "answer": "1.1 A student must attend at least 80 percent of the lectures of each course to be allowed to sit the final examination. [academic-rules-2026.md / 1. Attendance]\nThe Head of Department may condone a further absence only for documented medical reasons. [academic-rules-2026.md / 1. Attendance]\n1.2 A student who falls below the minimum attendance receives the grade FA in that course. [academic-rules-2026.md / 1. Attendance]",
         "citations": [
           {
@@ -194,11 +209,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.029,
+      "seconds": 0.024,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "f03",
@@ -212,8 +228,9 @@
         }
       ],
       "expect": "B",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "90d46d57502c401c9ba31c5d10ce06e1",
+        "request_id": "4d7be3b38ff04a2aacd0f215ed814e72",
         "answer": "3.1 A student may repeat a course in which the grade was C or lower. [academic-rules-2023.md / 3. Repeating a course]\nWhen a course is repeated, the highest grade a student can receive is B. [academic-rules-2023.md / 3. Repeating a course]",
         "citations": [
           {
@@ -257,11 +274,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.029,
+      "seconds": 0.023,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "f04",
@@ -275,8 +293,9 @@
         }
       ],
       "expect": "10,000",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "4677aa5034fc45ba836f7b34ffb198ec",
+        "request_id": "28c2fe52d2914eb689d706f7d0764fe5",
         "answer": "| Programme | Fee per credit hour (PKR) | [fees-2026.md / 1. Tuition]\n| --- | --- | [fees-2026.md / 1. Tuition]\n| BS (all disciplines) | 10,000 | [fees-2026.md / 1. Tuition]\n| MS | 12,500 | [fees-2026.md / 1. Tuition]",
         "citations": [
           {
@@ -327,11 +346,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.018,
+      "seconds": 0.024,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "f05",
@@ -340,8 +360,9 @@
       "must_abstain": true,
       "relevant": [],
       "expect": null,
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "a7afed398ae548b984436ef7c20d2cd9",
+        "request_id": "91bc23ed13984e80943e6a6e580b6592",
         "answer": "The available corpus does not contain enough evidence to answer this question.",
         "citations": [],
         "answered_from_context": false,
@@ -386,11 +407,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.013,
+      "seconds": 0.019,
       "recall@3": null,
       "recall@5": null,
       "citation_validity": null,
-      "abstention_correct": true
+      "abstention_correct": true,
+      "answer_checks_passed": null
     },
     {
       "id": "f06",
@@ -404,8 +426,9 @@
         }
       ],
       "expect": "80",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "2b775fb344234424ace9165de9540372",
+        "request_id": "45fd494d00374d01b249295cebfeef9e",
         "answer": "1.1 A student must attend at least 80 percent of the lectures of each course to be allowed to sit the final examination. [academic-rules-2026.md / 1. Attendance]\nThe Head of Department may condone a further absence only for documented medical reasons. [academic-rules-2026.md / 1. Attendance]\n1.2 A student who falls below the minimum attendance receives the grade FA in that course. [academic-rules-2026.md / 1. Attendance]",
         "citations": [
           {
@@ -456,11 +479,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.018,
+      "seconds": 0.021,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "f07",
@@ -474,8 +498,9 @@
         }
       ],
       "expect": "most recent",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "a097697cf3014ef381f676ec26d1ac5f",
+        "request_id": "a4fc0f1d0d9b4cd4b853811a02e4698f",
         "answer": "3.1 A student may repeat any course to improve the CGPA. [academic-rules-2026.md / 3. Repeating a course]\nOnly the grade of the most recent attempt counts, even when it is lower than an earlier attempt. [academic-rules-2026.md / 3. Repeating a course]",
         "citations": [
           {
@@ -526,11 +551,12 @@
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.019,
+      "seconds": 0.018,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     }
   ],
   "golden": "eval/fixtures/golden.fixture.yaml",

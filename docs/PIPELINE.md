@@ -27,19 +27,21 @@ The chosen embedding pin is `nomic-embed-text`, 768 dimensions, from the shared 
 
 [ADR 0006](adr/0006-immutable-index-publication.md) replaces the old two-rename publication gap. A successful build verifies the complete snapshot before a Redis transaction publishes its name and increments cache generation. Readers finish against their own immutable snapshot. Old snapshots remain for in-flight readers; monitor PVC capacity and drain before maintenance cleanup. Lost publication acknowledgement causes a visible failed Job and retains the potentially active snapshot.
 
-## Three measured settings: released reference run
+## Three measured settings: reviewed completion run
 
-These are the **November 6 release measurements**, retained as prior evidence. The completion branch changes answer rendering and publication, so these rows must not be relabelled as a fresh run of this branch.
+[Real audit run 42514806458](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42514806458) passed all three configurations on source commit `f583517`. It completed on 9 November 2026 Pakistan time (8 November UTC). The corpus, pinned dependencies and actual model digests were identical across the isolated Docker jobs; see [comparison.json](../eval/runs/verified-f583517/comparison.json) and their individual reports. Original cleaned text contained 37,522 whitespace words; the denominator below is actual embedding-model tokens, not that word proxy.
 
-| Word size | Overlap | Chunks | Original words | Stored words | Word amplification | Recall@5 |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 120 | 20 | 802 | 37,508 | 40,248 | 1.0731 | 100% |
-| 240 | 35 | 690 | 37,508 | 38,383 | 1.0233 | 100% |
-| 400 | 50 | 669 | 37,508 | 37,708 | 1.0053 | 100% |
+| Word size | Overlap | Chunks | Original model tokens | Stored model tokens | Token amplification | Recall@5 | Required fact probes |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 120 | 20 | 802 | 51,512 | 56,251 | 1.091998 | 100% | 5/5 |
+| 240 | 35 | 691 | 51,512 | 53,725 | 1.042961 | 100% | 5/5 |
+| 400 | 50 | 669 | 51,512 | 52,720 | 1.023451 | 100% | 5/5 |
 
-All three used the same six PDFs, 15 golden questions, embedding/generation models, top-k 5 and heading-only filter. Recall@3 was 12/13. The current summer rule was below rank three. 400/50 tied on recall with the smallest vector count and duplication, so it remains the reference setting pending new measurements.
+Every run measured recall@3 12/13, recall@5 13/13, citation validity 13/13 and both required abstentions. q10's current summer rule remains outside the first three retrieved references. 400/50 ties on recall and has the fewest vectors and least token expansion, so it remains selected. Larger excerpts can include irrelevant surrounding text and OCR furniture; this is a completeness/storage choice, not a claim that 400 words is universally best.
 
-The handout asks for **token** amplification; word ratio alone is a proxy. `python -m eval.live_audit` now separately embeds all cleaned original pages and each chunk configuration, sums Ollama's actual `prompt_eval_count`, and records `stored_model_tokens / original_model_tokens`. This includes the embedding model's per-input token accounting. Missing usage is a failed measurement, not a made-up value. The workflow records model inventory/digests, commit, raw result rows and each configuration in `measurements.json` and three run JSON files.
+`python -m eval.live_audit` embeds all cleaned original pages and each chunk configuration, sums Ollama `/api/embed` `prompt_eval_count`, and records stored/original model tokens. Missing usage fails measurement. Full answer rows, actual model inventory/digests, API token logs and provenance are committed under [verified-f583517](../eval/runs/verified-f583517/). `eval/results.json` and `eval/baseline.json` now contain the reviewed 400/50 run and matching summary; the recall baseline remains 100%.
+
+Earlier outcomes remain visible: [first-attempt-ad7239b](../eval/runs/first-attempt-ad7239b/) failed recall because a complete injection question was misrouted as a follow-up. [metadata-pass-1f15db9](../eval/runs/metadata-pass-1f15db9/) passed reference metrics but failed manual q04 review. Its unchanged answers fail the subsequently strengthened fact gate. November 6 word-count measurements remain historical in their original integration record.
 
 ## Cache thresholds and safety
 
@@ -49,7 +51,16 @@ Redis was chosen over a second Chroma collection to support TTL, atomic generati
 
 `python -m eval.calibrate_cache` embeds both questions, reports every score, and tests 0.85, 0.90 and 0.95. It chooses the **lowest tested threshold with zero false hits**, reports true-hit losses and records the negative pairs that disqualified lower thresholds. The first diagnostic audit tried a one-ULP boundary above the maximum negative similarity; that gives no practical numerical margin, so the rerun uses the coarse grid including the existing 0.95 setting. A conservative threshold may sacrifice most semantic hits; the experiment must state that tradeoff. If none of the tested settings avoids false hits, calibration fails and semantic reuse must be disabled pending further measurement.
 
-The ConfigMap's old 0.95 remains a **reference value, not a newly calibrated claim** until the real-model report is reviewed. Copy the selected threshold from the real report into the ConfigMap, roll out API and retain the report. A cache threshold of 1.01 disables cache for retrieval/generation experiments and is not calibration evidence. Follow-ups, abstentions and invalid outputs are never cached. Tests reproduce previously missed pronoun follow-ups; absent session context produces an explicit request to restate the question.
+The real [calibration report](../eval/runs/verified-f583517/400-50/cache-calibration.json) independently selects **0.95**, matching the existing ConfigMap; no threshold change was needed. Ten labelled pairs include four equivalent and six different-answer pairs. Results are below. This is calibration on this small set, not a held-out or universal false-hit guarantee. A cache threshold of 1.01 disables cache for retrieval/generation experiments and is not calibration evidence. Follow-ups, abstentions and invalid outputs are never cached. Tests reproduce previously missed pronoun follow-ups; absent session context produces an explicit request to restate the question.
+
+
+| Threshold | False hits / 6 negatives | True hits / 4 paraphrases |
+| ---: | ---: | ---: |
+| 0.85 | 4/6 | 3/4 |
+| 0.90 | 3/6 | 1/4 |
+| 0.95 | 0/6 | 0/4 |
+
+At 0.85, regular/summer attendance, minimum/maximum degree length, warning/closure and current/previous summer policy would be false hits. At 0.90, the latter three still fail. The chosen setting sacrifices all four tested paraphrase hits to avoid those different answers. Real repeated-question control is separate: during the live reindex test, 100 of 101 grounded answer probes were cache hits; the generation change forced one fresh answer. Historical requests bypass cache even when vectors are similar. Expand calibration when the model, corpus or query distribution changes.
 
 ## Generation and evaluation
 
@@ -59,7 +70,7 @@ Ollama's citation-item grammar enumerates only exact context source/section/page
 
 `eval/golden.yaml` contains eight ordinary, two version, two exact, two must-abstain and one injection question. Its questions, evidence references and expected facts preceded live tuning in Git history. Recall@3/@5 matches distinct relevant references and is macro-averaged over answerable questions; per-type results are included. Citation validity is a micro percentage over exact triples. Abstentions require false context flag and no citations. After manual review caught q04's contact-hours answer passing those three metrics, five optional `required_answer_patterns` sets were added to encode the existing expected facts for q04/q06/q08/q11/q15. They strengthen the gate without changing questions, references or expected answers. All five must pass when present; fixtures without these fields retain the original three gates. These probes do not replace manual review of all 15 answers.
 
-The released result is recall@3 12/13, recall@5 13/13, citations 23/23 and abstentions 2/2. Its terse q06/q08/q11/q15 answers were incomplete despite passing reference metrics. They are preserved in the old result rather than rewritten by hand. The new evidence renderer has regression tests for whole conditions, F/A, poisoned lines and inline citations, but fresh live results remain a separate required verification.
+The November 6 reference result had valid citation ratios but incomplete qualification answers. Those historical records are preserved. The new reviewed answers retain the student handbook restriction, DOI/impact-factor/affiliation/two-year conditions, F/A consequence and 100% attendance with conditional HoD condonation. Manual review also corrected q04's credit-allocation/contact-hours confusion. All 15 selected answer rows were compared with the existing expected facts; the five automated probes supplement that review.
 
 The evaluator fails if recall@5 drops over five percentage points, validity is below 95%, or any must-abstain probe is answered. A missing baseline is an immediate CLI error unless explicitly bootstrapping a reviewed baseline. Do not lower a baseline merely to obtain green CI.
 

@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-11-08T19:50:59.789132+00:00",
+  "stage": "A: extraction",
+  "scope": "Real corpus PDF, local prepare() with OCR deliberately disabled; healthy Tesseract control from the identified Linux run",
+  "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
+  "sha256": "c2d5c7648d1593daf34d5c0596ede476e8984b0551830cc1690017e6e22f1359",
+  "disabled_ocr_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "observed_error": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf: no readable text in document",
+  "healthy_control": {
+    "ts": "2026-11-08T19:27:29Z",
+    "logger": "rahbar.indexer",
+    "request_id": "indexer-local",
+    "msg": "extracted",
+    "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
+    "pages": 8,
+    "ocr_pages": 8,
+    "empty_pages": []
+  },
+  "healthy_run": "https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42514806458",
+  "diagnosis": "Every scanned page needs OCR; extraction fails before publication, instead of publishing empty evidence",
+  "remedy": "Restore OCR and run Tesseract; the healthy control extracted all eight pages"
+}

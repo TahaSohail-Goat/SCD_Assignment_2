@@ -1,0 +1,111 @@
+{
+  "model": "nomic-embed-text",
+  "timestamp": "2026-11-08T19:39:51.098440+00:00",
+  "environment": "live Ollama embeddings",
+  "trials": [
+    {
+      "threshold": 0.85,
+      "false_hits": [
+        "regular-vs-summer-attendance",
+        "minimum-vs-maximum-degree",
+        "warning-vs-closure",
+        "current-vs-previous-summer"
+      ],
+      "true_hits": [
+        "cgpa-paraphrase",
+        "summer-paraphrase",
+        "teaching-paraphrase"
+      ]
+    },
+    {
+      "threshold": 0.9,
+      "false_hits": [
+        "minimum-vs-maximum-degree",
+        "warning-vs-closure",
+        "current-vs-previous-summer"
+      ],
+      "true_hits": [
+        "cgpa-paraphrase"
+      ]
+    },
+    {
+      "threshold": 0.95,
+      "false_hits": [],
+      "true_hits": []
+    }
+  ],
+  "selected_threshold": 0.95,
+  "pairs": [
+    {
+      "id": "cgpa-paraphrase",
+      "first": "What minimum CGPA avoids academic warning in an undergraduate programme?",
+      "second": "What is the undergraduate CGPA threshold for avoiding academic warning?",
+      "equivalent": true,
+      "similarity": 0.9169298435306272
+    },
+    {
+      "id": "summer-paraphrase",
+      "first": "Under the current undergraduate rules, how long is the summer semester?",
+      "second": "How many weeks does the current undergraduate summer semester last?",
+      "equivalent": true,
+      "similarity": 0.8992853358629944
+    },
+    {
+      "id": "teaching-paraphrase",
+      "first": "What is the duration in minutes of one classroom teaching period?",
+      "second": "How many minutes is a classroom teaching period under the undergraduate rules?",
+      "equivalent": true,
+      "similarity": 0.8892173198826923
+    },
+    {
+      "id": "grade-paraphrase",
+      "first": "Which interpretation corresponds to grades A and A-?",
+      "second": "How does the letter-grade table interpret A and A-?",
+      "equivalent": true,
+      "similarity": 0.8445021705226854
+    },
+    {
+      "id": "regular-vs-summer-attendance",
+      "first": "What attendance percentage is required in a regular undergraduate course?",
+      "second": "What attendance percentage is required in a summer undergraduate course?",
+      "equivalent": false,
+      "similarity": 0.898956008445046
+    },
+    {
+      "id": "attendance-vs-absence",
+      "first": "What attendance percentage is required in an undergraduate course?",
+      "second": "What maximum absence percentage can the head of department condone?",
+      "equivalent": false,
+      "similarity": 0.6281261838178395
+    },
+    {
+      "id": "minimum-vs-maximum-degree",
+      "first": "What is the minimum duration of a Bachelor's degree?",
+      "second": "What is the maximum duration of a Bachelor's degree?",
+      "equivalent": false,
+      "similarity": 0.9333872346336187
+    },
+    {
+      "id": "warning-vs-closure",
+      "first": "What happens after one semester below CGPA 2.00?",
+      "second": "What happens after three consecutive semesters below CGPA 2.00?",
+      "equivalent": false,
+      "similarity": 0.9246208926783835
+    },
+    {
+      "id": "current-vs-previous-summer",
+      "first": "Under the current undergraduate rules, how long is the summer semester?",
+      "second": "Under the August 2023 undergraduate rules, how long was the summer semester?",
+      "equivalent": false,
+      "similarity": 0.9435405134219761
+    },
+    {
+      "id": "duration-vs-credit-hours",
+      "first": "What is the duration of a classroom teaching period?",
+      "second": "What is the credit-hour assignment of a classroom course?",
+      "equivalent": false,
+      "similarity": 0.7092292011239754
+    }
+  ],
+  "selection_rule": "lowest tested threshold with zero labelled false hits"
+}
