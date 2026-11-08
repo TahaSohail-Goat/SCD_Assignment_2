@@ -7,6 +7,11 @@ from pathlib import Path
 
 import yaml
 
+if __package__:
+    from .artifact_paths import artifact_path
+else:
+    from artifact_paths import artifact_path
+
 
 def inspect(objects):
     errors = []
@@ -52,11 +57,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
+    output = artifact_path(args.out) if args.out else None
     result = inspect([obj for obj in yaml.safe_load_all(sys.stdin) if obj])
     body = json.dumps(result, indent=2) + "\n"
-    if args.out:
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(body, encoding="utf-8")
+    if output:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(body, encoding="utf-8")
     print(body)
     return int(bool(result["errors"]))
 

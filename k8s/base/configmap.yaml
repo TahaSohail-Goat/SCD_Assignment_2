@@ -13,7 +13,7 @@ data:
   CHROMA_COLLECTION: rahbar
   REDIS_HOST: redis
   REDIS_PORT: "6379"
-  OLLAMA_URL: http://host.minikube.internal:11434
+  OLLAMA_URL: http://host.minikube.internal:11434 # NOSONAR: isolated Minikube bridge /32; see docs/SECURITY-REVIEW.md.
   TOP_K: "5"
   RELEVANCE_FLOOR: "0.55"
   CACHE_THRESHOLD: "0.95"
