@@ -47,7 +47,7 @@ jobs:
       - uses: helm/kind-action@v1.14.0
       - name: Install Ingress controller
         run: |
-          curl --fail --silent --show-error --location \
+          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
             https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml \
             --output /tmp/ingress-nginx-kind.yaml
           echo '2a3ae008c8786431115502644e77ab398fdebfb721a5d1195ed3089cde3299df  /tmp/ingress-nginx-kind.yaml' | sha256sum --check --strict
@@ -79,7 +79,8 @@ jobs:
           done
           curl -fsS -H 'Host: rahbar.local' -X POST http://localhost:18080/api/ask \
             -H 'Content-Type: application/json' \
-            -d '{"question":"What is the attendance requirement?"}' \
-            | python -c 'import json,sys; x=json.load(sys.stdin); assert x["citations"] and x["answered_from_context"]'
+            -d '{"question":"What is the attendance requirement?"}' --output /tmp/rahbar-answer.json
+          python -c 'import json; from pathlib import Path; x=json.loads(Path("/tmp/rahbar-answer.json").read_text()); assert x["citations"] and x["answered_from_context"]'
           curl -fsS -H 'Host: rahbar.local' http://localhost:18080/readyz \
-            | python -c 'import json,sys; assert json.load(sys.stdin)["status"] == "ready"'
+            --output /tmp/rahbar-readiness.json
+          python -c 'import json; from pathlib import Path; assert json.loads(Path("/tmp/rahbar-readiness.json").read_text())["status"] == "ready"'

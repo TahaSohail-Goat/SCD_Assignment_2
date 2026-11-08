@@ -11,11 +11,16 @@ and cleartext transports. The gate and its rating requirement remain enabled.
   rejected before deletion, directory creation or writing. Cache-case input is
   restricted to existing YAML files inside `eval/`. Regression tests cover escapes
   and attempts to overwrite source.
-- Cache calibration accepts only a private/loopback Ollama origin on port 11434,
-  rejects credentials and metadata/link-local/public/non-server destinations, pins
-  the validated address for the request, disables redirects and ignores proxy
-  environment variables. Tests cover malicious destinations and normal localhost.
-- CD verifies the pinned Ingress manifest's committed SHA-256 before applying it.
+- Cache calibration uses an explicit loopback-origin allowlist on port 11434;
+  remote models require a local port-forward. Credentials and all arbitrary
+  hostnames, metadata/link-local/public/non-server destinations are rejected.
+  Requests disable redirects and ignore proxy environment variables. Tests cover
+  malicious destinations and normal localhost. Standalone output has a fixed
+  repository filename, with a symlink check before writing; the live audit saves
+  returned measurements in its validated artifact directory.
+- CD verifies the pinned Ingress manifest's committed SHA-256 before applying it,
+  allows HTTPS redirects only, and parses smoke-response JSON from data files
+  rather than piping downloaded bytes to a Python command.
 - New audit dependencies use a complete Python 3.12/Linux lock with hashes and
   binary wheels only. The Ubuntu 24.04 Tesseract package version is pinned.
 - The verifier's unnecessary backtracking expression was replaced by literal
@@ -23,9 +28,9 @@ and cleartext transports. The gate and its rating requirement remain enabled.
 
 ## Narrow transport exceptions
 
-Four HTTP locations carry explicit `NOSONAR` comments after review: the API's
-shared local Ollama default, the corresponding ConfigMap entry, and two visible
-rollout HTML fetches. These are assignment test-cluster transports. They do not
+Three HTTP locations carry explicit `NOSONAR` comments after review: the
+ConfigMap entry and two visible rollout HTML fetches. The standalone API default
+uses loopback. These are assignment test-cluster transports. They do not
 describe an Internet production deployment or a promise of transport encryption.
 
 The host Ollama address is the Minikube bridge; the deployment helper resolves

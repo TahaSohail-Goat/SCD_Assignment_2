@@ -1,5 +1,4 @@
 from pathlib import Path
-import socket
 
 import pytest
 
@@ -28,16 +27,12 @@ def test_cache_cases_cannot_read_outside_eval(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("address", ["169.254.169.254", "8.8.8.8", "0.0.0.0", "224.0.0.1"])
-def test_calibration_rejects_metadata_public_and_non_server_destinations(address, monkeypatch):
-    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [
-        (socket.AF_INET, socket.SOCK_STREAM, 6, "", (address, 11434))])
+def test_calibration_rejects_metadata_public_and_non_server_destinations(address):
     with pytest.raises(ValueError):
-        local_ollama_url("http://untrusted.example:11434")
+        local_ollama_url(f"http://{address}:11434")
 
 
-def test_calibration_pins_checked_private_ip_and_rejects_credentials(monkeypatch):
-    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [
-        (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 11434))])
+def test_calibration_pins_loopback_ip_and_rejects_credentials():
     assert local_ollama_url("http://localhost:11434") == "http://127.0.0.1:11434"
     with pytest.raises(ValueError):
         local_ollama_url("http://user:password@localhost:11434")

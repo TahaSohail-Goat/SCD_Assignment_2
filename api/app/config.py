@@ -10,9 +10,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
-# The assignment's host Ollama transport stays on the isolated Minikube bridge;
-# NetworkPolicy restricts it to the resolved host /32, never Internet egress.
-_LOCAL_OLLAMA_URL = "http://host.minikube.internal:11434"  # NOSONAR: reviewed local bridge transport; see docs/SECURITY-REVIEW.md.
+# Standalone API development uses loopback. Kubernetes supplies its scoped host
+# bridge address explicitly through the ConfigMap and NetworkPolicy.
+_LOCAL_OLLAMA_URL = "http://127.0.0.1:11434"
 
 def _int(name: str, default: int) -> int:
     return int(os.environ.get(name, default))
