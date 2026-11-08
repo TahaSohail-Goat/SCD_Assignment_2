@@ -73,9 +73,10 @@ jobs:
       - run: python -m pip install httpx==0.28.1 pyyaml==6.0.2
       - name: Load API, UI and fixture indexer images
         run: |
-          docker build -t rahbar-api:dev api
-          docker build -t rahbar-ui:dev ui
-          docker build -t rahbar-indexer:fixture-base indexer
+          revision=$(git rev-parse HEAD)
+          docker build --build-arg "VCS_REF=$revision" -t rahbar-api:dev api
+          docker build --build-arg "VCS_REF=$revision" -t rahbar-ui:dev ui
+          docker build --build-arg "VCS_REF=$revision" -t rahbar-indexer:fixture-base indexer
           docker build -t rahbar-indexer:dev -f - eval/fixtures <<'DOCKERFILE'
           FROM rahbar-indexer:fixture-base
           COPY --chown=10001:10001 *.md /corpus/
@@ -89,6 +90,12 @@ jobs:
           kubectl -n rahbar rollout status deployment/fixture-ollama --timeout=120s
           kubectl -n rahbar wait --for=condition=complete job/initial-index --timeout=300s
           kubectl -n rahbar rollout status deployment/api --timeout=300s
+      - name: Validate the shared CD Ingress smoke before release
+        env:
+          EXPECTED_REVISION: ${{ github.sha }}
+        run: |
+          bash scripts/install_ingress.sh
+          bash scripts/smoke_ingress.sh
       - name: Enforce the fixture baseline
         run: |
           kubectl -n rahbar port-forward svc/api 18000:8000 &
@@ -107,6 +114,12 @@ jobs:
           kubectl -n rahbar logs -l job-name=initial-index --all-containers=true --tail=60 || true
           kubectl -n rahbar logs -l app=api --tail=30 || true
           kubectl -n rahbar logs -l app=fixture-ollama --tail=30 || true
+          kubectl -n ingress-nginx logs deployment/ingress-nginx-controller --tail=40 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-ingress-smoke
+          path: output/ingress-smoke/
       - uses: actions/upload-artifact@v4
         if: always()
         with:
