@@ -23,7 +23,7 @@ from api.app.providers.llm.ollama import OllamaProvider
 from api.app.retrieval.chroma import ChromaRetriever
 from api.app.services.answer import answer_question
 from api.app.services.cache import SemanticCache
-from eval.calibrate_cache import main as calibrate
+from eval.calibrate_cache import measure as calibrate
 from eval.run_eval import evaluate, gate, load_golden, write_results
 from indexer.pipeline.config import get_settings
 from indexer.pipeline.embed import embed
@@ -83,13 +83,9 @@ def main() -> int:
                       "gate_failures": gate(result, {"recall@5": 1.0})}
             records.append(record)
             print(json.dumps(record), flush=True)
-        calibration_argv = ["calibrate_cache", "--out", str(args.out / "cache-calibration.json")]
-        previous = sys.argv
-        try:
-            sys.argv = calibration_argv
-            calibrate()
-        finally:
-            sys.argv = previous
+        calibration = calibrate(settings.ollama_url, settings.embed_model,
+                                Path("eval/cache_cases.yaml"))
+        write_results(calibration, args.out / "cache-calibration.json")
         # Capture a complete-clause answer against the final published snapshot.
         config = api_settings()
         cache = SemanticCache(config)
