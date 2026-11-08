@@ -27,8 +27,7 @@ export HOST
 INGRESS_IP="$INGRESS_IP" "$PYTHON" -c 'import ipaddress,os; p=ipaddress.ip_address(os.environ["INGRESS_IP"]); assert p.is_private and not (p.is_link_local or p.is_unspecified or p.is_multicast)'
 
 fetch_ready() {
-  curl -fsS --retry 60 --retry-connrefused --retry-delay 2 -H "Host: $HOST" \
-    "http://$INGRESS_IP/readyz" --output "$1" # NOSONAR: private ephemeral cluster IP checked above; dependency status only.
+  curl -fsS --retry 60 --retry-connrefused --retry-delay 2 -H "Host: $HOST" "http://$INGRESS_IP/readyz" --output "$1" # NOSONAR: private ephemeral cluster IP checked above; dependency status only.
   "$PYTHON" -c 'import json,sys; x=json.load(open(sys.argv[1])); assert x["status"] == "ready"' "$1"
 }
 fetch_ready "$out/ready-before.json"
@@ -53,8 +52,7 @@ PY
 chroma_ip=$(kubectl --context=minikube -n rahbar get service chroma -o jsonpath='{.spec.clusterIP}')
 kubectl --context=minikube -n rahbar exec deployment/ui -- which wget > "$out/ui-wget.txt"
 kubectl --context=minikube -n rahbar exec deployment/ui -- wget -q -O - http://127.0.0.1:8080/ > "$out/ui-positive.html"
-if kubectl --context=minikube -n rahbar exec deployment/ui -- \
-    wget -T 5 -O - "http://$chroma_ip:8000/api/v2/heartbeat" > "$out/ui-chroma-denied.txt" 2>&1; then # NOSONAR: deliberate private-cluster negative connectivity test, no credentials.
+if kubectl --context=minikube -n rahbar exec deployment/ui -- wget -T 5 -O - "http://$chroma_ip:8000/api/v2/heartbeat" > "$out/ui-chroma-denied.txt" 2>&1; then # NOSONAR: deliberate private-cluster negative connectivity test, no credentials.
   echo 'UI unexpectedly reached Chroma' >&2
   exit 1
 fi

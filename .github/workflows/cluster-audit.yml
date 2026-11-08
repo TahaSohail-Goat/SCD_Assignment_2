@@ -23,7 +23,7 @@ jobs:
       - name: Install locked audit tools
         run: |
           python -m pip install --only-binary=:all: --require-hashes -r requirements-audit.lock
-      - uses: medyagh/setup-minikube@v0.0.20
+      - uses: medyagh/setup-minikube@e3c7f79eb1e997eabccc536a6cf318a2b0fe19d9 # v0.0.20
         with:
           minikube-version: 1.37.0
           kubernetes-version: v1.33.0
