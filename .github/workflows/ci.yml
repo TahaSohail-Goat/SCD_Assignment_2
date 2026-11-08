@@ -36,7 +36,8 @@ jobs:
         with: {version: v1.33.0}
       - uses: actions/setup-python@v6
         with: {python-version: '3.12'}
-      - run: python -m pip install --only-binary=:all: pyyaml==6.0.2
+      - run: |
+          python -m pip install --only-binary=:all: pyyaml==6.0.2
       - run: kubectl kustomize k8s/overlays/prod | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
       - run: kubectl kustomize k8s/overlays/dev | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
       - run: kubectl kustomize k8s/overlays/ci | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary
