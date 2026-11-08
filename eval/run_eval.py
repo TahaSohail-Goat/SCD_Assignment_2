@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import time
 from collections import defaultdict
@@ -84,6 +85,8 @@ def _metrics(rows: list[dict]) -> dict:
         valid += right
         total += checked
     abstentions = [row["abstention_correct"] for row in rows if row["must_abstain"]]
+    facts = [row["answer_checks_passed"] for row in rows
+             if row.get("answer_checks_passed") is not None]
     return {
         **{f"recall@{k}": mean(scores) if (scores := [
             row[f"recall@{k}"] for row in rows if row[f"recall@{k}"] is not None
@@ -94,6 +97,8 @@ def _metrics(rows: list[dict]) -> dict:
         "abstention_correctness": mean(abstentions) if abstentions else None,
         "must_abstain_questions": len(abstentions),
         "questions": len(rows),
+        "answer_check_correctness": mean(facts) if facts else None,
+        "checked_answers": len(facts),
     }
 
 
@@ -111,6 +116,12 @@ def summarise(rows: list[dict]) -> dict:
             "abstention_correct": (
                 response["answered_from_context"] is False and not response["citations"]
                 if row["must_abstain"] else None
+            ),
+            "answer_checks_passed": (
+                bool(response["answered_from_context"]) and all(
+                    re.search(pattern, response.get("answer", ""), re.I)
+                    for pattern in row["required_answer_patterns"])
+                if row.get("required_answer_patterns") else None
             ),
         }
         scored.append(result)
@@ -135,6 +146,8 @@ def gate(results: dict, baseline: dict | None) -> list[str]:
         failures.append(f"citation validity {validity!r} is below {MIN_CITATION_VALIDITY:.0%}")
     if results["abstention_correctness"] != REQUIRED_ABSTENTION:
         failures.append("all must-abstain questions must be declined without citations")
+    if results.get("checked_answers", 0) and results.get("answer_check_correctness") != 1:
+        failures.append("required answer facts or qualifications are missing")
     return failures
 
 
@@ -147,6 +160,7 @@ def evaluate(client: httpx.Client, api: str, questions: list[dict]) -> dict:
             "id": q["id"], "type": q.get("type", "ordinary"),
             "question": q["question"], "must_abstain": bool(q.get("must_abstain", False)),
             "relevant": q.get("relevant") or [], "expect": q.get("expect"),
+            "required_answer_patterns": q.get("required_answer_patterns") or [],
             "response": response, "seconds": round(time.perf_counter() - started, 3),
         })
     return summarise(rows)

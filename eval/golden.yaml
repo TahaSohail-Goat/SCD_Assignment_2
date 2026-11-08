@@ -25,6 +25,7 @@ questions:
     relevant:
       - {source: academic-rules-handbook-jun-2026.pdf, page: 8, section: "1.10"}
     expect: 1 or 2 credit hours
+    required_answer_patterns: ['\b1\s+or\s+2\s+credit\s+hours\b']
   - id: q05
     type: ordinary
     question: In the undergraduate letter-grade interpretation table, which interpretation corresponds to A and A-?
@@ -37,6 +38,7 @@ questions:
     relevant:
       - {source: student-handbook-jun-2026.pdf, page: 50, section: "4. Acceptable Uses of Generative AI Tools"}
     expect: It may help with preparatory research, but it must not be the only source.
+    required_answer_patterns: ['never\s+be\s+the\s+only\s+source']
   - id: q07
     type: ordinary
     question: What is the maximum absence the head of department may condone in an undergraduate course for a genuine reason?
@@ -49,6 +51,7 @@ questions:
     relevant:
       - {source: faculty-entrepreneurship-and-technical-start-ups-policy.pdf, page: 2}
     expect: One impact-factor journal paper, at least online with a DOI, with NUCES affiliation.
+    required_answer_patterns: ['one\s+journal\s+paper', '\bDOI\b', 'impact[\s-]+factor', 'two\s+years', 'NUCES\s+affiliation']
   - id: q09
     type: version
     question: Under the August 2023 undergraduate rules, how long was the optional summer semester?
@@ -67,6 +70,7 @@ questions:
     relevant:
       - {source: academic-rules-handbook-jun-2026.pdf, page: 10, section: "1.22"}
     expect: Ineligible for the final exam and assigned F/A.
+    required_answer_patterns: ['\bineligible\b', '\bF/A\b']
   - id: q12
     type: exact
     question: What does current undergraduate clause 1.23 give as the minimum duration of a Bachelor's degree?
@@ -89,3 +93,4 @@ questions:
     relevant:
       - {source: academic-rules-handbook-jun-2026.pdf, page: 10, section: "1.21"}
     expect: 100 percent, with up to 20 percent condonable by the HoD for genuine reasons.
+    required_answer_patterns: ['100\s*%', '20\s*%', '\bHoD\b', '\bgenuine\b']

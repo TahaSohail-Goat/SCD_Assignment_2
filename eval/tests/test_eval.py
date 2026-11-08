@@ -52,6 +52,23 @@ def test_gate_thresholds_and_missing_values() -> None:
     assert len(run_eval.gate(broken, {"recall@5": 1})) == 3
 
 
+def test_correct_retrieval_and_citations_cannot_hide_a_wrong_unit_or_missing_fact():
+    response = {"answered_from_context": True, "citations": [GOOD], "retrieved": [GOOD],
+                "answer": "One credit corresponds to three contact hours."}
+    rows = [
+        {"id": "quantity", "type": "ordinary", "must_abstain": False, "relevant": [GOOD],
+         "required_answer_patterns": [r"1\s+or\s+2\s+credits"], "response": response},
+        {"id": "unknown", "type": "abstain", "must_abstain": True, "relevant": [],
+         "response": {**response, "answered_from_context": False, "citations": []}},
+    ]
+    result = run_eval.summarise(rows)
+    assert result["recall@5"] == result["citation_validity"] == result["abstention_correctness"] == 1
+    assert run_eval.gate(result, {"recall@5": 1}) == [
+        "required answer facts or qualifications are missing"]
+    response["answer"] = "The unit is assigned 1 or 2 credits."
+    assert run_eval.gate(run_eval.summarise(rows), {"recall@5": 1}) == []
+
+
 def test_cli_writes_failure_details_without_overwriting_baseline(tmp_path, monkeypatch) -> None:
     golden = tmp_path / "golden.yaml"
     golden.write_text(json.dumps({"questions": [

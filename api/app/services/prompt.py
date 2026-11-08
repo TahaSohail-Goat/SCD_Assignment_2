@@ -52,6 +52,19 @@ def grounded_schema(passages: list[Passage]) -> dict:
     return schema
 
 
+def select_context(question: str, passages: list[Passage]) -> list[Passage]:
+    """Remove distractors when an exact clause or a standout match is present."""
+    clause = re.search(r"\bclause\s+(\d+(?:\.\d+)+)", question, re.I)
+    if clause:
+        exact = [p for p in passages if p.section == clause[1]]
+        if exact:
+            return exact
+    ranked = sorted(passages, key=lambda p: -p.score)
+    if len(ranked) > 1 and ranked[0].score - ranked[1].score >= 0.10:
+        return ranked[:1]
+    return passages
+
+
 def messages(question: str, passages: list[Passage]) -> list[dict[str, str]]:
     evidence = [
         {"number": i, "chunk_id": p.chunk_id, "source": p.source, "section": p.section,

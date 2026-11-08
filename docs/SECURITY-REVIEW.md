@@ -29,8 +29,8 @@ and cleartext transports. The gate and its rating requirement remain enabled.
 ## Narrow transport exceptions
 
 Explicit `NOSONAR` comments identify reviewed local HTTP transports: the
-ConfigMap entry, two visible rollout HTML fetches, and the live cluster's
-dependency-status fetch and deliberate negative Chroma probe. The standalone API
+ConfigMap entry, visible rollout version probes, and the live cluster's
+dependency/answer probes and deliberate negative Chroma probe. The standalone API
 default uses loopback. These are assignment test-cluster transports. They do not
 describe an Internet production deployment or a promise of transport encryption.
 
