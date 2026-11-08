@@ -49,3 +49,7 @@ certificate validation. No global rule exclusion, quality-profile change, status
 override, branch-protection relaxation or vulnerability acceptance was applied to
 make the PR green. These line exceptions do not suppress the path, network-input
 or supply-chain findings above.
+
+## Captured rollout HTML and duplication analysis
+
+The final evidence commit stores actual blue/green/undo and UI-control HTTP bodies. Sonar reported 70.4% new duplication because these captured copies intentionally contain the deployed UI. `.sonarcloud.properties` excludes only `docs/evidence/**/*.html` from copy/paste detection. Application UI, API, indexer, scripts and tests retain duplication checks; security rules and the quality gate are unchanged. Raw captures remain available for review. This is an artifact-scope correction, not a code-duplication waiver.

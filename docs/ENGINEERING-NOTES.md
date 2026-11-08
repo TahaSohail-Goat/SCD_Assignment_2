@@ -32,7 +32,7 @@ Resource rationale and evidence limits:
 | Data-wait init | 10m, 16Mi / 50m, 32Mi | Bounded busybox connectivity wait; no independent sample captured yet. |
 | CI model double | 100m, 128Mi / 500m, 256Mi | Bounded stdlib fixture server, now explicitly limited; not real Ollama. |
 
-New raw samples are in `docs/evidence/kubernetes-f583517/indexer-memory-samples.txt` and `resources-after.txt`, with a computed `summary.json`. Older figures remain in their dated records. Requests provide scheduling headroom and limits cap bursts; these finite observations do not establish optimal resource settings.
+The evidence workflow samples `kubectl top pod` while the indexer is active and `kubectl top pods` after the experiments. New raw samples are in `docs/evidence/kubernetes-f583517/indexer-memory-samples.txt` and `resources-after.txt`, with a computed `summary.json`. Older figures remain in their dated records. Requests provide scheduling headroom and limits cap bursts; these finite observations do not establish optimal resource settings.
 
 ## 5. Where is recall@5 worst, and what technique addresses it?
 
