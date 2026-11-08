@@ -1,0 +1,63 @@
+name: Real Kubernetes evidence
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/assignment-completion']
+    paths:
+      - '.github/workflows/cluster-audit.yml'
+      - 'scripts/live_cluster.sh'
+permissions:
+  contents: read
+concurrency:
+  group: cluster-audit-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  demonstrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - name: Install locked audit tools
+        run: |
+          python -m pip install --only-binary=:all: --require-hashes -r requirements-audit.lock
+      - uses: medyagh/setup-minikube@v0.0.20
+        with:
+          minikube-version: v1.37.0
+          kubernetes-version: v1.33.0
+          driver: docker
+          cni: calico
+          memory: '6144'
+          cpus: '4'
+          addons: ingress,metrics-server
+      - name: Start host Ollama on the private bridge only
+        run: |
+          gateway=$(minikube ssh -- "getent ahostsv4 host.minikube.internal | head -n 1 | cut -d ' ' -f 1" | tr -d '\r')
+          [[ -n "$gateway" ]]
+          docker run -d --name ollama --cpus=3 --memory=7g \
+            -p "$gateway:11434:11434" ollama/ollama:0.40.15
+          for attempt in $(seq 1 60); do
+            if docker exec ollama ollama list; then break; fi
+            sleep 1
+          done
+          docker exec ollama ollama pull nomic-embed-text
+          docker exec ollama ollama pull llama3.2:3b
+      - name: Exercise the real corpus, policy isolation, persistence and rollout
+        run: PYTHON=python bash scripts/live_cluster.sh
+      - name: Preserve diagnostics
+        if: always()
+        run: |
+          mkdir -p output/cluster-audit
+          kubectl -n rahbar get pods,svc,pvc,hpa,ingress -o wide > output/cluster-audit/objects.txt || true
+          kubectl -n rahbar get events --sort-by=.lastTimestamp > output/cluster-audit/events.txt || true
+          kubectl -n rahbar logs -l job-name=initial-index --all-containers=true --tail=100 > output/cluster-audit/indexer.jsonl 2>&1 || true
+          kubectl -n rahbar logs -l app=api --tail=100 > output/cluster-audit/api.jsonl 2>&1 || true
+          kubectl -n rahbar logs -l app=chroma --tail=60 > output/cluster-audit/chroma.log 2>&1 || true
+          docker logs --tail 60 ollama > output/cluster-audit/ollama.log 2>&1 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-kubernetes-evidence
+          path: output/cluster-audit/

@@ -28,16 +28,20 @@ and cleartext transports. The gate and its rating requirement remain enabled.
 
 ## Narrow transport exceptions
 
-Three HTTP locations carry explicit `NOSONAR` comments after review: the
-ConfigMap entry and two visible rollout HTML fetches. The standalone API default
-uses loopback. These are assignment test-cluster transports. They do not
+Explicit `NOSONAR` comments identify reviewed local HTTP transports: the
+ConfigMap entry, two visible rollout HTML fetches, and the live cluster's
+dependency-status fetch and deliberate negative Chroma probe. The standalone API
+default uses loopback. These are assignment test-cluster transports. They do not
 describe an Internet production deployment or a promise of transport encryption.
 
 The host Ollama address is the Minikube bridge; the deployment helper resolves
 that address and NetworkPolicy permits only its `/32` and port 11434. The operator
 must keep Ollama on a trusted local network, with no public port forwarding. The
 rollout script validates a private/loopback Ingress IP before fetching public UI
-version labels; it transmits no credentials or user prompts. Loopback benchmark
+version labels; it transmits no credentials or user prompts. The cluster audit
+checks a private Ingress IP, downloads dependency-status JSON, and probes the
+Chroma service's private cluster IP from the UI to demonstrate denied traffic.
+Loopback benchmark
 service ports bind to `127.0.0.1` in the live audit workflow.
 
 Using this system over an untrusted network requires TLS termination and proper
