@@ -6,6 +6,10 @@ on:
     paths:
       - '.github/workflows/cluster-audit.yml'
       - 'scripts/live_cluster.sh'
+      - 'api/app/**'
+      - 'indexer/pipeline/**'
+      - 'scripts/deploy_real.sh'
+      - 'scripts/rollout_demo.sh'
 permissions:
   contents: read
 concurrency:

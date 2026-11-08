@@ -4,9 +4,15 @@ on:
   push:
     branches: ['fix/assignment-completion']
     paths:
-      - 'api/**'
-      - 'indexer/**'
-      - 'eval/**'
+      - 'api/app/**'
+      - 'indexer/pipeline/**'
+      - 'eval/run_eval.py'
+      - 'eval/live_audit.py'
+      - 'eval/calibrate_cache.py'
+      - 'eval/golden.yaml'
+      - 'eval/cache_cases.yaml'
+      - 'corpus/fetch.py'
+      - 'corpus/sources.yaml'
       - 'scripts/artifact_paths.py'
       - 'requirements-audit.lock'
       - '.github/workflows/live-audit.yml'
@@ -17,6 +23,14 @@ concurrency:
   cancel-in-progress: true
 jobs:
   measure:
+    name: measure (${{ matrix.size }}/${{ matrix.overlap }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {size: 120, overlap: 20}
+          - {size: 240, overlap: 35}
+          - {size: 400, overlap: 50}
     runs-on: ubuntu-24.04
     timeout-minutes: 70
     env:
@@ -54,7 +68,7 @@ jobs:
       - run: python corpus/fetch.py
       - run: python corpus/fetch.py --verify
       - name: Measure real retrieval, answers, tokens and cache thresholds
-        run: python -m eval.live_audit --out eval/runs/current
+        run: python -m eval.live_audit --out eval/runs/current --configuration '${{ matrix.size }}/${{ matrix.overlap }}'
       - name: Capture service resources
         if: always()
         run: |
@@ -64,5 +78,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: real-corpus-measurements
+          name: real-corpus-measurements-${{ matrix.size }}-${{ matrix.overlap }}
           path: eval/runs/current/

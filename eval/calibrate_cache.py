@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,11 +35,9 @@ def summarise_pairs(pairs: list[dict]) -> dict:
     negatives = [row["similarity"] for row in pairs if not row["equivalent"]]
     if not negatives or not any(row["equivalent"] for row in pairs):
         raise ValueError("calibration needs positive and negative labelled pairs")
-    # Compare two permissive settings with the first safe representable boundary.
-    safe = math.nextafter(max(negatives), math.inf)
-    if safe > 1:
-        raise ValueError("different answers have indistinguishable embeddings; disable semantic hits")
-    thresholds = sorted({max(0.0, safe - 0.10), max(0.0, safe - 0.05), safe})
+    # Coarse thresholds leave a practical margin; a one-ULP boundary above a
+    # negative pair is too sensitive to floating-point/model execution changes.
+    thresholds = (0.85, 0.90, 0.95)
     trials = []
     for threshold in thresholds:
         false_hits = [row["id"] for row in pairs
@@ -48,7 +45,10 @@ def summarise_pairs(pairs: list[dict]) -> dict:
         true_hits = [row["id"] for row in pairs
                      if row["equivalent"] and row["similarity"] >= threshold]
         trials.append({"threshold": threshold, "false_hits": false_hits, "true_hits": true_hits})
-    chosen = next(row["threshold"] for row in trials if not row["false_hits"])
+    safe_trials = [row for row in trials if not row["false_hits"]]
+    if not safe_trials:
+        raise ValueError("no tested threshold avoids false hits; disable semantic reuse and recalibrate")
+    chosen = safe_trials[0]["threshold"]
     return {"trials": trials, "selected_threshold": chosen, "pairs": pairs,
             "selection_rule": "lowest tested threshold with zero labelled false hits"}
 

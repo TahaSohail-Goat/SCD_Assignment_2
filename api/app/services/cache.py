@@ -11,6 +11,7 @@ import redis
 
 from ..config import Settings
 from ..schemas import AskResponse
+from .prompt import factual_question
 
 GENERATION_KEY = "rahbar:index_generation"
 _FOLLOW_UP = re.compile(
@@ -20,6 +21,7 @@ _FOLLOW_UP = re.compile(
 
 
 def is_follow_up(question: str) -> bool:
+    question = factual_question(question)
     # A fully specified factual question can contain an incidental "it" in an
     # injection sentence; that does not make the policy subject unresolved.
     domain = re.search(r"\b(attendance|CGPA|tuition|credit|semester|degree|course|fee)\b", question, re.I)
@@ -75,7 +77,7 @@ class SemanticCache:
             self.settings.top_k, self.settings.relevance_floor, self.settings.temperature,
         )).encode()).hexdigest()[:12]
         generation = generation_id if generation_id is not None else self.generation_id()
-        return f"rahbar:cache:{generation}:v2-{scope}:"
+        return f"rahbar:cache:{generation}:v3-{scope}:"
 
     def lookup(self, embedding: list[float], *, generation_id: str | None = None) -> AskResponse | None:
         prefix = self._prefix(generation_id)

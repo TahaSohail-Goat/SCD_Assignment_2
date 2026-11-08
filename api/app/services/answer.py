@@ -14,6 +14,7 @@ from ..routes import metrics
 from ..schemas import Answer, AskResponse, Passage, RetrievedRef
 from .cache import SemanticCache, is_follow_up
 from .grounding import render_evidence
+from .prompt import factual_question
 
 log = logging.getLogger("rahbar.answer")
 _NO_EVIDENCE = "The available corpus does not contain enough evidence to answer this question."
@@ -73,9 +74,9 @@ def answer_question(
 ) -> AskResponse:
     embedding: list[float] | None = None
     generation_id = None
-    follow_up = is_follow_up(question)
-    skip_cache = follow_up or is_historical_question(question)
-    query = question
+    query = factual_question(question)
+    follow_up = is_follow_up(query)
+    skip_cache = follow_up or is_historical_question(query)
     if follow_up:
         try:
             previous = cache.previous_question(session_id) if cache and session_id else None
@@ -142,6 +143,10 @@ def answer_question(
                 metrics.TOKENS.labels(provider=provider.name, direction="output").inc(result.output_tokens)
                 if not _citations_valid(candidate, grounded):
                     raise ValueError("model cited evidence that was not retrieved")
+                if not candidate.answered_from_context:
+                    candidate = candidate.model_copy(update={
+                        "answer": _NO_EVIDENCE, "confidence": "low",
+                    })
                 answer = render_evidence(candidate, grounded, question)
                 log.info("generation", extra={"input_tokens": result.input_tokens,
                                               "output_tokens": result.output_tokens})
