@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-11-08T18:44:23.863447+00:00",
+  "commit": "ad7239b772827a6c928e369cf1a208f360557046",
+  "measurements": [
+    {
+      "size": 120,
+      "overlap": 20,
+      "chunks": 802,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 56251,
+      "amplification": 1.0919979810529585,
+      "recall@3": 0.8461538461538461,
+      "recall@5": 0.9230769230769231,
+      "gate_failures": [
+        "recall@5 92.3% fell below baseline 100.0%"
+      ]
+    },
+    {
+      "size": 240,
+      "overlap": 35,
+      "chunks": 691,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 53725,
+      "amplification": 1.0429608634881193,
+      "recall@3": 0.8461538461538461,
+      "recall@5": 0.9230769230769231,
+      "gate_failures": [
+        "recall@5 92.3% fell below baseline 100.0%"
+      ]
+    },
+    {
+      "size": 400,
+      "overlap": 50,
+      "chunks": 669,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 52720,
+      "amplification": 1.0234508464047212,
+      "recall@3": 0.8461538461538461,
+      "recall@5": 0.9230769230769231,
+      "gate_failures": [
+        "recall@5 92.3% fell below baseline 100.0%"
+      ]
+    }
+  ],
+  "token_definition": "Ollama /api/embed prompt_eval_count summed per input batch",
+  "model_inventory": {
+    "models": [
+      {
+        "name": "llama3.2:3b",
+        "model": "llama3.2:3b",
+        "modified_at": "2026-11-08T18:05:42.110546362Z",
+        "size": 2019393189,
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "3.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 3072,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "completion",
+          "tools"
+        ]
+      },
+      {
+        "name": "nomic-embed-text:latest",
+        "model": "nomic-embed-text:latest",
+        "modified_at": "2026-11-08T18:05:33.258418599Z",
+        "size": 274302450,
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "nomic-bert",
+          "families": [
+            "nomic-bert"
+          ],
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      }
+    ]
+  }
+}

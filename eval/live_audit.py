@@ -36,7 +36,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=Path("eval/runs/current"))
     parser.add_argument("--publish", action="store_true")
+    parser.add_argument("--configuration", choices=("all", "120/20", "240/35", "400/50"),
+                        default="all")
     args = parser.parse_args()
+    if args.publish and args.configuration != "all":
+        parser.error("--publish requires the complete three-configuration audit")
     args.out = artifact_path(args.out, directory=True)
     args.out.mkdir(parents=True, exist_ok=True)
     settings = get_settings()
@@ -48,7 +52,10 @@ def main() -> int:
     server = None
     server_log = (args.out / "api.jsonl").open("w", encoding="utf-8")
     try:
-        for size, overlap in ((120, 20), (240, 35), (400, 50)):
+        configurations = [(120, 20), (240, 35), (400, 50)]
+        if args.configuration != "all":
+            configurations = [tuple(map(int, args.configuration.split("/")))]
+        for size, overlap in configurations:
             chunks = build_chunks(documents, size, overlap)
             usage: dict[str, int] = {}
             vectors = embed([piece.text for piece in chunks], settings, usage=usage)

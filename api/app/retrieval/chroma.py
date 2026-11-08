@@ -20,10 +20,27 @@ _HISTORICAL = re.compile(
     re.I,
 )
 _YEAR = re.compile(r"\b((?:19|20)\d{2})\b")
+_FILENAME_NOISE = frozenset((
+    "pdf", "jan", "january", "feb", "february", "mar", "march", "apr", "april",
+    "may", "jun", "june", "jul", "july", "aug", "august", "sep", "september",
+    "oct", "october", "nov", "november", "dec", "december",
+))
 
 
 def is_historical_question(question: str) -> bool:
     return bool(_HISTORICAL.search(question))
+
+
+def explicitly_named_sources(question: str, passages: list[Passage]) -> set[str]:
+    """Recognize complete filename titles, excluding date/extension furniture."""
+    query = " " + " ".join(re.findall(r"[a-z]+", question.casefold())) + " "
+    named = set()
+    for source in {p.source for p in passages}:
+        title = [word for word in re.findall(r"[a-z]+", source.casefold())
+                 if word not in _FILENAME_NOISE]
+        if len(title) >= 2 and " " + " ".join(title) + " " in query:
+            named.add(source)
+    return named
 
 
 def _heading_only(passage: Passage) -> bool:
@@ -108,6 +125,8 @@ class ChromaRetriever:
             # a different year just because its vector is semantically close.
             passages = [p for p in passages if year.group(1) in p.doc_version]
             passages.sort(key=lambda p: -p.score)
+        if named := explicitly_named_sources(question, passages):
+            passages = [p for p in passages if p.source in named]
         substantive = [passage for passage in passages if not _heading_only(passage)]
         if len(substantive) < k:
             substantive.extend(passage for passage in passages if _heading_only(passage))

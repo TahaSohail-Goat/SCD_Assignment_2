@@ -6,7 +6,7 @@ import httpx
 
 from ...config import Settings
 from ...schemas import Answer, Passage
-from ...services.prompt import messages
+from ...services.prompt import grounded_schema, messages
 from .base import GenerationError, GenerationResult
 
 
@@ -20,7 +20,7 @@ class OllamaProvider:
         payload = {
             "model": self.settings.llm_model,
             "messages": messages(question, passages),
-            "format": Answer.model_json_schema(),
+            "format": grounded_schema(passages),
             "stream": False,
             "options": {"temperature": self.settings.temperature},
         }

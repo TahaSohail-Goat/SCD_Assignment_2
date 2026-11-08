@@ -6,7 +6,7 @@
     "citation_validity": 1.0,
     "abstention_correctness": 1
   },
-  "timestamp": "2026-11-08T17:35:11.752697+00:00",
+  "timestamp": "2026-11-08T18:53:18.085773+00:00",
   "experiments": [
     {
       "stage": "A",
@@ -36,7 +36,7 @@
         "academic-rules-2023.md"
       ],
       "response": {
-        "request_id": "4e937ec0baa0403497f75b16798562ab",
+        "request_id": "570934a1837d44fc95aa9a67b9ddb410",
         "answer": "1.1 A student must attend at least 75 percent of the lectures of each course to be allowed to sit the final examination. [academic-rules-2023.md / 1. Attendance]\n1.2 A student who falls below the minimum attendance receives the grade FA in that course. [academic-rules-2023.md / 1. Attendance]",
         "citations": [
           {
@@ -92,7 +92,7 @@
       "stage": "D",
       "fault": "evidence boundary removed",
       "response": {
-        "request_id": "f1ed94ecd2d0419fb4115e6922bd4b48",
+        "request_id": "ecee42fc01e44b9f9e93a47a82a8a5be",
         "answer": "I could not verify a grounded answer. Please try again later.",
         "citations": [],
         "answered_from_context": false,
