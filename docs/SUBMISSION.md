@@ -37,7 +37,7 @@ The GitHub connector returned HTTP 403 for branch/tree writes. GitHub CLI was th
 6. Committed `eval/results.json` for the selected reviewed real run.
 7. Committed matching `eval/baseline.json`.
 
-Docker Hub namespace is not hard-coded because the workflow takes it from GitHub Secrets and masks it in logs. Fill the three image links from the actual registry after publishing; do not invent them. The prior README reports a November 6 Classroom hand-in, but this completion workflow has not independently opened Classroom or changed that submission.
+Docker Hub namespace is not hard-coded because the workflow takes it from GitHub Secrets and masks it in logs. After a successful reviewed release, CD's `release-image-links` artifact records the exact three public image/tag URLs and full commit; it includes no registry token. Use those actual links after publishing. The prior README reports a November 6 Classroom hand-in, but this completion workflow has not independently opened Classroom or changed that submission.
 
 ## Final release sequence
 

@@ -38,6 +38,25 @@ jobs:
               -t "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}" "$component"
             docker push "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}"
           done
+      - name: Record published image links for the team hand-in
+        env:
+          HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          user, sha = os.environ["HUB_USER"], os.environ["COMMIT_SHA"]
+          record = {"commit": sha, "images": {component: {
+              "image": f"{user}/rahbar-{component}:sha-{sha}",
+              "docker_hub": f"https://hub.docker.com/r/{user}/rahbar-{component}/tags?name=sha-{sha}",
+          } for component in ("api", "indexer", "ui")}}
+          Path("release-image-links.json").write_text(json.dumps(record, indent=2) + "\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-image-links
+          path: release-image-links.json
   deploy:
     needs: build-push
     runs-on: ubuntu-24.04
