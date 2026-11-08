@@ -6,7 +6,7 @@ Updated 8 November 2026. The assignment requires repository Markdown documentati
 
 The prior public release is main commit `1818a03a23527e411865e4c6b25020d92eadfaf9`. Its successful [CD run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42273870473), [CI run](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42272439538), real results and branch-protection/gate screenshots are historical evidence. The local `fix/assignment-completion` branch changes application and manifests. It must pass new CI, actual model measurements and cluster demonstrations before those old links can support a new release claim.
 
-At the time this completion work began, the GitHub connector could read the repository but returned HTTP 403 for branch/tree writes; local Git had no login. The user is enabling write access. No token should be placed in chat, a file, an environment example or Git history. If access remains unavailable, the implementation and runnable evidence tools stay local; that does not mean fresh remote results were produced.
+The GitHub connector returned HTTP 403 for branch/tree writes. GitHub CLI was then installed and authenticated interactively by the repository owner. Commit `ad7239b` is pushed to `fix/assignment-completion`, with [draft PR #11](https://github.com/TahaSohail-Goat/SCD_Assignment_2/pull/11) targeting `dev`. [New CI](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42508130233) passed all six jobs, including image security scans and the Kubernetes fixture evaluation. The [real-corpus audit](https://github.com/TahaSohail-Goat/SCD_Assignment_2/actions/runs/42508098303) is running; it is not yet passing evidence. No token belongs in chat, repository files or Git history.
 
 ## Requirement/evidence ledger
 
@@ -20,7 +20,7 @@ At the time this completion work began, the GitHub connector could read the repo
 | Inline citation/complete evidence, follow-up safety, dependency fallback | Implemented with regression tests; real model pass still needed. |
 | Three real chunk settings and token amplification | New live audit command/workflow implemented; run artifacts must be reviewed and retained. Prior table remains historical. |
 | Three cache thresholds and measured false hits | Labelled cases/calibrator implemented; production threshold must come from the new real embedding report. |
-| Hardened stateful data/fixture workloads | Explicit non-root, readonly root, capabilities, per-workload accounts/resources; runtime CI still needed. |
+| Hardened stateful data/fixture workloads | Explicit non-root, readonly root, capabilities, per-workload accounts/resources; new Kubernetes fixture CI passed. Real-corpus runtime evidence remains separate. |
 | Scoped host egress and real clean-clone runbook | Deployment renderer/helper implemented; fresh Minikube run needed. |
 | Visible image change/rollback and pod survival | Capture scripts ready; fresh real output must be collected. |
 | Real indexing resource samples | Older sampled 157Mi retained; collect current raw samples while indexing. |
