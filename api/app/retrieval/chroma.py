@@ -12,13 +12,14 @@ import httpx
 
 from ..config import Settings
 from ..schemas import Passage
+from ..services.cache import SemanticCache
 
 _HISTORICAL = re.compile(
     r"\b(?:old|older|previous|prior|superseded|historical|former) "
-    r"(?:edition|handbook|policy|regulations|rules|version)\b|\b20[0-2][0-5]\b",
+    r"(?:edition|handbook|policy|regulations|rules|version)\b|\b(?:19|20)\d{2}\b",
     re.I,
 )
-_YEAR = re.compile(r"\b(20\d{2})\b")
+_YEAR = re.compile(r"\b((?:19|20)\d{2})\b")
 
 
 def is_historical_question(question: str) -> bool:
@@ -67,7 +68,11 @@ class ChromaRetriever:
         return [float(value) for value in embeddings[0]]
 
     def retrieve(self, question: str, k: int, embedding: list[float] | None = None) -> list[Passage]:
-        collection = self.client.get_collection(self.settings.collection)
+        cache = SemanticCache(self.settings)
+        collection = self.client.get_collection(cache.active_collection(self.settings.collection))
+        metadata = collection.metadata or {}
+        if metadata.get("embed_model") != self.settings.embed_model:
+            raise ValueError("active collection embedding model conflicts with API configuration")
         historical = is_historical_question(question)
         count = int(collection.count())
         if count == 0:
@@ -79,6 +84,8 @@ class ChromaRetriever:
         }
         if not historical:
             query["where"] = {"superseded": False}
+        elif not _YEAR.search(question):
+            query["where"] = {"superseded": True}
         result = collection.query(**query)
         ids = result["ids"][0]
         documents = result["documents"][0]
@@ -97,8 +104,10 @@ class ChromaRetriever:
                 superseded=bool(meta.get("superseded", False)),
             ))
         if historical and (year := _YEAR.search(question)):
-            passages.sort(key=lambda p: (year.group(1) not in p.doc_version,
-                                         -p.score))
+            # An explicitly requested edition must never fall back silently to
+            # a different year just because its vector is semantically close.
+            passages = [p for p in passages if year.group(1) in p.doc_version]
+            passages.sort(key=lambda p: -p.score)
         substantive = [passage for passage in passages if not _heading_only(passage)]
         if len(substantive) < k:
             substantive.extend(passage for passage in passages if _heading_only(passage))

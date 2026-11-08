@@ -10,6 +10,18 @@ spec:
     - host: rahbar.local
       http:
         paths:
+          - path: /healthz
+            pathType: Exact
+            backend:
+              service: {name: api, port: {name: http}}
+          - path: /readyz
+            pathType: Exact
+            backend:
+              service: {name: api, port: {name: http}}
+          - path: /metrics
+            pathType: Exact
+            backend:
+              service: {name: api, port: {name: http}}
           - path: /api
             pathType: Prefix
             backend:

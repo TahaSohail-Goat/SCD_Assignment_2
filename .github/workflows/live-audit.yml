@@ -1,0 +1,65 @@
+name: Real corpus audit
+on:
+  workflow_dispatch:
+  push:
+    branches: ['fix/assignment-completion']
+    paths:
+      - 'api/**'
+      - 'indexer/**'
+      - 'eval/**'
+      - '.github/workflows/live-audit.yml'
+permissions:
+  contents: read
+concurrency:
+  group: real-corpus-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    env:
+      CHROMA_HOST: 127.0.0.1
+      CHROMA_PORT: '18001'
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: '16379'
+      OLLAMA_URL: http://127.0.0.1:11434
+      CORPUS_DIR: corpus/raw
+      RETRIEVER: chroma
+      LLM_PROVIDER: ollama-host
+      EMBED_MODEL: nomic-embed-text
+      LLM_MODEL: llama3.2:3b
+      CACHE_THRESHOLD: '1.01'
+      TOP_K: '5'
+    steps:
+      - uses: actions/checkout@v6
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
+      - run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+      - name: Start bounded real services
+        run: |
+          docker run -d --name chroma --cpus=1 --memory=2g -p 127.0.0.1:18001:8000 chromadb/chroma:1.0.12
+          docker run -d --name redis --cpus=0.5 --memory=256m -p 127.0.0.1:16379:6379 redis:7.4.2-alpine
+          docker run -d --name ollama --cpus=3 --memory=7g -p 127.0.0.1:11434:11434 ollama/ollama:0.40.15
+          for attempt in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:11434/api/tags && break
+            sleep 1
+          done
+          docker exec ollama ollama pull nomic-embed-text
+          docker exec ollama ollama pull llama3.2:3b
+      - run: python corpus/fetch.py
+      - run: python corpus/fetch.py --verify
+      - name: Measure real retrieval, answers, tokens and cache thresholds
+        run: python -m eval.live_audit --out eval/runs/current
+      - name: Capture service resources
+        if: always()
+        run: |
+          mkdir -p eval/runs/current
+          docker stats --no-stream --format '{{json .}}' > eval/runs/current/docker-resources.jsonl
+          docker logs --tail 100 ollama > eval/runs/current/ollama.log 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-corpus-measurements
+          path: eval/runs/current/

@@ -167,6 +167,8 @@ def main() -> int:
     parser.add_argument("--update-baseline", action="store_true",
                         help="write these results as the new baseline")
     args = parser.parse_args()
+    if not args.baseline.exists() and not args.update_baseline:
+        parser.error("baseline is missing; use --update-baseline only for a reviewed initial run")
 
     questions = load_golden(args.golden)
     headers = {"Host": args.host} if args.host else {}

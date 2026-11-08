@@ -1,0 +1,143 @@
+{
+  "environment": "offline fixture doubles",
+  "healthy_control": {
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "citation_validity": 1.0,
+    "abstention_correctness": 1
+  },
+  "timestamp": "2026-11-08T17:35:11.752697+00:00",
+  "experiments": [
+    {
+      "stage": "A",
+      "fault": "OCR disabled on image-only PDF",
+      "control_text": "Attendance rule: attend 80 percent.",
+      "observed_error": "image-only-policy.pdf: no readable text in document",
+      "scope": "synthetic raster PDF; deterministic OCR control"
+    },
+    {
+      "stage": "C",
+      "fault": "API embedding model changed alone",
+      "http_status": 503,
+      "response": {
+        "status": "not_ready",
+        "checks": {
+          "embedding_pin": "collection model 'fixture-hash' != configured model 'wrong'",
+          "redis": "ok"
+        }
+      }
+    },
+    {
+      "stage": "E",
+      "fault": "superseded filter removed",
+      "superseded_sources": [
+        "academic-rules-2023.md",
+        "academic-rules-2023.md",
+        "academic-rules-2023.md"
+      ],
+      "response": {
+        "request_id": "4e937ec0baa0403497f75b16798562ab",
+        "answer": "1.1 A student must attend at least 75 percent of the lectures of each course to be allowed to sit the final examination. [academic-rules-2023.md / 1. Attendance]\n1.2 A student who falls below the minimum attendance receives the grade FA in that course. [academic-rules-2023.md / 1. Attendance]",
+        "citations": [
+          {
+            "source": "academic-rules-2023.md",
+            "section": "1. Attendance",
+            "page": 1
+          }
+        ],
+        "answered_from_context": true,
+        "confidence": "low",
+        "retrieved": [
+          {
+            "chunk_id": "87b51c5f07738b83527a41e1333ca230fdf39ef82fe04ab24decabfa4909444f",
+            "source": "academic-rules-2023.md",
+            "section": "1. Attendance",
+            "page": 1,
+            "score": 0.2461829819586655
+          },
+          {
+            "chunk_id": "dc60e0d297a0edd089f5125a149fbe93aeeb8e4d7f75281bcd5a7956fef3fba8",
+            "source": "academic-rules-2026.md",
+            "section": "1. Attendance",
+            "page": 1,
+            "score": 0.22222222222222232
+          },
+          {
+            "chunk_id": "410904a1f05e395c2fe721a33f13dbf42e9a9ec2153b70bfbbb82a58af5e8dc7",
+            "source": "academic-rules-2026.md",
+            "section": "3. Repeating a course",
+            "page": 1,
+            "score": 0.060858061945018416
+          },
+          {
+            "chunk_id": "224af4a574dd7e8483174acc3c866eded9dfc163027e3d716a52a0a5b94afbfd",
+            "source": "academic-rules-2023.md",
+            "section": "2. Academic warning",
+            "page": 1,
+            "score": 0.0
+          },
+          {
+            "chunk_id": "24e56793e4f2821fb79e09a5e95c3b541352505e3f3f67bbc2adc5bbf3580620",
+            "source": "academic-rules-2023.md",
+            "section": "Margalla Institute of Technology: Academic Rules (2023 edition)",
+            "page": 1,
+            "score": 0.0
+          }
+        ],
+        "provider": "ollama",
+        "cached": false
+      }
+    },
+    {
+      "stage": "D",
+      "fault": "evidence boundary removed",
+      "response": {
+        "request_id": "f1ed94ecd2d0419fb4115e6922bd4b48",
+        "answer": "I could not verify a grounded answer. Please try again later.",
+        "citations": [],
+        "answered_from_context": false,
+        "confidence": "low",
+        "retrieved": [
+          {
+            "chunk_id": "dc60e0d297a0edd089f5125a149fbe93aeeb8e4d7f75281bcd5a7956fef3fba8",
+            "source": "academic-rules-2026.md",
+            "section": "1. Attendance",
+            "page": 1,
+            "score": 0.28867513459481287
+          },
+          {
+            "chunk_id": "410904a1f05e395c2fe721a33f13dbf42e9a9ec2153b70bfbbb82a58af5e8dc7",
+            "source": "academic-rules-2026.md",
+            "section": "3. Repeating a course",
+            "page": 1,
+            "score": 0.21081851067789192
+          },
+          {
+            "chunk_id": "373ffaf4c312d122a5cca379f771009b0b78859a42a39004aa3561a11111c0e9",
+            "source": "fees-2026.md",
+            "section": "1. Tuition",
+            "page": 1,
+            "score": 0.11111111111111116
+          },
+          {
+            "chunk_id": "efb5e1604bf3720ac38d6b5f8fa2cd89d84af8ff2fdc727e5b57512dd9d764ca",
+            "source": "academic-rules-2026.md",
+            "section": "2. Academic warning",
+            "page": 1,
+            "score": 0.08512565307587483
+          },
+          {
+            "chunk_id": "d72adf46f7597ffdec6543bbbf0426978687bc9ebcd10b3b67758d6282c66cf5",
+            "source": "fees-2026.md",
+            "section": "2. Other charges",
+            "page": 1,
+            "score": 0.04714045207910322
+          }
+        ],
+        "provider": "ollama",
+        "cached": false
+      },
+      "scope": "deterministic provider rejects missing boundary; not a real-model claim"
+    }
+  ]
+}

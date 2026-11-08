@@ -8,7 +8,7 @@ Repeated standalone questions otherwise incur embedding, retrieval, and generati
 
 ## Decision
 
-`api/app/services/cache.py` stores response JSON and query vectors in Redis with a 24 hour TTL. It compares cosine similarity against configurable threshold 0.95. Follow-up questions, abstentions, and fallbacks are not stored. Keys include the `rahbar:index_generation` counter. The indexer must increment that counter after a complete successful write. Redis is required for readiness so cache failures are operationally visible; request handling degrades to uncached answering if one lookup fails.
+`api/app/services/cache.py` stores response JSON and query vectors in Redis with a 24-hour TTL. Cosine threshold is configurable; the prior 0.95 is a reference pending review of the new real calibration. `eval/calibrate_cache.py` measures three thresholds and selects the lowest tested threshold with zero labelled false hits, retaining every pair's score and true-hit tradeoff. Follow-ups, abstentions and fallbacks are not stored. Keys include index generation plus model/prompt/retrieval scope; the indexer atomically increments generation with snapshot publication. Redis is required for readiness. Request handling can degrade to uncached answering if cache lookup alone fails. Separate turn records expire after one hour and never contain internal reasoning.
 
 ## Consequences
 

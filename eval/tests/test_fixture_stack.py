@@ -2,6 +2,7 @@
 
 import json
 import os
+from datetime import datetime, timezone
 from contextlib import nullcontext
 from dataclasses import replace
 from pathlib import Path
@@ -50,6 +51,32 @@ class MemoryRedis:
         self.values[key] = str(int(self.get(key) or "0") + 1)
         return int(self.values[key])
 
+    def pipeline(self, transaction=True):
+        memory = self
+
+        class Transaction:
+            def __enter__(self):
+                self.commands = []
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def set(self, key, value):
+                self.commands.append((key, value))
+
+            def incr(self, key):
+                self.commands.append((key, None))
+
+            def execute(self):
+                for key, value in self.commands:
+                    if value is None:
+                        memory.incr(key)
+                    else:
+                        memory.values[key] = value
+
+        return Transaction()
+
     def scan_iter(self, *, match):
         return (key for key in self.values if key.startswith(match.removesuffix("*")))
 
@@ -61,6 +88,29 @@ class MemoryRedis:
 
 
 def test_fixture_evaluation_gate(monkeypatch, tmp_path):
+    observations = []
+    # A: an actual image-only PDF has no native policy text without OCR. The
+    # control OCR is deterministic; this does not pretend to measure Tesseract.
+    from PIL import Image, ImageDraw
+    from pipeline.extract import ExtractionError, extract
+
+    image = Image.new("RGB", (600, 160), "white")
+    ImageDraw.Draw(image).text((30, 60), "Attendance rule: attend 80 percent.", fill="black")
+    scan = tmp_path / "image-only-policy.pdf"
+    image.save(scan, "PDF")
+    image.close()
+    with monkeypatch.context() as fault:
+        fault.setattr("pipeline.extract._ocr", lambda page: "Attendance rule: attend 80 percent.")
+        control_text = extract(str(scan), "2026", False).pages[0].text
+        fault.setattr("pipeline.extract._ocr", lambda page: "")
+        try:
+            extract(str(scan), "2026", False)
+        except ExtractionError as exc:
+            observations.append({"stage": "A", "fault": "OCR disabled on image-only PDF",
+                "control_text": control_text, "observed_error": str(exc),
+                "scope": "synthetic raster PDF; deterministic OCR control"})
+        else:
+            raise AssertionError("image-only policy was silently accepted without OCR")
     client = Client()
     memory = MemoryRedis()
     make_client = httpx.Client
@@ -98,6 +148,8 @@ def test_fixture_evaluation_gate(monkeypatch, tmp_path):
             response = api.get("/readyz")
             assert response.status_code == 503
             assert "embedding_pin" in response.text
+            observations.append({"stage": "C", "fault": "API embedding model changed alone",
+                "http_status": response.status_code, "response": response.json()})
 
         with monkeypatch.context() as fault:
             def unfiltered(self, **kwargs):
@@ -106,6 +158,10 @@ def test_fixture_evaluation_gate(monkeypatch, tmp_path):
             fault.setattr(Collection, "query", unfiltered)
             response = api.post("/api/ask", json={"question": probes["f02"]}).json()
             assert any(ref["source"] == "academic-rules-2023.md" for ref in response["retrieved"])
+            observations.append({"stage": "E", "fault": "superseded filter removed",
+                "superseded_sources": [ref["source"] for ref in response["retrieved"]
+                                       if ref["source"] == "academic-rules-2023.md"],
+                "response": response})
 
         with monkeypatch.context() as fault:
             def without_boundary(question, passages):
@@ -117,11 +173,19 @@ def test_fixture_evaluation_gate(monkeypatch, tmp_path):
             response = api.post("/api/ask", json={"question": probes["f06"]}).json()
             assert response["answered_from_context"] is False
             assert "could not verify" in response["answer"]
+            observations.append({"stage": "D", "fault": "evidence boundary removed",
+                "response": response,
+                "scope": "deterministic provider rejects missing boundary; not a real-model claim"})
 
     results["golden"] = "eval/fixtures/golden.fixture.yaml"
     results["environment"] = "offline fixture doubles"
     output = Path(os.environ.get("RAHBAR_FIXTURE_RESULTS", tmp_path / "results.json"))
     write_results(results, output)
+    fault_output = Path(os.environ.get("RAHBAR_FAULT_RESULTS", tmp_path / "faults.json"))
+    write_results({"environment": "offline fixture doubles", "healthy_control": {
+        key: results[key] for key in ("recall@3", "recall@5", "citation_validity",
+                                     "abstention_correctness")},
+        "timestamp": datetime.now(timezone.utc).isoformat(), "experiments": observations}, fault_output)
     baseline_path = FIXTURES / "baseline.fixture.json"
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
     assert not gate(results, baseline)

@@ -1,0 +1,14 @@
+{
+  "resources": 26,
+  "containers": [
+    "Deployment/api/api",
+    "Deployment/redis/redis",
+    "Deployment/ui/ui",
+    "StatefulSet/chroma/chroma",
+    "CronJob/reindex/indexer",
+    "CronJob/reindex/wait-for-data",
+    "Job/initial-index/indexer",
+    "Job/initial-index/wait-for-data"
+  ],
+  "errors": []
+}

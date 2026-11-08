@@ -20,7 +20,7 @@ def check_readiness(settings: Settings, cache: SemanticCache) -> dict[str, str]:
             host=settings.chroma_host, port=settings.chroma_port,
             settings=ChromaSettings(anonymized_telemetry=False),
         )
-        collection = client.get_collection(settings.collection)
+        collection = client.get_collection(cache.active_collection(settings.collection))
         count = int(collection.count())
         metadata = collection.metadata or {}
         recorded_model = str(metadata.get("embed_model", ""))

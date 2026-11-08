@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-        with: {persist-credentials: false}
+        with: {persist-credentials: false, fetch-depth: 0}
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -20,14 +20,13 @@ jobs:
             api/requirements-dev.txt
             indexer/requirements-dev.txt
       - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
-      - run: ruff check api indexer eval corpus
+      - run: ruff check api indexer eval corpus scripts
       - run: cd api && mypy app
       - run: cd indexer && mypy pipeline
       - run: cd api && pytest -q --cov=app --cov-branch --cov-fail-under=60
       - run: cd indexer && pytest -q
       - run: python -m pytest -q -c eval/pyproject.toml eval/tests
       - run: python scripts/check_submission.py
-        continue-on-error: true # final submission also needs measured real-corpus results and evidence
   manifests:
     runs-on: ubuntu-24.04
     steps:
@@ -35,8 +34,16 @@ jobs:
         with: {persist-credentials: false}
       - uses: azure/setup-kubectl@v4
         with: {version: v1.33.0}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - run: python -m pip install pyyaml==6.0.2
       - run: kubectl kustomize k8s/overlays/prod | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
       - run: kubectl kustomize k8s/overlays/dev | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary -ignore-missing-schemas
+      - run: kubectl kustomize k8s/overlays/ci | docker run --rm -i ghcr.io/yannh/kubeconform:v0.8.0-alpine -strict -summary
+      - run: |
+          for overlay in prod dev ci; do
+            kubectl kustomize "k8s/overlays/$overlay" | python scripts/check_manifest_contract.py
+          done
   images:
     runs-on: ubuntu-24.04
     strategy:
@@ -77,11 +84,8 @@ jobs:
       - name: Index fixtures and wait for the API
         run: |
           kubectl apply -f k8s/base/namespace.yaml
-          kubectl -n rahbar create deployment fixture-ollama --image=rahbar-indexer:dev -- \
-            python /app/fake_ollama.py
-          kubectl -n rahbar expose deployment fixture-ollama --port=11434
-          kubectl -n rahbar rollout status deployment/fixture-ollama --timeout=120s
           kubectl apply -k k8s/overlays/ci
+          kubectl -n rahbar rollout status deployment/fixture-ollama --timeout=120s
           kubectl -n rahbar wait --for=condition=complete job/initial-index --timeout=300s
           kubectl -n rahbar rollout status deployment/api --timeout=300s
       - name: Enforce the fixture baseline

@@ -20,12 +20,17 @@ spec:
     metadata:
       labels: {app: redis}
     spec:
-      serviceAccountName: rahbar-data
+      serviceAccountName: rahbar-redis
       enableServiceLinks: false
       automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001}
       containers:
         - name: redis
           image: redis:7.4.2-alpine
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
           command: [redis-server, --appendonly, "yes", --dir, /data]
           ports:
             - {name: redis, containerPort: 6379}

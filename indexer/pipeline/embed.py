@@ -12,7 +12,8 @@ _BATCH_SIZE = 16
 _KNOWN_DIMENSIONS = {"nomic-embed-text": 768}
 
 
-def embed(texts: list[str], settings: IndexerSettings) -> list[list[float]]:
+def embed(texts: list[str], settings: IndexerSettings,
+          usage: dict[str, int] | None = None) -> list[list[float]]:
     """Validate shape, dimension and values before returning any vectors."""
     if not texts:
         raise ValueError("cannot embed an empty index")
@@ -28,6 +29,9 @@ def embed(texts: list[str], settings: IndexerSettings) -> list[list[float]]:
                 })
                 response.raise_for_status()
                 payload = response.json()
+                if usage is not None and isinstance(payload, dict):
+                    usage["prompt_tokens"] = usage.get("prompt_tokens", 0) + int(
+                        payload.get("prompt_eval_count") or 0)
                 returned = payload.get("embeddings") if isinstance(payload, dict) else None
                 if not isinstance(returned, list) or len(returned) != len(batch):
                     raise ValueError(f"expected {len(batch)} embeddings")

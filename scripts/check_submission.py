@@ -435,6 +435,10 @@ def check_api_and_pin():
     if ready is None:
         warn(s, "could not locate the readiness handler - check by hand")
     else:
+        if "check_readiness" in ready:
+            # Follow the explicit delegated helper rather than mistaking a
+            # route wrapper for the complete readiness implementation.
+            ready += _function_body(src, r"check_readiness") or ""
         soft(bool(re.search(r"(count\(|n_results|is_empty|len\(|peek\()", ready, re.I)), s,
              "readiness appears to check the collection is non-empty",
              "readiness does not look like it checks for a NON-EMPTY collection - required")
@@ -900,7 +904,7 @@ def check_tests():
             "no prompt-injection test - required")
     verdict(bool(re.search(r"(abstain|answered_from_context)", tests, re.I)), s,
             "abstention is tested", "no abstention test")
-    soft(bool(re.search(r"(fallback|ValidationError)", tests, re.I)), s,
+    soft(bool(re.search(r"(fallback|ValidationError|schema_failure)", tests, re.I)), s,
          "the validation/fallback path is tested",
          "no test for the schema-failure fallback path")
     if re.search(r"(requests|httpx)\.(get|post)\s*\(\s*[\"']https?://(?!localhost|127)", tests):

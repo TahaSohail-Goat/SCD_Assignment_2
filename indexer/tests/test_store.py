@@ -70,6 +70,7 @@ VECTORS = [[0.2, 0.4], [0.4, 0.2]]
 def chroma(monkeypatch):
     client = Client()
     client.generation = 0
+    client.cache_values = {}
 
     class Cache:
         def lock(self, name, **options):
@@ -80,6 +81,38 @@ def chroma(monkeypatch):
             assert key == "rahbar:index_generation"
             client.generation += 1
             return client.generation
+
+        def pipeline(self, transaction=True):
+            cache = self
+
+            class Transaction:
+                def __init__(self):
+                    self.commands = []
+
+                def __enter__(self):
+                    return self
+
+                def __exit__(self, *args):
+                    return False
+
+                def set(self, key, value):
+                    self.commands.append((key, value))
+
+                def incr(self, key):
+                    self.commands.append((key, None))
+
+                def execute(self):
+                    if client.fail_publish:
+                        raise RuntimeError("publish failed")
+                    for key, value in self.commands:
+                        if value is None:
+                            cache.incr(key)
+                        else:
+                            client.cache_values[key] = value
+                    if client.lost_ack:
+                        raise RuntimeError("publication acknowledgement lost")
+
+            return Transaction()
 
         def close(self):
             pass
@@ -94,9 +127,9 @@ def test_store_publishes_complete_cosine_index(chroma):
     settings = replace(get_settings(), embed_model="test-model", collection="policy")
     old = chroma.create_collection(name="policy", metadata={})
     assert stage.store(CHUNKS, VECTORS, settings) == 2
-    published = chroma.get_collection("policy")
+    published = chroma.get_collection(chroma.cache_values["rahbar:index:policy:active"])
     assert published is not old
-    assert set(chroma.collections) == {"policy"}
+    assert "policy" in chroma.collections # previous readers still resolve their snapshot
     assert chroma.generation == 1
     assert published.metadata == {"hnsw:space": "cosine", "embed_model": "test-model",
                                   "dimension": 2}
@@ -113,7 +146,8 @@ def test_failed_build_or_publish_preserves_previous_index(chroma, failure):
         chroma.fail_publish = True
     with pytest.raises(RuntimeError, match="failed"):
         stage.store(CHUNKS, VECTORS, settings)
-    assert chroma.collections == {settings.collection: old}
+    assert chroma.get_collection(settings.collection) is old
+    assert not chroma.cache_values
     assert chroma.generation == 0
 
 
@@ -123,10 +157,23 @@ def test_store_validates_shape_before_writing(chroma):
     assert chroma.collections == {}
 
 
-def test_rename_acknowledgement_loss_checks_live_collection_id(chroma):
+def test_lost_publication_acknowledgement_never_deletes_active_snapshot(chroma):
     settings = get_settings()
     chroma.create_collection(name=settings.collection, metadata={})
-    chroma.lost_ack = settings.collection
-    assert stage.store(CHUNKS, VECTORS, settings) == 2
-    assert chroma.get_collection(settings.collection).count() == 2
+    chroma.lost_ack = True
+    with pytest.raises(RuntimeError, match="acknowledgement"):
+        stage.store(CHUNKS, VECTORS, settings)
+    active = chroma.cache_values[f"rahbar:index:{settings.collection}:active"]
+    assert chroma.get_collection(active).count() == 2
     assert chroma.generation == 1
+
+
+def test_reindex_keeps_previous_snapshot_queryable(chroma):
+    settings = get_settings()
+    stage.store(CHUNKS, VECTORS, settings)
+    key = f"rahbar:index:{settings.collection}:active"
+    previous = chroma.get_collection(chroma.cache_values[key])
+    stage.store(CHUNKS, VECTORS, settings)
+    assert chroma.get_collection(chroma.cache_values[key]) is not previous
+    assert previous.count() == 2
+    assert chroma.get_collection(previous.name) is previous

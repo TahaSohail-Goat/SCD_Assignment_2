@@ -4,6 +4,7 @@ namespace: rahbar
 resources:
   - ../../base
   - fixture-network.yaml
+  - fixture-model.yaml
 patches:
   - target:
       kind: ConfigMap

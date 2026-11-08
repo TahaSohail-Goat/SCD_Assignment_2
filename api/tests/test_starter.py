@@ -15,6 +15,9 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("RETRIEVER", "stub")
     monkeypatch.setenv("LLM_PROVIDER", "stub")
     from app.main import app
+    monkeypatch.setattr("app.main.check_readiness", lambda *args: {
+        "chroma": "ok (3 chunks, 768 dimensions)", "embedding_pin": "ok", "redis": "ok",
+    })
 
     with TestClient(app) as c:
         yield c
@@ -51,7 +54,7 @@ def test_request_id_is_echoed(client: TestClient) -> None:
     assert r.json()["request_id"] == "test-123"
 
 
-@pytest.mark.parametrize("question", ["hi", "x" * 501])
+@pytest.mark.parametrize("question", ["hi", "x" * 501, "   "])
 def test_question_length_is_enforced(client: TestClient, question: str) -> None:
     r = client.post("/api/ask", json={"question": question})
     assert r.status_code == 422

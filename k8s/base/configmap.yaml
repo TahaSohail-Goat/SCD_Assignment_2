@@ -13,12 +13,12 @@ data:
   CHROMA_COLLECTION: rahbar
   REDIS_HOST: redis
   REDIS_PORT: "6379"
-  OLLAMA_URL: http://host.docker.internal:11434
+  OLLAMA_URL: http://host.minikube.internal:11434
   TOP_K: "5"
   RELEVANCE_FLOOR: "0.55"
   CACHE_THRESHOLD: "0.95"
   CACHE_TTL_SECONDS: "86400"
-  TEMPERATURE: "0.2"
+  TEMPERATURE: "0.2" # Low variance for policy facts and schema output; not a truth guarantee.
   LOG_LEVEL: INFO
   CORPUS_DIR: /corpus
   CHUNK_SIZE: "400"
