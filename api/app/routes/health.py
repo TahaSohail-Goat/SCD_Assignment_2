@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+import os
+
 from fastapi import APIRouter, Request, Response
 
 from ..services.readiness import check_readiness, is_ready
 
 router = APIRouter()
+
+
+@router.get("/api/version")
+def version() -> dict[str, str]:
+    return {"revision": os.getenv("RAHBAR_REVISION", "development")}
 
 
 @router.get("/healthz")

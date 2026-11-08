@@ -88,3 +88,11 @@ def test_real_golden_matches_required_mix() -> None:
     assert Counter(q["type"] for q in questions) == {
         "ordinary": 8, "version": 2, "exact": 2, "abstain": 2, "injection": 1,
     }
+
+
+def test_missing_baseline_fails_before_sending_any_requests(tmp_path, monkeypatch):
+    monkeypatch.setattr("sys.argv", ["run_eval.py", "--api", "http://unreachable",
+        "--baseline", str(tmp_path / "missing.json")])
+    with pytest.raises(SystemExit) as stopped:
+        run_eval.main()
+    assert stopped.value.code == 2

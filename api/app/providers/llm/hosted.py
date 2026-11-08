@@ -11,7 +11,7 @@ import httpx
 from ...config import Settings
 from ...schemas import Answer, Passage
 from ...services.prompt import messages
-from .base import GenerationResult
+from .base import GenerationError, GenerationResult
 
 
 class HostedProvider:
@@ -36,10 +36,14 @@ class HostedProvider:
             )
             response.raise_for_status()
             body = response.json()
-        answer = Answer.model_validate_json(body["choices"][0]["message"]["content"])
         usage = body.get("usage") or {}
+        input_tokens = int(usage.get("prompt_tokens") or 0)
+        output_tokens = int(usage.get("completion_tokens") or 0)
+        try:
+            answer = Answer.model_validate_json(body["choices"][0]["message"]["content"])
+        except ValueError as exc:
+            raise GenerationError("invalid model schema", input_tokens, output_tokens) from exc
         return GenerationResult(
             answer=answer,
-            input_tokens=int(usage.get("prompt_tokens") or 0),
-            output_tokens=int(usage.get("completion_tokens") or 0),
+            input_tokens=input_tokens, output_tokens=output_tokens,
         )

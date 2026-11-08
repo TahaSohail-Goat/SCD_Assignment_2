@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rahbar-fixture
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fixture-ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: fixture-ollama}
+  template:
+    metadata:
+      labels: {app: fixture-ollama}
+    spec:
+      serviceAccountName: rahbar-fixture
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
+      containers:
+        - name: fixture-ollama
+          image: rahbar-indexer:dev
+          imagePullPolicy: IfNotPresent
+          command: [python, /app/fake_ollama.py]
+          ports:
+            - {name: ollama, containerPort: 11434}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          startupProbe:
+            tcpSocket: {port: ollama}
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            tcpSocket: {port: ollama}
+          livenessProbe:
+            tcpSocket: {port: ollama}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fixture-ollama
+spec:
+  type: ClusterIP
+  selector: {app: fixture-ollama}
+  ports:
+    - {name: ollama, port: 11434, targetPort: ollama}

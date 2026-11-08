@@ -1,29 +1,49 @@
-# Engineering notes
+# Engineering notes: seven questions
 
-## 1. Why not index during API startup?
+Line references below were checked against the completion branch on 8 November 2026. Historical measurements are labelled; a successful static/test run is not a substitute for a real cluster sample.
 
-The API has three replicas in `k8s/base/api.yaml:6`. If each startup extracted and wrote documents, all three would race on one Chroma volume and restarts would reindex. `k8s/base/indexer.yaml:2` makes indexing a separate Job and CronJob; `api/app/main.py:30` starts readers only. See ADR 0001.
+## 1. Three API replicas, one Chroma volume: why not index at startup?
 
-## 2. What if readiness and liveness are swapped and Chroma stalls for 90 seconds?
+`k8s/base/api.yaml:6` requests three API replicas. Putting extraction/embedding/writes in `api/app/main.py:31` would repeat indexing three times during startup and again on every restart or scale-up. The failure is competing index writers, startup delays and readiness that either serves an incomplete index or never completes a rollout. `k8s/base/indexer.yaml:2` makes the writer a separate finite Job; its CronJob template supports manual reindexing without deploying API. `indexer/pipeline/store.py:79` publishes only a complete immutable snapshot through Redis. API only initializes readers and checks dependencies. ADR 0001 and ADR 0006 explain the separation/publication details.
 
-With a Chroma-dependent liveness probe, Kubernetes would restart healthy API processes repeatedly during the stall. Here liveness uses `/healthz` at `k8s/base/api.yaml:46`, which touches no dependency, while readiness uses `/readyz` at line 49 and removes unready pods from Service endpoints. The API has a startup grace period and zero-unavailable rolling updates at line 9.
+## 2. What happens if readiness and liveness are swapped during a 90-second Chroma stall?
 
-## 3. What does CPU HPA measure?
+Liveness at `k8s/base/api.yaml:50` calls dependency-free `/healthz`. Readiness at line 53 calls `/readyz`; failing readiness removes a pod from endpoints without killing its healthy process. If these were swapped, the dependency stall would repeatedly fail liveness and restart the three API processes while the false health-only readiness still admits traffic. Startup at line 46 grants boot grace but does not repair the wrong liveness dependency. Correct probes contain the fault to dependency unavailability instead of turning it into a restart storm.
 
-`k8s/base/hpa.yaml:8` uses API CPU utilization against its 200m request at `k8s/base/api.yaml:55`, scaling from three to eight replicas at 70%. That measures API worker CPU, including request processing and serialization; it does not measure host Ollama queueing or saturation. For generation-heavy traffic, a better scaling signal would be in-flight API requests or Ollama queue depth, with request/generation latency as a check. Instrument the chosen metric, expose it to Prometheus, and connect it to the HPA through a custom or external metrics adapter. This is a proposed improvement; the deployed HPA uses CPU.
+## 3. What does the CPU HPA measure while Ollama generates?
 
-## 4. Indexer peak memory and limit
+`k8s/base/hpa.yaml:13` targets 70% of the API's 200m CPU request (`api.yaml:59`), approximately 140m usage per replica. The pod mostly waits for HTTP generation on the host, so low API CPU is not evidence of spare model capacity. The HPA measures worker CPU for request handling, token/JSON processing and serialization; adding API pods does not multiply the host's generation throughput.
 
-The indexer limit is 2Gi (2048Mi) and request is 512Mi in `k8s/base/indexer.yaml:40-42`. During the real 120/20 reindex, `kubectl top pod` samples every eight seconds reached 157Mi. The observed margin to the limit was 1891Mi, about 92% of the limit. This is the highest *observed sample*, not an instrumented instantaneous peak; an eight-second interval can miss a spike. Exceeding the limit causes an OOMKilled container (exit code 137) and a failed Job, not a quiet partial success.
+A better signal is in-flight generation requests or backend queue depth, with p95 generation/request latency as a check. To use it, add a trustworthy queue/in-flight gauge, scrape it with Prometheus, expose it through a custom/external metrics adapter, and change the autoscaling/v2 target. The current deployment uses CPU; no queue-based scaler is claimed. The earlier HPA capture shows a numeric 3–4% rather than `<unknown>`, and the startup recipe enables metrics-server.
 
-## 5. Which question type has worst recall@5?
+## 4. Indexer memory: limit, margin, and failure exit
 
-The three real-corpus settings tied at 100% recall@5 in every answerable type, so none has the worst recall@5. Version questions were weakest at recall@3: q10's current eight-week rule appeared at rank four or five. Section-title-only hits were ahead of the actual rule before the API filtered heading-only passages. A next experiment would combine lexical and dense retrieval or rerank candidates, then compare recall@3 and answer completeness on the same golden set. That technique was not implemented in the reported run. The final `eval/results.json` retains the per-type breakdown.
+`k8s/base/indexer.yaml:47–48` sets a 512Mi request and 2Gi (2048Mi) limit; the CronJob uses the same values at lines 101–102. The November 6 real 120/20 run's eight-second `kubectl top` samples reached 157Mi. Observed margin to limit was 2048−157 = **1891Mi**, about 92.3% of the limit. Sparse samples can miss an instantaneous OCR spike, so this is a sampled maximum, not a proven peak. Over a CPU limit a process is throttled; over its memory limit the container can be OOMKilled with exit code **137**. Job retries must remain visible, never publish partial content, and retain the previous snapshot.
 
-## 6. What if API EMBED_MODEL changes alone?
+Resource rationale and evidence limits:
 
-`api/app/services/readiness.py:29-41` compares the configured model and expected dimension with collection metadata on every readiness call. The API logs a pin conflict at startup in `api/app/main.py:39-40`, and `/readyz` returns 503 for a mismatched pod. The deployment remains unready instead of returning nonsense retrieval results. The indexer and API must share `k8s/base/configmap.yaml:8`. In the [live Minikube demo](evidence/embedding-model-mismatch-2026-11-06.md), changing only the API Deployment from `nomic-embed-text` to `intentional-mismatch-demo` left the new pod at `0/1 Ready`; its log named both models. Removing the override restored 3/3 available and `/readyz` HTTP 200.
+| Container | Requests / limits | Observed evidence and rationale |
+| --- | --- | --- |
+| API | 200m, 256Mi / 1 CPU, 1Gi | Earlier stub samples 5–7m and 72–73Mi; memory request >3× sampled resident use and CPU denominator supports HPA. These are not fresh real-load peaks. |
+| Chroma | 100m, 512Mi / 1 CPU, 2Gi | Earlier dummy-index sample 2m/56Mi; persistent real index/snapshots need additional headroom. Fresh real snapshot/query sampling is required before claiming these figures are tuned. |
+| Redis | 50m, 128Mi / 500m, 512Mi | Earlier sample 4m/3Mi; allowance covers cache, active pointer and expiring turns. Monitor under the expected one-hour turn retention. |
+| UI | 25m, 32Mi / 200m, 128Mi | Earlier sample 1m/2Mi; small nginx process with allowance for requests/buffers. |
+| Indexer | 200m, 512Mi / 2 CPU, 2Gi | Real sampled maximum 157Mi; conservative OCR/document-size allowance, not a measured 2Gi requirement. |
+| Data-wait init | 10m, 16Mi / 50m, 32Mi | Bounded busybox connectivity wait; no independent sample captured yet. |
+| CI model double | 100m, 128Mi / 500m, 256Mi | Bounded stdlib fixture server, now explicitly limited; not real Ollama. |
 
-## 7. Failure costing more than one hour
+The raw older capture is `docs/evidence/local-resource-usage.txt`; the real sample is described in `real-corpus-integration-2026-11-06.md`. `make evidence` records raw samples for this branch. These limitations are kept explicit rather than labelling padded requests as measured optimums.
 
-Environment setup on Windows delayed Ubuntu/Minikube startup by more than an hour. `wsl --install --no-distribution` reported "The system cannot find the path specified," while `winget install Microsoft.WSL` reported that another version was already installed. These messages initially pointed us toward reinstalling the WSL package. The decisive diagnostic was `Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux`, which showed `State: Disabled`; `VirtualMachinePlatform` was enabled. The fix enabled the WSL feature, repaired the installed WSL MSI from the prepared D: path as administrator, restarted, and installed Ubuntu on D:. The package's presence alone did not mean the Windows feature and service were working.
+## 5. Where is recall@5 worst, and what technique addresses it?
+
+The released 15-question `eval/results.json` has a 100% recall@5 tie across answerable categories, so none is worst at k=5. Version questions are weaker at recall@3: 0.5, because q10's direct current summer rule was fourth/fifth. Heading-only navigation hits formerly outranked substantive evidence; `api/app/retrieval/chroma.py` now filters those candidates. Dense embeddings can blur a clause number, short code or closely related edition. A next experiment is lexical/BM25 plus dense retrieval or a reranker, measured against the same golden set. Hybrid retrieval is a proposed technique, not an implemented feature or a fabricated new result. A new live audit must confirm this branch's metrics.
+
+## 6. Change only the API embedding model: what happens?
+
+`k8s/base/configmap.yaml:8` supplies the shared pin. `api/app/services/readiness.py:23` resolves the active snapshot, then lines 26–32 compare recorded model/dimension with configuration. Startup logs an explicit conflict; readiness returns 503 rather than admitting the mismatched pod. Retrieval also checks active metadata, protecting direct requests during an incompatible publication. Without this guardrail, the vector database could return semantically meaningless nearest neighbors without a useful error. The existing real mismatch capture shows a 0/1 new pod while the old three stay ready; the current fixture repeats the 503 check in `docs/evidence/faults/offline-current.json`.
+
+## 7. A failure that cost more than an hour
+
+The earlier Windows setup failure delayed Ubuntu/Minikube startup for over an hour. `wsl --install --no-distribution` reported that a path could not be found, while winget reported another WSL version already installed. The initial wrong belief was that reinstalling the package alone would fix it. `Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux` showed **Disabled**, while VirtualMachinePlatform was enabled. Enabling the missing Windows feature, repairing the prepared MSI, restarting and installing Ubuntu resolved that environment. Package presence was not proof the Windows feature/service was running.
+
+The completion audit found a separate application trap: `/readyz` used to fall through Ingress to the UI and return HTML with HTTP 200. Checking only a status code therefore produced misleading evidence. Explicit health routes and a JSON `status=ready` assertion now distinguish API readiness from UI availability. Fresh evidence must retain the response body, not just `curl`'s exit status.

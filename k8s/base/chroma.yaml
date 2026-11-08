@@ -11,10 +11,10 @@ spec:
     metadata:
       labels: {app: chroma}
     spec:
-      serviceAccountName: rahbar-data
+      serviceAccountName: rahbar-chroma
       enableServiceLinks: false
       automountServiceAccountToken: false
-      securityContext: {fsGroup: 10001}
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001}
       containers:
         - name: chroma
           image: chromadb/chroma:1.0.12
@@ -22,11 +22,17 @@ spec:
           ports:
             - {name: http, containerPort: 8000}
           env:
+            - {name: HOME, value: /tmp}
             - {name: IS_PERSISTENT, value: "TRUE"}
             - {name: PERSIST_DIRECTORY, value: /data}
             - {name: ANONYMIZED_TELEMETRY, value: "FALSE"}
           volumeMounts:
             - {name: chroma-data, mountPath: /data}
+            - {name: tmp, mountPath: /tmp}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
           startupProbe:
             httpGet: {path: /api/v2/heartbeat, port: http}
             failureThreshold: 30
@@ -40,6 +46,9 @@ spec:
           resources:
             requests: {cpu: 100m, memory: 512Mi}
             limits: {cpu: "1", memory: 2Gi}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 128Mi}
   volumeClaimTemplates:
     - metadata:
         name: chroma-data

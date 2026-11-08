@@ -134,10 +134,12 @@ def test_prompt_keeps_exact_citation_metadata_and_factual_question() -> None:
     assert "80 percent" in prompt[1]["content"]
 
 
-def test_retrieval_skips_title_only_hit_for_later_evidence() -> None:
+def test_retrieval_skips_title_only_hit_for_later_evidence(monkeypatch) -> None:
     from app.retrieval.chroma import ChromaRetriever
+    monkeypatch.setattr(SemanticCache, "active_collection", lambda self, name: name)
 
     class Collection:
+        metadata = {"embed_model": "nomic-embed-text"}
         def count(self):
             return 6
 

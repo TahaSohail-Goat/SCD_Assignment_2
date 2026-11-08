@@ -1,0 +1,15 @@
+{
+  "resources": 31,
+  "containers": [
+    "Deployment/api/api",
+    "Deployment/fixture-ollama/fixture-ollama",
+    "Deployment/redis/redis",
+    "Deployment/ui/ui",
+    "StatefulSet/chroma/chroma",
+    "CronJob/reindex/indexer",
+    "CronJob/reindex/wait-for-data",
+    "Job/initial-index/indexer",
+    "Job/initial-index/wait-for-data"
+  ],
+  "errors": []
+}

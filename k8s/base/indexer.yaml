@@ -12,7 +12,7 @@ spec:
       serviceAccountName: rahbar-indexer
       enableServiceLinks: false
       automountServiceAccountToken: false
-      restartPolicy: Never
+      restartPolicy: OnFailure
       securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
       volumes:
         - name: ocr-tmp
@@ -25,6 +25,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 10001
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities: {drop: [ALL]}
           resources:
             requests: {cpu: 10m, memory: 16Mi}
@@ -65,7 +66,7 @@ spec:
           serviceAccountName: rahbar-indexer
           enableServiceLinks: false
           automountServiceAccountToken: false
-          restartPolicy: Never
+          restartPolicy: OnFailure
           securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001}
           volumes:
             - name: ocr-tmp
@@ -78,6 +79,7 @@ spec:
                 runAsNonRoot: true
                 runAsUser: 10001
                 allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
                 capabilities: {drop: [ALL]}
               resources:
                 requests: {cpu: 10m, memory: 16Mi}

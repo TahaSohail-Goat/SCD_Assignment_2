@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import sys
 import time
@@ -22,7 +23,14 @@ from .models import Chunk, Document
 
 def log(msg: str, **fields: object) -> None:
     print(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                      "logger": "rahbar.indexer", "msg": msg, **fields}), flush=True)
+                      "logger": "rahbar.indexer", "request_id": "indexer-" +
+                      os.environ.get("HOSTNAME", "local"), "msg": msg, **fields}), flush=True)
+
+
+class JsonHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        log(record.getMessage(), level=record.levelname,
+            error=logging.Formatter().formatException(record.exc_info) if record.exc_info else None)
 
 
 def _front_matter(path: Path) -> dict[str, str]:
@@ -115,6 +123,7 @@ def _plan_pair(value: str) -> tuple[int, int]:
 
 
 def main() -> int:
+    logging.basicConfig(level=logging.INFO, handlers=[JsonHandler()], force=True)
     parser = argparse.ArgumentParser(description="Build the RAHBAR index, then exit.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dummy", action="store_true", help="write three fake chunks")
@@ -137,6 +146,16 @@ def main() -> int:
             from .store import get_client
 
             count = write_dummy_index(settings, get_client(settings))
+            # The dummy writer is only for development. Reset any previously
+            # published production pointer when switching an existing dev cluster.
+            import redis
+            cache = redis.Redis(host=settings.redis_host, port=settings.redis_port,
+                                socket_connect_timeout=5, socket_timeout=5)
+            with cache.pipeline(transaction=True) as transaction:
+                transaction.delete(f"rahbar:index:{settings.collection}:active")
+                transaction.incr("rahbar:index_generation")
+                transaction.execute()
+            cache.close()
         else:
             count = run_pipeline(settings)
     except Exception as exc:

@@ -61,6 +61,7 @@
 <main>
   <header>
     <h1>RAHBAR</h1>
+    <small class="meta" id="release">Version __BUILD_REVISION__</small>
     <p>Answers only from the indexed documents, with sources. If the documents do not cover it, it says so.</p>
   </header>
   <section id="thread" aria-live="polite"></section>
@@ -78,6 +79,12 @@
 // The API sits behind the same Ingress host at /api. For local development you can
 // point elsewhere with ?api=http://localhost:8000 (that server must allow CORS).
 const API_BASE = new URLSearchParams(location.search).get("api") || window.RAHBAR_API || "";
+const release = document.getElementById("release");
+if (release.textContent.includes("__BUILD_REVISION__")) release.textContent = "Development version";
+const sessionId = sessionStorage.getItem("rahbar-session") ||
+  (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)),
+    x => x.toString(16).padStart(2, "0")).join(""));
+sessionStorage.setItem("rahbar-session", sessionId);
 
 const thread = document.getElementById("thread");
 const form = document.getElementById("ask");
@@ -169,7 +176,7 @@ async function ask(question) {
     const res = await fetch(`${API_BASE}/api/ask`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, session_id: sessionId }),
     });
     let body = null;
     try { body = await res.json(); } catch { /* non-JSON error page */ }

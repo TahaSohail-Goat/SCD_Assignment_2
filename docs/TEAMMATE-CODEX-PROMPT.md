@@ -1,5 +1,8 @@
 # Teammate handoff: indexer, corpus, and evaluation
 
+> Historical planning document. Its future-tense tasks are not the current release
+> status; see `docs/SUBMISSION.md` and the verified evidence index for that status.
+
 ## Why this division is balanced
 
 Student A owns the FastAPI retrieval and generation path, Redis cache, validation, readiness, images, Kubernetes, CI/CD, deployment evidence, and integration. Student B owns the real document corpus, OCR and extraction, cleaning, chunking, embeddings, Chroma writes, fixture and real evaluation, measured tuning, and failure analysis. Both students should make their own substantive commits. Student B can write and test on a modest laptop without Docker, WSL, or a local LLM; Student A runs the cluster and Ollama and shares actual results for Student B to analyze.

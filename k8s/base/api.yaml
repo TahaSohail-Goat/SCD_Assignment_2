@@ -39,6 +39,10 @@ spec:
             capabilities:
               drop:
                 - ALL
+          lifecycle:
+            preStop:
+              exec:
+                command: [python, -c, "import time; time.sleep(5)"]
           startupProbe:
             httpGet: {path: /healthz, port: http}
             failureThreshold: 30

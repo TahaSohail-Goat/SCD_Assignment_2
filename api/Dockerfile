@@ -1,4 +1,7 @@
 FROM python:3.12.16-slim-bookworm
+ARG VCS_REF=development
+ENV RAHBAR_REVISION=${VCS_REF}
+LABEL org.opencontainers.image.revision=${VCS_REF}
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*

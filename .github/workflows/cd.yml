@@ -13,9 +13,10 @@ jobs:
       - uses: actions/setup-python@v6
         with: {python-version: '3.12'}
       - run: python -m pip install -r api/requirements-dev.txt -r indexer/requirements-dev.txt
-      - run: ruff check api indexer eval corpus
+      - run: ruff check api indexer eval corpus scripts
       - run: cd api && pytest -q --cov=app --cov-branch --cov-fail-under=60
       - run: cd indexer && pytest -q
+      - run: python -m pytest -q -c eval/pyproject.toml eval/tests
   build-push:
     needs: test
     runs-on: ubuntu-24.04
@@ -33,7 +34,8 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           for component in api indexer ui; do
-            docker build -t "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}" "$component"
+            docker build --build-arg VCS_REF="$COMMIT_SHA" \
+              -t "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}" "$component"
             docker push "$HUB_USER/rahbar-$component:sha-${COMMIT_SHA}"
           done
   deploy:
@@ -75,3 +77,5 @@ jobs:
             -H 'Content-Type: application/json' \
             -d '{"question":"What is the attendance requirement?"}' \
             | python -c 'import json,sys; x=json.load(sys.stdin); assert x["citations"] and x["answered_from_context"]'
+          curl -fsS -H 'Host: rahbar.local' http://localhost:18080/readyz \
+            | python -c 'import json,sys; assert json.load(sys.stdin)["status"] == "ready"'

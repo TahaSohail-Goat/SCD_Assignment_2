@@ -34,28 +34,6 @@ def _discard(client: Any, name: str) -> None:
         _LOG.exception("could not remove temporary Chroma collection %s", name)
 
 
-def _publish(client: Any, staging: Any, name: str, backup: str) -> None:
-    try:
-        old = client.get_collection(name)
-    except NotFoundError:
-        old = None
-    try:
-        if old is not None:
-            old.modify(name=backup)
-        staging.modify(name=name)
-    except Exception:
-        try:
-            live = client.get_collection(name)
-        except NotFoundError:
-            if old is not None:
-                client.get_collection(backup).modify(name=name)
-        else:
-            # A rename can succeed even when its response never reaches the Job.
-            if live.id == staging.id:
-                return
-        raise
-
-
 def store(chunks: list[Chunk], vectors: list[list[float]], settings: IndexerSettings) -> int:
     """Write and verify a cosine collection with the shared embedding pin."""
     if not chunks or len(vectors) != len(chunks):
@@ -68,8 +46,8 @@ def store(chunks: list[Chunk], vectors: list[list[float]], settings: IndexerSett
 
     client = get_client(settings)
     suffix = uuid4().hex
-    pending = f"rahbar-staging-{suffix}"
-    backup = f"rahbar-backup-{suffix}"
+    pending = f"rahbar-snapshot-{suffix}"
+    publication_started = False
     try:
         staging = client.create_collection(
             name=pending,
@@ -93,12 +71,21 @@ def store(chunks: list[Chunk], vectors: list[list[float]], settings: IndexerSett
             # Only complete collections compete for the live name. Manual Jobs
             # can overlap the CronJob even with concurrencyPolicy: Forbid.
             with cache.lock("rahbar:index_publish", timeout=120, blocking_timeout=30):
-                _publish(client, staging, settings.collection, backup)
-                cache.incr(GENERATION_KEY)
-                _discard(client, backup)
+                # Readers resolve one immutable collection name per query.
+                # MULTI/EXEC makes the new pointer and cache generation visible
+                # together, without ever renaming/removing a readable index.
+                publication_started = True
+                with cache.pipeline(transaction=True) as transaction:
+                    transaction.set(f"rahbar:index:{settings.collection}:active", pending)
+                    transaction.incr(GENERATION_KEY)
+                    transaction.execute()
         finally:
             cache.close()
     except Exception:
-        _discard(client, pending)
+        # A lost EXEC acknowledgement may have published the snapshot. Retain it
+        # rather than deleting a potentially live index. Pre-publication failures
+        # are safe to discard. Old snapshots remain readable by in-flight readers.
+        if not publication_started:
+            _discard(client, pending)
         raise
     return int(count)
