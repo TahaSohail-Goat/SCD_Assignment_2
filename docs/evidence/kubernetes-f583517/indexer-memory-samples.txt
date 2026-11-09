@@ -1,0 +1,241 @@
+2026-11-08T19:25:55Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:01Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:06Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:11Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:16Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:21Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:26Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:31Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:36Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:42Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:47Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:52Z
+No resources found in rahbar namespace.
+2026-11-08T19:26:57Z
+No resources found in rahbar namespace.
+2026-11-08T19:27:02Z
+No resources found in rahbar namespace.
+2026-11-08T19:27:07Z
+No resources found in rahbar namespace.
+2026-11-08T19:27:12Z
+No resources found in rahbar namespace.
+2026-11-08T19:27:17Z
+The connection to the server 192.168.49.2:8443 was refused - did you specify the right host or port?
+2026-11-08T19:27:22Z
+The connection to the server 192.168.49.2:8443 was refused - did you specify the right host or port?
+2026-11-08T19:27:28Z
+The connection to the server 192.168.49.2:8443 was refused - did you specify the right host or port?
+2026-11-08T19:27:33Z
+error: Metrics API not available
+2026-11-08T19:27:38Z
+error: Metrics API not available
+2026-11-08T19:27:43Z
+error: Metrics API not available
+2026-11-08T19:27:48Z
+error: Metrics API not available
+2026-11-08T19:27:53Z
+No resources found in rahbar namespace.
+2026-11-08T19:27:58Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:04Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:09Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:14Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:19Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:24Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:29Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:34Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:39Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:45Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:50Z
+No resources found in rahbar namespace.
+2026-11-08T19:28:55Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:00Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:05Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:10Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:15Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:21Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:26Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:31Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:36Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:41Z
+No resources found in rahbar namespace.
+2026-11-08T19:29:46Z
+error: metrics not available yet
+2026-11-08T19:29:51Z
+error: metrics not available yet
+2026-11-08T19:29:57Z
+error: metrics not available yet
+2026-11-08T19:30:02Z
+error: metrics not available yet
+2026-11-08T19:30:07Z
+error: metrics not available yet
+2026-11-08T19:30:12Z
+error: metrics not available yet
+2026-11-08T19:30:17Z
+error: metrics not available yet
+2026-11-08T19:30:22Z
+error: metrics not available yet
+2026-11-08T19:30:27Z
+error: metrics not available yet
+2026-11-08T19:30:32Z
+error: metrics not available yet
+2026-11-08T19:30:38Z
+error: metrics not available yet
+2026-11-08T19:30:43Z
+error: metrics not available yet
+2026-11-08T19:30:48Z
+error: metrics not available yet
+2026-11-08T19:30:53Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:30:58Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:03Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:09Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:14Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:19Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:24Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:29Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:34Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:39Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:44Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:50Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1409m        170Mi           
+2026-11-08T19:31:55Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:00Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:05Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:10Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:15Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:20Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:26Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:31Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:36Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:41Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:46Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   1361m        135Mi           
+2026-11-08T19:32:51Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:32:57Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:02Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:07Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:12Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:17Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:22Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:28Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:33Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:38Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:43Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:48Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   936m         135Mi           
+2026-11-08T19:33:53Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   3m           135Mi           
+2026-11-08T19:33:59Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   3m           135Mi           
+2026-11-08T19:34:04Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   3m           135Mi           
+2026-11-08T19:34:09Z
+NAME                  CPU(cores)   MEMORY(bytes)   
+initial-index-rwh4s   3m           135Mi           
+2026-11-08T19:34:14Z
+error: Metrics not available for pod rahbar/initial-index-rwh4s, age: 4m32.72604068s
+2026-11-08T19:34:19Z
+error: Metrics not available for pod rahbar/initial-index-rwh4s, age: 4m37.845990628s
+2026-11-08T19:34:24Z
+error: Metrics not available for pod rahbar/initial-index-rwh4s, age: 4m42.973491376s
+2026-11-08T19:34:29Z
+error: Metrics not available for pod rahbar/initial-index-rwh4s, age: 4m48.078316535s

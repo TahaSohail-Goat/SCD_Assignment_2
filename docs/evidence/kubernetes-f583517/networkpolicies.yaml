@@ -1,0 +1,226 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"allow-api","namespace":"rahbar"},"spec":{"egress":[{"ports":[{"port":8000,"protocol":"TCP"}],"to":[{"podSelector":{"matchLabels":{"app":"chroma"}}}]},{"ports":[{"port":6379,"protocol":"TCP"}],"to":[{"podSelector":{"matchLabels":{"app":"redis"}}}]},{"ports":[{"port":53,"protocol":"UDP"},{"port":53,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"kube-system"}},"podSelector":{"matchLabels":{"k8s-app":"kube-dns"}}}]},{"ports":[{"port":11434,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"192.168.49.1/32"}}]}],"ingress":[{"from":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"ingress-nginx"}},"podSelector":{"matchLabels":{"app.kubernetes.io/component":"controller"}}},{"podSelector":{"matchLabels":{"app":"ui"}}}],"ports":[{"port":8000,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"app":"api"}},"policyTypes":["Ingress","Egress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: allow-api
+    namespace: rahbar
+    resourceVersion: "1518"
+    uid: f1723aab-af5f-4d2b-a538-60e39ad09d4e
+  spec:
+    egress:
+    - ports:
+      - port: 8000
+        protocol: TCP
+      to:
+      - podSelector:
+          matchLabels:
+            app: chroma
+    - ports:
+      - port: 6379
+        protocol: TCP
+      to:
+      - podSelector:
+          matchLabels:
+            app: redis
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+      to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+    - ports:
+      - port: 11434
+        protocol: TCP
+      to:
+      - ipBlock:
+          cidr: 192.168.49.1/32
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-nginx
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: controller
+      - podSelector:
+          matchLabels:
+            app: ui
+      ports:
+      - port: 8000
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        app: api
+    policyTypes:
+    - Ingress
+    - Egress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"allow-chroma","namespace":"rahbar"},"spec":{"ingress":[{"from":[{"podSelector":{"matchLabels":{"app":"api"}}},{"podSelector":{"matchLabels":{"app":"indexer"}}}],"ports":[{"port":8000,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"app":"chroma"}},"policyTypes":["Ingress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: allow-chroma
+    namespace: rahbar
+    resourceVersion: "1519"
+    uid: bf58b908-cc80-4360-9261-55ff56f88a9d
+  spec:
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: api
+      - podSelector:
+          matchLabels:
+            app: indexer
+      ports:
+      - port: 8000
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        app: chroma
+    policyTypes:
+    - Ingress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"allow-indexer","namespace":"rahbar"},"spec":{"egress":[{"ports":[{"port":8000,"protocol":"TCP"}],"to":[{"podSelector":{"matchLabels":{"app":"chroma"}}}]},{"ports":[{"port":6379,"protocol":"TCP"}],"to":[{"podSelector":{"matchLabels":{"app":"redis"}}}]},{"ports":[{"port":53,"protocol":"UDP"},{"port":53,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"kube-system"}},"podSelector":{"matchLabels":{"k8s-app":"kube-dns"}}}]},{"ports":[{"port":11434,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"192.168.49.1/32"}}]}],"podSelector":{"matchLabels":{"app":"indexer"}},"policyTypes":["Egress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: allow-indexer
+    namespace: rahbar
+    resourceVersion: "1521"
+    uid: 34241201-69fc-467c-ab2a-b19d657758dc
+  spec:
+    egress:
+    - ports:
+      - port: 8000
+        protocol: TCP
+      to:
+      - podSelector:
+          matchLabels:
+            app: chroma
+    - ports:
+      - port: 6379
+        protocol: TCP
+      to:
+      - podSelector:
+          matchLabels:
+            app: redis
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+      to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+    - ports:
+      - port: 11434
+        protocol: TCP
+      to:
+      - ipBlock:
+          cidr: 192.168.49.1/32
+    podSelector:
+      matchLabels:
+        app: indexer
+    policyTypes:
+    - Egress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"allow-redis","namespace":"rahbar"},"spec":{"ingress":[{"from":[{"podSelector":{"matchLabels":{"app":"api"}}},{"podSelector":{"matchLabels":{"app":"indexer"}}}],"ports":[{"port":6379,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"app":"redis"}},"policyTypes":["Ingress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: allow-redis
+    namespace: rahbar
+    resourceVersion: "1522"
+    uid: b037d4c8-2c8f-413b-afc2-9e70d7a183bb
+  spec:
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: api
+      - podSelector:
+          matchLabels:
+            app: indexer
+      ports:
+      - port: 6379
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        app: redis
+    policyTypes:
+    - Ingress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"allow-ui","namespace":"rahbar"},"spec":{"ingress":[{"from":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"ingress-nginx"}},"podSelector":{"matchLabels":{"app.kubernetes.io/component":"controller"}}}],"ports":[{"port":8080,"protocol":"TCP"}]}],"podSelector":{"matchLabels":{"app":"ui"}},"policyTypes":["Ingress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: allow-ui
+    namespace: rahbar
+    resourceVersion: "1524"
+    uid: c3920616-e43f-4ff9-aba5-f308b387cda2
+  spec:
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-nginx
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: controller
+      ports:
+      - port: 8080
+        protocol: TCP
+    podSelector:
+      matchLabels:
+        app: ui
+    policyTypes:
+    - Ingress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":{"annotations":{},"name":"default-deny","namespace":"rahbar"},"spec":{"podSelector":{},"policyTypes":["Ingress","Egress"]}}
+    creationTimestamp: "2026-11-08T19:29:42Z"
+    generation: 1
+    name: default-deny
+    namespace: rahbar
+    resourceVersion: "1525"
+    uid: 19166324-4783-490e-aeb7-835b96c1e95e
+  spec:
+    podSelector: {}
+    policyTypes:
+    - Ingress
+    - Egress
+kind: List
+metadata:
+  resourceVersion: ""

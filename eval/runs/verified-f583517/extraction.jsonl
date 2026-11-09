@@ -1,0 +1,6 @@
+{"ts": "2026-11-08T19:27:02Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "undergraduate-academic-rules-aug-2023.pdf", "pages": 26, "ocr_pages": 24, "empty_pages": [3]}
+{"ts": "2026-11-08T19:27:08Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "academic-rules-handbook-jun-2026.pdf", "pages": 58, "ocr_pages": 5, "empty_pages": [2, 56, 57]}
+{"ts": "2026-11-08T19:27:15Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "student-handbook-jun-2026.pdf", "pages": 64, "ocr_pages": 4, "empty_pages": [2, 63]}
+{"ts": "2026-11-08T19:27:18Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "annual-report-2019-20.pdf", "pages": 33, "ocr_pages": 0, "empty_pages": []}
+{"ts": "2026-11-08T19:27:29Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf", "pages": 8, "ocr_pages": 8, "empty_pages": []}
+{"ts": "2026-11-08T19:27:30Z", "logger": "rahbar.indexer", "request_id": "indexer-local", "msg": "extracted", "source": "prospectus-2026-academic-rules-and-regulations.pdf", "pages": 5, "ocr_pages": 0, "empty_pages": []}

@@ -29,8 +29,8 @@ and cleartext transports. The gate and its rating requirement remain enabled.
 ## Narrow transport exceptions
 
 Explicit `NOSONAR` comments identify reviewed local HTTP transports: the
-ConfigMap entry, two visible rollout HTML fetches, and the live cluster's
-dependency-status fetch and deliberate negative Chroma probe. The standalone API
+ConfigMap entry, visible rollout version probes, and the live cluster's
+dependency/answer probes and deliberate negative Chroma probe. The standalone API
 default uses loopback. These are assignment test-cluster transports. They do not
 describe an Internet production deployment or a promise of transport encryption.
 
@@ -49,3 +49,7 @@ certificate validation. No global rule exclusion, quality-profile change, status
 override, branch-protection relaxation or vulnerability acceptance was applied to
 make the PR green. These line exceptions do not suppress the path, network-input
 or supply-chain findings above.
+
+## Captured rollout HTML and duplication analysis
+
+The final evidence commit stores actual blue/green/undo and UI-control HTTP bodies. Sonar reported 70.4% new duplication because these captured copies intentionally contain the deployed UI. `.sonarcloud.properties` excludes only `docs/evidence/**/*.html` from copy/paste detection. Application UI, API, indexer, scripts and tests retain duplication checks; security rules and the quality gate are unchanged. Raw captures remain available for review. This is an artifact-scope correction, not a code-duplication waiver.

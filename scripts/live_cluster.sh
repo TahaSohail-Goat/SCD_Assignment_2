@@ -38,14 +38,46 @@ import os
 from pathlib import Path
 import httpx
 from eval.run_eval import evaluate, gate, load_golden, write_results
-questions = [q for q in load_golden(Path("eval/golden.yaml"))
-             if q["id"] in {"q06", "q08", "q11", "q13", "q15"}]
+questions = load_golden(Path("eval/golden.yaml"))
 with httpx.Client(timeout=300, headers={"Host": os.environ["HOST"]}) as client:
     results = evaluate(client, "http://" + os.environ["INGRESS_IP"], questions)
 write_results(results, Path("output/cluster-audit/ingress-results.json"))
 failures = gate(results, {"recall@5": 1.0})
 if failures:
     raise SystemExit(str(failures))
+PY
+
+# Re-index a complete immutable snapshot while existing readers remain ready.
+kubectl --context=minikube -n rahbar get deployment api -o json > "$out/api-before-reindex.json"
+kubectl --context=minikube -n rahbar exec deployment/redis -- redis-cli --raw GET rahbar:index:rahbar:active > "$out/pointer-before.txt"
+reindex="live-reindex-$(date +%s)"
+kubectl --context=minikube -n rahbar create job --from=cronjob/reindex "$reindex"
+kubectl --context=minikube -n rahbar wait --for=condition=complete "job/$reindex" --timeout=900s > "$out/reindex-wait.txt" 2>&1 &
+wait_pid=$!
+trap 'kill "$wait_pid" 2>/dev/null || true' EXIT
+while kill -0 "$wait_pid" 2>/dev/null; do
+  curl -fsS --max-time 10 -H "Host: $HOST" "http://$INGRESS_IP/readyz" --output "$out/reindex-ready-sample.json" # NOSONAR: private test IP checked above; observe each readiness sample without retries.
+  "$PYTHON" -c 'import json,sys; from datetime import datetime,timezone; x=json.load(open(sys.argv[1])); assert x["status"] == "ready"; print(json.dumps({"at":datetime.now(timezone.utc).isoformat(),"response":x}))' "$out/reindex-ready-sample.json" >> "$out/readiness-during-reindex.jsonl"
+  curl -fsS --max-time 300 -H "Host: $HOST" -H 'Content-Type: application/json' -d '{"question":"What consequence does clause 1.22 specify for failing to meet attendance requirements?"}' "http://$INGRESS_IP/api/ask" --output "$out/reindex-answer-sample.json" # NOSONAR: validated private test IP, public-policy uptime probe.
+  "$PYTHON" -c 'import json,sys; from datetime import datetime,timezone; x=json.load(open(sys.argv[1])); assert x["answered_from_context"] and x["citations"] and "F/A" in x["answer"]; print(json.dumps({"at":datetime.now(timezone.utc).isoformat(),"response":x}))' "$out/reindex-answer-sample.json" >> "$out/answers-during-reindex.jsonl"
+  sleep 2
+done
+wait "$wait_pid"
+trap - EXIT
+kubectl --context=minikube -n rahbar logs "job/$reindex" > "$out/reindex.jsonl"
+kubectl --context=minikube -n rahbar exec deployment/redis -- redis-cli --raw GET rahbar:index:rahbar:active > "$out/pointer-after.txt"
+kubectl --context=minikube -n rahbar get deployment api -o json > "$out/api-after-reindex.json"
+fetch_ready "$out/ready-after-reindex.json"
+"$PYTHON" - <<'PY'
+import json
+from pathlib import Path
+p = Path("output/cluster-audit")
+read = lambda name: json.loads((p / name).read_text())
+assert (p / "pointer-before.txt").read_text().strip() != (p / "pointer-after.txt").read_text().strip()
+assert read("api-before-reindex.json")["spec"]["template"] == read("api-after-reindex.json")["spec"]["template"], "re-indexing redeployed the API"
+assert read("ready-before.json")["checks"]["chroma"] == read("ready-after-reindex.json")["checks"]["chroma"]
+assert (p / "readiness-during-reindex.jsonl").read_text().strip(), "no concurrent readiness samples"
+assert (p / "answers-during-reindex.jsonl").read_text().strip(), "no concurrent answer samples"
 PY
 
 # Use the IP so blocked DNS cannot masquerade as denied Chroma connectivity.

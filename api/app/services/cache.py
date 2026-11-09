@@ -77,7 +77,7 @@ class SemanticCache:
             self.settings.top_k, self.settings.relevance_floor, self.settings.temperature,
         )).encode()).hexdigest()[:12]
         generation = generation_id if generation_id is not None else self.generation_id()
-        return f"rahbar:cache:{generation}:v3-{scope}:"
+        return f"rahbar:cache:{generation}:v4-{scope}:"
 
     def lookup(self, embedding: list[float], *, generation_id: str | None = None) -> AskResponse | None:
         prefix = self._prefix(generation_id)

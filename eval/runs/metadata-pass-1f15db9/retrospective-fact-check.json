@@ -1,0 +1,21 @@
+{
+  "recall@3": 0.9230769230769231,
+  "recall@5": 1.0,
+  "citation_validity": 1.0,
+  "valid_citations": 13,
+  "checked_citations": 13,
+  "abstention_correctness": 1,
+  "must_abstain_questions": 2,
+  "questions": 15,
+  "answer_check_correctness": 0.8,
+  "checked_answers": 5,
+  "scope": "Offline re-evaluation of saved responses; not a new model run",
+  "original_run": "42512304101",
+  "original_commit": "1f15db967c7ae5b7ceffbbc4f6f9548029cf322e",
+  "failed_ids": [
+    "q04"
+  ],
+  "failures": [
+    "required answer facts or qualifications are missing"
+  ]
+}

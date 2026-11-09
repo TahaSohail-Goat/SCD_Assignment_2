@@ -2,11 +2,13 @@
   "recall@3": 0.9230769230769231,
   "recall@5": 1.0,
   "citation_validity": 1.0,
-  "valid_citations": 23,
-  "checked_citations": 23,
+  "valid_citations": 13,
+  "checked_citations": 13,
   "abstention_correctness": 1,
   "must_abstain_questions": 2,
   "questions": 15,
+  "answer_check_correctness": 1,
+  "checked_answers": 5,
   "by_type": {
     "abstain": {
       "recall@3": null,
@@ -16,7 +18,9 @@
       "checked_citations": 0,
       "abstention_correctness": 1,
       "must_abstain_questions": 2,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     },
     "exact": {
       "recall@3": 1.0,
@@ -26,7 +30,9 @@
       "checked_citations": 2,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": 1,
+      "checked_answers": 1
     },
     "injection": {
       "recall@3": 1.0,
@@ -36,27 +42,33 @@
       "checked_citations": 1,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 1
+      "questions": 1,
+      "answer_check_correctness": 1,
+      "checked_answers": 1
     },
     "ordinary": {
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "valid_citations": 16,
-      "checked_citations": 16,
+      "valid_citations": 8,
+      "checked_citations": 8,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 8
+      "questions": 8,
+      "answer_check_correctness": 1,
+      "checked_answers": 3
     },
     "version": {
       "recall@3": 0.5,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "valid_citations": 4,
-      "checked_citations": 4,
+      "valid_citations": 2,
+      "checked_citations": 2,
       "abstention_correctness": null,
       "must_abstain_questions": 0,
-      "questions": 2
+      "questions": 2,
+      "answer_check_correctness": null,
+      "checked_answers": 0
     }
   },
   "rows": [
@@ -73,19 +85,15 @@
         }
       ],
       "expect": "August/September and May/June",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "bad658dc46634ed69d77238d6d0120d1",
-        "answer": "August/September to May/June",
+        "request_id": "04f3d01572624b6f8a7283042aee4f6e",
+        "answer": "1.2 Academic Year of the University starts in August/September and ends in May/June of the subsequent year. [academic-rules-handbook-jun-2026.pdf / 1.2]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.2",
             "page": 7
-          },
-          {
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "3. Academic Year",
-            "page": 1
           }
         ],
         "answered_from_context": true,
@@ -96,45 +104,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.2",
             "page": 7,
-            "score": 0.81193602
+            "score": 0.81201553
           },
           {
             "chunk_id": "391da0a7d700d1336a3f7e5f603b88c792d977a5a42186d44c5f8de03db53747",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "3. Academic Year",
             "page": 1,
-            "score": 0.80814779
+            "score": 0.80845177
           },
           {
             "chunk_id": "c0d0496ebacfd10a80d2b54be328a6d35262cc05177a7fab22934db6ed01fd9b",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "3.3",
             "page": 14,
-            "score": 0.74824834
+            "score": 0.7487921
           },
           {
             "chunk_id": "9f70aaf1f61eba86c106e7506c575f8e71383cff186345cbe1eb74979f064bb1",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.5",
             "page": 7,
-            "score": 0.7249105
+            "score": 0.72521687
           },
           {
             "chunk_id": "d626c9cbce86ae48acaa7c8baf83cabf75c9af57d2ff8497ab23f82f1f11c7c3",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.3",
             "page": 7,
-            "score": 0.7228065699999999
+            "score": 0.7233721
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.613,
+      "seconds": 24.101,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q02",
@@ -149,9 +158,10 @@
         }
       ],
       "expect": "50 to 60 minutes",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "4cdec6dcbe454a3e9e72e6597451ab1c",
-        "answer": "50-60",
+        "request_id": "ce41fe1a284646aa9797a20a03ae248a",
+        "answer": "1.8 A classroom-teaching hour or one period is of 50 to 60 minutes. [academic-rules-handbook-jun-2026.pdf / 1.8]\nU ndergraduate Academic Rules and Regulations 2026 1 [academic-rules-handbook-jun-2026.pdf / 1.8]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
@@ -167,45 +177,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.8",
             "page": 7,
-            "score": 0.85480416
+            "score": 0.85469699
           },
           {
             "chunk_id": "b6e934965cda8b7d16b4868677a8e9472cb096fb4f1d0cfda538a5cd1f1ac5f5",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.16",
             "page": 9,
-            "score": 0.7462356
+            "score": 0.74635786
           },
           {
             "chunk_id": "d2a43950a6c3eb3921c40604d26de473d571bb5588664f8df9c0e072d55b28aa",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.7",
             "page": 7,
-            "score": 0.7251147
+            "score": 0.7254495599999999
           },
           {
             "chunk_id": "1f6d2b69bdd7f32d5600e055cbdcb456ba5b9046e89ff15c9dae0dcde24426b9",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.13",
             "page": 8,
-            "score": 0.6972965600000001
+            "score": 0.6968595399999999
           },
           {
             "chunk_id": "a4830ad0b2cab85ed29286185568c0aa693cb4f54012a7a1aee23c6e8df3175e",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.6",
             "page": 7,
-            "score": 0.68884826
+            "score": 0.6891244599999999
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.396,
+      "seconds": 6.78,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q03",
@@ -220,34 +231,15 @@
         }
       ],
       "expect": "2.00",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "1c61938c922b4c1ea3d1c23fe66067a7",
-        "answer": "2.00",
+        "request_id": "3f7004a276744cbcabe6c131e21755de",
+        "answer": "5.4 Minimum CGPA required to avoid academic warning is 2.00 for all undergraduate programs. [academic-rules-handbook-jun-2026.pdf / 5.4]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "5.4",
             "page": 24
-          },
-          {
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "11. Academic Warning/Probation",
-            "page": 2
-          },
-          {
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "5.6",
-            "page": 24
-          },
-          {
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "3.28",
-            "page": 17
-          },
-          {
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "1.25",
-            "page": 10
           }
         ],
         "answered_from_context": true,
@@ -258,45 +250,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "5.4",
             "page": 24,
-            "score": 0.92788279
+            "score": 0.92773986
           },
           {
             "chunk_id": "76bc7ed37760699efe38a083483bf8704c5eee5c47702b53d77416f1724963a1",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "11. Academic Warning/Probation",
             "page": 2,
-            "score": 0.81273079
+            "score": 0.8126735700000001
           },
           {
             "chunk_id": "3a95e2cfaa25a11cc97f1f553ef4b85a2fa3f38f4826d02258aed4aef7627e61",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "3.28",
             "page": 17,
-            "score": 0.78184831
+            "score": 0.7816149
           },
           {
             "chunk_id": "0875836efa271463a37a2bef45f34ced0cd3d2452ad2691d6e5394e7332bde8a",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "5.6",
             "page": 24,
-            "score": 0.76219773
+            "score": 0.76242316
           },
           {
             "chunk_id": "451c1c1e7bdf61610d2de54bea40d796fe68bf8c49fce11af817aeda141eb958",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.25",
             "page": 10,
-            "score": 0.7487688
+            "score": 0.74891043
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 2.255,
+      "seconds": 6.835,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q04",
@@ -311,18 +304,16 @@
         }
       ],
       "expect": "1 or 2 credit hours",
+      "required_answer_patterns": [
+        "\\b1\\s+or\\s+2\\s+credit\\s+hours\\b"
+      ],
       "response": {
-        "request_id": "ae614bb57f9c43e1bb75ad3ae1e0d5e9",
-        "answer": "1 or 2",
+        "request_id": "7a5c0ab1d71a49e9a762ca534b962a19",
+        "answer": "1.10 A lab or workshop is normally assigned 1 or 2 credit hours. [academic-rules-handbook-jun-2026.pdf / 1.10]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.10",
-            "page": 8
-          },
-          {
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "1.11",
             "page": 8
           }
         ],
@@ -334,45 +325,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.10",
             "page": 8,
-            "score": 0.9061067700000001
+            "score": 0.90618372
           },
           {
             "chunk_id": "8a2173e61656990680cd37427e1a2231913f6324305b293cd00e31aa9cfdde5f",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.11",
             "page": 8,
-            "score": 0.80164105
+            "score": 0.8017297999999999
           },
           {
             "chunk_id": "fd1b4ac0a257b0f4d7f1bd7c2e486c911a34f6a01a3ac3bd574a4e639fbc93a4",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "4. Semester Course Load",
             "page": 1,
-            "score": 0.76926708
+            "score": 0.76942849
           },
           {
             "chunk_id": "700d46858c2773be0702fcdfb330f74ba50169d8e59e927fbeabaa62c1a3e830",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.12",
             "page": 8,
-            "score": 0.7582475
+            "score": 0.75798309
           },
           {
             "chunk_id": "4077065c545713e4d391185b3013ff21174c45e6f2af524f3d9081cdafd03f04",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.9",
             "page": 8,
-            "score": 0.7296227200000001
+            "score": 0.72959983
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.354,
+      "seconds": 6.8,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": true
     },
     {
       "id": "q05",
@@ -387,9 +379,10 @@
         }
       ],
       "expect": "Excellent",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "f94a074f7f194b9b8fe5e1b202608534",
-        "answer": "Excellent",
+        "request_id": "3b5ad03fcad54e17bac8356af6b7d561",
+        "answer": "2.2 Interpretation of Letter Grades is as follows: [academic-rules-handbook-jun-2026.pdf / 2.2]\n| Grade | Interpretation | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| A+ | Outstanding | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| A, A- | Excellent | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| B+, B, B- | Good | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| C+, C | Adequate | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| C-, D+, D | Pass, the student may repeat the course | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| F | Fail | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| FA | Fail due to shortage of attendance | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| I | Incomplete | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| W | Withdrawn | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| S | Satisfactory | [academic-rules-handbook-jun-2026.pdf / 2.2]\n| U | Unsatisfactory | [academic-rules-handbook-jun-2026.pdf / 2.2]\nU ndergraduate Academic Rules and Regulations 2026 5 [academic-rules-handbook-jun-2026.pdf / 2.2]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
@@ -405,45 +398,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "2.2",
             "page": 11,
-            "score": 0.77644527
+            "score": 0.7766138300000001
           },
           {
             "chunk_id": "fe8fd9cfb234a37aa2db772a76fc12c96545c1697bc5920a2848a350f9e41cca",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "2.1",
             "page": 11,
-            "score": 0.7069502
+            "score": 0.70704013
           },
           {
             "chunk_id": "0d18d97b6216a39acd04f93586834c3234955dbb99032516e5fddd832bbe972a",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "2. Grading and GPA Calculations 5",
             "page": 5,
-            "score": 0.6822429999999999
+            "score": 0.6825062
           },
           {
             "chunk_id": "12f2acefdcce8988184f19d9036f99ae50699241e973c4fa0eadfc646f42904e",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "5. Academic Grading",
             "page": 1,
-            "score": 0.64641702
+            "score": 0.64666837
           },
           {
             "chunk_id": "6eba3c1c7caf9239e5024c5ddb0a49306e92804f7851aa58adb0362a641c4679",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "6. Letter Grades and Grade Points",
             "page": 1,
-            "score": 0.6309642799999999
+            "score": 0.63125825
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.123,
+      "seconds": 26.033,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q06",
@@ -458,15 +452,13 @@
         }
       ],
       "expect": "It may help with preparatory research, but it must not be the only source.",
+      "required_answer_patterns": [
+        "never\\s+be\\s+the\\s+only\\s+source"
+      ],
       "response": {
-        "request_id": "7e74a91dcd1b422f8053dda8eca24090",
-        "answer": "No",
+        "request_id": "b48305860845457c847fc9032a4ab8e4",
+        "answer": "4. [student-handbook-jun-2026.pdf / 4. Acceptable Uses of Generative AI Tools]\nAcceptable Uses of Generative AI Tools In general, using Generative AI tools for preparatory research work, assignment and project is considered acceptable practice, however such tools should never be the only source of information used. [student-handbook-jun-2026.pdf / 4. Acceptable Uses of Generative AI Tools]\nGenerative AI tools are not academic sources; they do not produce fact- checked content, and they can, and [student-handbook-jun-2026.pdf / 4. Acceptable Uses of Generative AI Tools]",
         "citations": [
-          {
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "4. Acceptable Uses of Generative AI Tools",
-            "page": 43
-          },
           {
             "source": "student-handbook-jun-2026.pdf",
             "section": "4. Acceptable Uses of Generative AI Tools",
@@ -477,49 +469,50 @@
         "confidence": "high",
         "retrieved": [
           {
-            "chunk_id": "af15dad02d3b3cbb19247bdc6361c5786bf5b66058def5337a55b3a88a111397",
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "4. Acceptable Uses of Generative AI Tools",
-            "page": 43,
-            "score": 0.83840466
-          },
-          {
             "chunk_id": "98f66a22ea0d65a2c6efd78f5c07e83abff1dc23d9a924271a2f8c217409adb9",
             "source": "student-handbook-jun-2026.pdf",
             "section": "4. Acceptable Uses of Generative AI Tools",
             "page": 50,
-            "score": 0.82824886
+            "score": 0.82832026
           },
           {
             "chunk_id": "5e63cd6a36a745e98ecc75dc18666341f0d2eecc2c130b62ec7029822125f825",
             "source": "student-handbook-jun-2026.pdf",
             "section": "6.3",
             "page": 58,
-            "score": 0.8125996
+            "score": 0.81294662
           },
           {
             "chunk_id": "fe66e4e8293b2c19f49b3edbe4e8522941f189893f6e1ab141e4076daab92922",
             "source": "student-handbook-jun-2026.pdf",
             "section": "4. Acceptable Uses of Generative AI Tools",
             "page": 51,
-            "score": 0.80860007
+            "score": 0.80870801
           },
           {
             "chunk_id": "8e9fa48e0f798c3670d32b400074a21b470706b74c2431eb54cfd77679bf0a2b",
             "source": "student-handbook-jun-2026.pdf",
             "section": "8. Referencing Generative AI Tools",
             "page": 59,
-            "score": 0.80048752
+            "score": 0.800834
+          },
+          {
+            "chunk_id": "d3c9a5516b5f7bab625f1284e5e9ca22de913a784662aac449c7cda173ef20c4",
+            "source": "student-handbook-jun-2026.pdf",
+            "section": "6. Generative AI and Assessments",
+            "page": 56,
+            "score": 0.77524483
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.846,
+      "seconds": 28.071,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": true
     },
     {
       "id": "q07",
@@ -534,15 +527,11 @@
         }
       ],
       "expect": "20 percent",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "818a41883ccb4e7397ce4c6627051cd0",
-        "answer": "20%",
+        "request_id": "404d910a69e04f17b366c565f70b0005",
+        "answer": "1.21 Students are required to maintain 100% attendance in lectures, labs, tutorials, seminars and discussions as prescribed by the course instructor. [academic-rules-handbook-jun-2026.pdf / 1.21]\nAbsence of a maximum of 20% of the total attendance may be condoned by the HoD for genuine reasons, such as illness, etc. [academic-rules-handbook-jun-2026.pdf / 1.21]",
         "citations": [
-          {
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "1. Attendance Requirement",
-            "page": 1
-          },
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.21",
@@ -557,45 +546,46 @@
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "1. Attendance Requirement",
             "page": 1,
-            "score": 0.76176453
+            "score": 0.76172894
           },
           {
             "chunk_id": "44725c78f227490c82a13f22c86dc64fa17d9f5fe87ba55396cd303600d3f490",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.21",
             "page": 10,
-            "score": 0.75600201
+            "score": 0.7559481299999999
           },
           {
             "chunk_id": "b7972f95a5bda15b10543f09a82869e139f1168293b19823fdf72048214ff875",
             "source": "student-handbook-jun-2026.pdf",
             "section": "7. Students who have missed classes due to any",
             "page": 30,
-            "score": 0.7281329599999999
+            "score": 0.7282431
           },
           {
             "chunk_id": "ad9ac9ee77294a04e5da92da761f9e444870a0375ee2a4121173db0fe15662ef",
             "source": "student-handbook-jun-2026.pdf",
             "section": "14. In case of absence from an exam (e.g. due to illness,",
             "page": 28,
-            "score": 0.7143364
+            "score": 0.7139876000000001
           },
           {
             "chunk_id": "b553ceb8d7dcf8140af4a15112340a2db487a726dbdf450d6e0342b78daf416d",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.22",
             "page": 10,
-            "score": 0.71244323
+            "score": 0.71260363
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.456,
+      "seconds": 19.363,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q08",
@@ -609,9 +599,16 @@
         }
       ],
       "expect": "One impact-factor journal paper, at least online with a DOI, with NUCES affiliation.",
+      "required_answer_patterns": [
+        "one\\s+journal\\s+paper",
+        "\\bDOI\\b",
+        "impact[\\s-]+factor",
+        "two\\s+years",
+        "NUCES\\s+affiliation"
+      ],
       "response": {
-        "request_id": "8d31faf1684448d5a25bc5f0a1d3f1ea",
-        "answer": "A faculty member must have published one journal paper with the impact factor journals appearing in Journal Citation Reports by Web of Science Group (JCR) within two years prior to the date of application.",
+        "request_id": "ace1ca6cd74c4f52b3a175d034e4dc74",
+        "answer": "6. 6.1. 6.2. 63, 6.4. 6.4.1. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\n6.4.2. 6.4.3. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\n6.4.4. 6:5; [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nhs Viale [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\ndds [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nTee [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nEvaluation criteria for a technical start-up Faculty member must have published one journal paper (at least online with a DOI number), with the impact factor journals appearing in Journal Citation Reports by Web of [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nScience Group (JCR) within two years prior to the date of application with NUCES affiliation. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nFaculty member must have completed or currently be involved as a Principal Investi ‘gator or Co-Principal Investigator of an externally funded research project of significant funding amount within the last five years. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nThe start-up should align with the ongoing research at the university and the university degree programs. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nThe start-up should be related to emerging technologies and should be aiming to commercialise the research of faculty members or research projects. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nProcedure for submitting the application Applications may be submitted at any time. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nApplication must be submitted on the prescribed form (Annex -I) with all the required information. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nA brief business plan must be provided using the form provided in Annex-II. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nFollowing information should be provided on the prescribed form: Technical domain of the start-up Research outputs /technologies/products that the start-up aims to commercialize, A _ transfer/commercial usage of Intellectual Property required from the university should be explicitly listed (see Intellectual Property Rights (IP) Policy available at university website). [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nList of NUCES faculty members and staff involved in the start-up Applications must be submitted through the campus Director office. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nProcedure for evaluating the application [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nThe Campus Director shall provide comments, recommend the application and forward the application to ORIC. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nORIC shall evaluate and recommend the application using the criteria provided in Section 5). [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nFor final approval, the cases shall be presented to the RECTOR NUCES for approval. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nThe decision by the RECTOR is final in this regard. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nMandatory periodic (six monthly) deliverables of the start-up Approximate business/funds being generated by the start-up. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nNumber of employments created by the start-up. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nSummary of industry partnerships generated by the start-up. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nPatents held by university being commercialized by the start-up. . .. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nAny new patents registered by the start-up [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nMarketing material / evidence of commercialization activities by the start-up [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nOther terms and conditions [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]\nThe approval for a start-up does not imply any kind of financial or legal liability of the university. [faculty-entrepreneurship-and-technical-start-ups-policy.pdf / 1. Purpose]",
         "citations": [
           {
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
@@ -623,49 +620,50 @@
         "confidence": "high",
         "retrieved": [
           {
-            "chunk_id": "d3103baa36b02dc9125a618e893dd54e1f1a6be37879ff20e0ecb53560652068",
+            "chunk_id": "e9db721c2e541daa4d25371bcfc104fceec96f2b428a03bd3c744bb5d87db235",
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
             "section": "1. Purpose",
             "page": 2,
-            "score": 0.8067257999999999
+            "score": 0.80631018
           },
           {
-            "chunk_id": "a28f626eabd53964742f410c1fb04e7c0c9bf0d1237e963ad366591994565c6a",
+            "chunk_id": "f57370e6a7eba216c13a8c9897597e3d5c57ce2391f79394ccaafa3951a8e404",
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
             "section": "1. Purpose",
             "page": 1,
-            "score": 0.73029542
+            "score": 0.7286427600000001
           },
           {
             "chunk_id": "62a8f1a4677e3c7394eb6aee8aa3088fe746733fb38dba868f9814f6ef01e86f",
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
             "section": "Document",
             "page": 1,
-            "score": 0.7099502
+            "score": 0.7098107300000001
           },
           {
             "chunk_id": "77b0cbfa049af054fa0cab2c88f6e1790e73932f41e434622f261659d799a374",
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
             "section": "1. Purpose",
             "page": 4,
-            "score": 0.7003535000000001
+            "score": 0.7004385
           },
           {
             "chunk_id": "1bd59e0351b72dd96f294ea994a5ca2fd7418b3b5eac39a4be98790124762d69",
             "source": "faculty-entrepreneurship-and-technical-start-ups-policy.pdf",
             "section": "3. Name & Designation in start-up:",
             "page": 5,
-            "score": 0.6841767999999999
+            "score": 0.6842585800000001
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.888,
+      "seconds": 42.674,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": true
     },
     {
       "id": "q09",
@@ -680,9 +678,10 @@
         }
       ],
       "expect": "8 to 9 weeks",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "a8e7dbc83ef745acbdb9d34d7a52be45",
-        "answer": "8 to 9 weeks",
+        "request_id": "41e2c382c1b4410e8c66d6477eb2cd83",
+        "answer": "6. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nRules for Summer Semester [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nSummer semester will be offered as an optional semester of 8 to 9 weeks' duration. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nThe contact hours per week during the Summer Semester will be doubled to ensure that the course is completely taught in summer (with half the duration as compared to a regular semester). [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nResearch courses or projects will not be offered. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nA student cannot register for a new course. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nException to this rule is granted for the following cases: (1) For internship, as required by HEC (ii) An elective course is being offered by a distinguished scholar or professional who is only available during summer (iii) A student needs one or two new elective courses to graduate at the end of summer. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nStudents are not allowed to register in summer semester for courses which they have previously taken, and were awarded a W grade. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nA student will be allowed to repeat a maximum of 2 courses (with associated labs if any. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nA student can withdraw from a summer course on or before the last day of classes. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nSummer courses cannot be dropped; hence, fee is neither refunded nor carried forward to next semester(s). [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nFinancial assistance, scholarship or fee concession is not available in summer semester. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nA minimum of TEN (10) students should register in a summer course. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nWarning Count is incremented/decremented in summer semester. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nA student can study summer semester in another campus, provided that the parent campus is not offering that course. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nStudent must obtain, in writing, prior permission from Director of the parent campus. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]\nVisiting faculty shall not be employed during summer semester, except where the course was offered in a regular semester by the same visiting member. [undergraduate-academic-rules-aug-2023.pdf / 6. Rules for Summer Semester]",
         "citations": [
           {
             "source": "undergraduate-academic-rules-aug-2023.pdf",
@@ -698,45 +697,39 @@
             "source": "undergraduate-academic-rules-aug-2023.pdf",
             "section": "6. Rules for Summer Semester",
             "page": 20,
-            "score": 0.8000470399999999
+            "score": 0.7999227
           },
           {
             "chunk_id": "20aec2766b1e66c0428b7d7d6e1fad1c2193f673dcbf3a2e8dd86e9d76845e6a",
             "source": "undergraduate-academic-rules-aug-2023.pdf",
             "section": "1.19",
             "page": 7,
-            "score": 0.75393176
+            "score": 0.75399739
           },
           {
             "chunk_id": "f7c8226590f79037bc7fa71faebd8e5cd7899abf059eed7c49e1e00399c76313",
             "source": "undergraduate-academic-rules-aug-2023.pdf",
             "section": "1.23",
             "page": 8,
-            "score": 0.6957357
+            "score": 0.6958742
           },
           {
             "chunk_id": "4f072555769df89fee6b867105d798c9cb0d0f0be2b1af099d1e67e033eeb913",
             "source": "undergraduate-academic-rules-aug-2023.pdf",
             "section": "3.3",
             "page": 11,
-            "score": 0.6859898
-          },
-          {
-            "chunk_id": "6d2d5fd309e3d1587678844ae3f6c2b3cd928d1ce79c5750fce5ce6a424404c2",
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "19. Rules for Summer Semester",
-            "page": 3,
-            "score": 0.77502668
+            "score": 0.6857919699999999
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.243,
+      "seconds": 17.385,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q10",
@@ -751,24 +744,15 @@
         }
       ],
       "expect": "8 weeks",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "44df2bb1799b401ab7df513901f4864d",
-        "answer": "8 weeks",
+        "request_id": "e59109e4bd16497c93c24cd73b6c1715",
+        "answer": "6.1 Summer semester is an 8-week semester and is meant to facilitate students who are in one of the following four categories. [academic-rules-handbook-jun-2026.pdf / 6.1]\nA. [academic-rules-handbook-jun-2026.pdf / 6.1]\nAcademic Warning I/II B. [academic-rules-handbook-jun-2026.pdf / 6.1]\nGraduating C. [academic-rules-handbook-jun-2026.pdf / 6.1]\nEligible for registering FYP-I in Fall by earning minimum required credits in the summer D. [academic-rules-handbook-jun-2026.pdf / 6.1]\nEligible for registering a course/lab in Fall by passing its pre-requisite in summer [academic-rules-handbook-jun-2026.pdf / 6.1]",
         "citations": [
-          {
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "19. Rules for Summer Semester",
-            "page": 3
-          },
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "6.1",
             "page": 28
-          },
-          {
-            "source": "prospectus-2026-academic-rules-and-regulations.pdf",
-            "section": "3. Academic Year",
-            "page": 1
           }
         ],
         "answered_from_context": true,
@@ -779,45 +763,46 @@
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "19. Rules for Summer Semester",
             "page": 3,
-            "score": 0.80414975
+            "score": 0.80416477
           },
           {
             "chunk_id": "b30ddf0307dd46d357edbb9fb3a63c040fa862d7e34cbc218acd4af11fba0d4d",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.19",
             "page": 9,
-            "score": 0.8027746099999999
+            "score": 0.80264401
           },
           {
             "chunk_id": "391d57e0437c1ebd41b0406b9c05bafb8b20be4c2fbfe9caf14c5494f7fb4c76",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "6.4",
             "page": 28,
-            "score": 0.76882994
+            "score": 0.7690633
           },
           {
             "chunk_id": "de04cdea34b17ed0d0cede6be633a1453ace3e78702fadcf74d1d48e5cebebc0",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "6.1",
             "page": 28,
-            "score": 0.7507909500000001
+            "score": 0.75087535
           },
           {
             "chunk_id": "391da0a7d700d1336a3f7e5f603b88c792d977a5a42186d44c5f8de03db53747",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "3. Academic Year",
             "page": 1,
-            "score": 0.71959788
+            "score": 0.7193906299999999
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 2.038,
+      "seconds": 24.361,
       "recall@3": 0.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q11",
@@ -832,9 +817,13 @@
         }
       ],
       "expect": "Ineligible for the final exam and assigned F/A.",
+      "required_answer_patterns": [
+        "\\bineligible\\b",
+        "\\bF/A\\b"
+      ],
       "response": {
-        "request_id": "f1c8bb34ae8b405fa54507a79bd4024d",
-        "answer": "ineligible to appear in the final examination of the concerned course",
+        "request_id": "420044e37cf141d49c116c981c4deaef",
+        "answer": "1.22 Failure to meet attendance requirements in a course will render the student ineligible to appear in the final examination of the concerned course. [academic-rules-handbook-jun-2026.pdf / 1.22]\nConsequently, the student will be assigned F/A grade in the course. [academic-rules-handbook-jun-2026.pdf / 1.22]\nBachelor’s Degree Requirements [academic-rules-handbook-jun-2026.pdf / 1.22]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
@@ -850,45 +839,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.20",
             "page": 10,
-            "score": 0.76283556
+            "score": 0.76274109
           },
           {
             "chunk_id": "b553ceb8d7dcf8140af4a15112340a2db487a726dbdf450d6e0342b78daf416d",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.22",
             "page": 10,
-            "score": 0.7546134600000001
+            "score": 0.75453794
           },
           {
             "chunk_id": "6c47daae48961a1e2a41bd6cb9b48fc08fbb824d186834f88e04dfca7a19a332",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "1. Attendance Requirement",
             "page": 1,
-            "score": 0.74450874
+            "score": 0.74436742
           },
           {
             "chunk_id": "44725c78f227490c82a13f22c86dc64fa17d9f5fe87ba55396cd303600d3f490",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.21",
             "page": 10,
-            "score": 0.6594914199999999
+            "score": 0.6589743
           },
           {
             "chunk_id": "6cef61797b4b55c0e3b4e521cd3bd77795488980025fbc4b7a3593dd1dc1f886",
             "source": "student-handbook-jun-2026.pdf",
             "section": "1. Violation of the rules and regulations of the University.",
             "page": 23,
-            "score": 0.64310634
+            "score": 0.64340413
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.372,
+      "seconds": 7.658,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": true
     },
     {
       "id": "q12",
@@ -903,9 +893,10 @@
         }
       ],
       "expect": "Four academic years (eight regular semesters).",
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "f40f587f882142cea82cf88c4138e757",
-        "answer": "Four academic years (8 regular semesters)",
+        "request_id": "06c781e5574b46cf876602396e73d949",
+        "answer": "1.23 The minimum duration of a Bachelor’s degree is four academic years (8 regular semesters) and a maximum time limit of 6 years, further extendable for one year with the approval of Statutory Bodies. [academic-rules-handbook-jun-2026.pdf / 1.23]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
@@ -921,45 +912,46 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.23",
             "page": 10,
-            "score": 0.85804898
+            "score": 0.85808033
           },
           {
             "chunk_id": "3add931d121065369ffb0efee37e43667e8877d383dfebf5dc3c2bb862342053",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "34. Maximum Time Allowed to",
             "page": 5,
-            "score": 0.78286457
+            "score": 0.7828455
           },
           {
             "chunk_id": "f1541d2d39f6d1c5f45c0930c24f87c11fde3767b781a9dff251cd2fd84895db",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.24",
             "page": 10,
-            "score": 0.74300802
+            "score": 0.7429601
           },
           {
             "chunk_id": "940f2ae54921806c9ef33c45c25124f253249f63e05ff89e3ae2d68b8b27b126",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "3.29",
             "page": 17,
-            "score": 0.72232473
+            "score": 0.72236001
           },
           {
             "chunk_id": "9a634a234a7aff9cf7b5ca512c6b1d38ea6620f86d356b90809f9637033f246a",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1. Medium of Instruction 1",
             "page": 5,
-            "score": 0.7006176
+            "score": 0.7003165
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.05,
+      "seconds": 7.103,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": null
     },
     {
       "id": "q13",
@@ -968,9 +960,10 @@
       "must_abstain": true,
       "relevant": [],
       "expect": null,
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "b3762727449a46b385ebda0b72397a61",
-        "answer": "Not specified",
+        "request_id": "975937be3b9945c7ae570cba687c738f",
+        "answer": "The available corpus does not contain enough evidence to answer this question.",
         "citations": [],
         "answered_from_context": false,
         "confidence": "low",
@@ -980,45 +973,46 @@
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 40,
-            "score": 0.56979382
+            "score": 0.5695126699999999
           },
           {
             "chunk_id": "d43e517efb0ac8b64fdd58558089b31a55593b9ebbcb3fc60289cb473c8bcc59",
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 45,
-            "score": 0.5638286
+            "score": 0.56367064
           },
           {
             "chunk_id": "004bcccfa9c4d2ff321513990ba9a466cf17418e9e64758cd953a0a716da663e",
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 44,
-            "score": 0.55542088
+            "score": 0.5550902
           },
           {
             "chunk_id": "ac95708281a869157dea60b16afe48089e4b0ff15176228cc42d83c007804075",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.20",
             "page": 10,
-            "score": 0.54887533
+            "score": 0.5490895
           },
           {
             "chunk_id": "f56f1d87572ad99f18f84a2a883442f8a470e0d98c07f2d7f14ffc8a997bbf3f",
             "source": "student-handbook-jun-2026.pdf",
             "section": "8. Group Study Rooms can only be booked for a group (at-",
             "page": 31,
-            "score": 0.54261112
+            "score": 0.54306698
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.721,
+      "seconds": 16.255,
       "recall@3": null,
       "recall@5": null,
       "citation_validity": null,
-      "abstention_correct": true
+      "abstention_correct": true,
+      "answer_checks_passed": null
     },
     {
       "id": "q14",
@@ -1027,9 +1021,10 @@
       "must_abstain": true,
       "relevant": [],
       "expect": null,
+      "required_answer_patterns": [],
       "response": {
-        "request_id": "850a164989ae4cf280743a2ec2e892c5",
-        "answer": "Not specified",
+        "request_id": "83d3800dba1d492f85cfb1e204c45918",
+        "answer": "The available corpus does not contain enough evidence to answer this question.",
         "citations": [],
         "answered_from_context": false,
         "confidence": "low",
@@ -1039,45 +1034,46 @@
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 40,
-            "score": 0.590248
+            "score": 0.58950323
           },
           {
             "chunk_id": "778929c7801dd0fdb0ef62fb0c47aebe586c7b77905f2ca15c49987844c77891",
             "source": "annual-report-2019-20.pdf",
             "section": "3. To promote research and scholarly activities to generate knowledge.",
             "page": 5,
-            "score": 0.56167042
+            "score": 0.56128228
           },
           {
             "chunk_id": "004bcccfa9c4d2ff321513990ba9a466cf17418e9e64758cd953a0a716da663e",
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 44,
-            "score": 0.54390872
+            "score": 0.54316008
           },
           {
             "chunk_id": "d43e517efb0ac8b64fdd58558089b31a55593b9ebbcb3fc60289cb473c8bcc59",
             "source": "student-handbook-jun-2026.pdf",
             "section": "19. All users must observe Lab rules. Breach of any of these",
             "page": 45,
-            "score": 0.5385568000000001
+            "score": 0.5381463799999999
           },
           {
-            "chunk_id": "0a3a288ec041c62cdcd32e47fae1650b5ddd3be6f72eb548c2d51031b0d9545a",
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "3. Admission Policy 8",
-            "page": 5,
-            "score": 0.5364477000000001
+            "chunk_id": "6285eb6cb56fd3c193c36902af7379da24642428ab1c1ba31e62d7f80a8a6a7b",
+            "source": "student-handbook-jun-2026.pdf",
+            "section": "16. Renewal of borrowed books cannot be claimed as a right.",
+            "page": 33,
+            "score": 0.5363466
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 0.871,
+      "seconds": 11.843,
       "recall@3": null,
       "recall@5": null,
       "citation_validity": null,
-      "abstention_correct": true
+      "abstention_correct": true,
+      "answer_checks_passed": null
     },
     {
       "id": "q15",
@@ -1092,9 +1088,15 @@
         }
       ],
       "expect": "100 percent, with up to 20 percent condonable by the HoD for genuine reasons.",
+      "required_answer_patterns": [
+        "100\\s*%",
+        "20\\s*%",
+        "\\bHoD\\b",
+        "\\bgenuine\\b"
+      ],
       "response": {
-        "request_id": "7f2ba0cb282544cfa16cd3f70bdd4151",
-        "answer": "100%",
+        "request_id": "fbaf9c4840f84b638709d503b8435b22",
+        "answer": "1.21 Students are required to maintain 100% attendance in lectures, labs, tutorials, seminars and discussions as prescribed by the course instructor. [academic-rules-handbook-jun-2026.pdf / 1.21]\nAbsence of a maximum of 20% of the total attendance may be condoned by the HoD for genuine reasons, such as illness, etc. [academic-rules-handbook-jun-2026.pdf / 1.21]",
         "citations": [
           {
             "source": "academic-rules-handbook-jun-2026.pdf",
@@ -1110,46 +1112,49 @@
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.20",
             "page": 10,
-            "score": 0.76164234
+            "score": 0.783037
           },
           {
             "chunk_id": "6c47daae48961a1e2a41bd6cb9b48fc08fbb824d186834f88e04dfca7a19a332",
             "source": "prospectus-2026-academic-rules-and-regulations.pdf",
             "section": "1. Attendance Requirement",
             "page": 1,
-            "score": 0.74162656
+            "score": 0.7110535
           },
           {
             "chunk_id": "44725c78f227490c82a13f22c86dc64fa17d9f5fe87ba55396cd303600d3f490",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "1.21",
             "page": 10,
-            "score": 0.72066188
-          },
-          {
-            "chunk_id": "b553ceb8d7dcf8140af4a15112340a2db487a726dbdf450d6e0342b78daf416d",
-            "source": "academic-rules-handbook-jun-2026.pdf",
-            "section": "1.22",
-            "page": 10,
-            "score": 0.6848353
+            "score": 0.70558316
           },
           {
             "chunk_id": "2a0b8addeb5e8e351fa0453f7a718fdadb6218ef90cb0303194aac565c8f69c8",
             "source": "academic-rules-handbook-jun-2026.pdf",
             "section": "6.7",
             "page": 28,
-            "score": 0.67931622
+            "score": 0.68428767
+          },
+          {
+            "chunk_id": "b553ceb8d7dcf8140af4a15112340a2db487a726dbdf450d6e0342b78daf416d",
+            "source": "academic-rules-handbook-jun-2026.pdf",
+            "section": "1.22",
+            "page": 10,
+            "score": 0.6595598
           }
         ],
         "provider": "ollama",
         "cached": false
       },
-      "seconds": 1.203,
+      "seconds": 7.283,
       "recall@3": 1.0,
       "recall@5": 1.0,
       "citation_validity": 1.0,
-      "abstention_correct": null
+      "abstention_correct": null,
+      "answer_checks_passed": true
     }
   ],
-  "golden": "eval/golden.yaml"
+  "golden": "eval/golden.yaml",
+  "environment": "GitHub Actions / Linux / real configured services / Ollama",
+  "commit": "f5835177565138f199da402abe93c87ee78b90dc"
 }

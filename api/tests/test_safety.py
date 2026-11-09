@@ -14,7 +14,24 @@ from app.providers.llm.base import GenerationError
 from app.providers.llm.base import GenerationResult
 from app.routes.metrics import TOKENS
 from app.providers.llm.stub import StubProvider
-from app.services.prompt import grounded_schema
+from app.services.prompt import grounded_schema, select_context
+
+
+def test_standout_evidence_removes_a_distracting_different_measurement():
+    correct = Passage(chunk_id="quantity", source="packaging.pdf", section="1.1", page=1,
+                      score=.91, text="A packaging unit holds six items.")
+    other = correct.model_copy(update={"chunk_id": "duration", "section": "1.2", "score": .79,
+                                       "text": "Shipping takes three days."})
+    assert select_context("What is the packaging unit size?", [correct, other]) == [correct]
+    close = other.model_copy(update={"score": .87})
+    assert select_context("What is the packaging unit size?", [correct, close]) == [correct, close]
+
+
+def test_requested_clause_takes_priority_over_a_higher_scoring_neighbour():
+    exact = Passage(chunk_id="exact", source="rules.pdf", section="2.3", page=1,
+                    score=.7, text="Exact requested clause.")
+    neighbour = exact.model_copy(update={"chunk_id": "neighbour", "section": "2.4", "score": .95})
+    assert select_context("What does clause 2.3 require?", [neighbour, exact]) == [exact]
 
 
 def test_complete_question_after_malicious_preamble_is_not_an_unresolved_followup():

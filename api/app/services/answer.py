@@ -14,7 +14,7 @@ from ..routes import metrics
 from ..schemas import Answer, AskResponse, Passage, RetrievedRef
 from .cache import SemanticCache, is_follow_up
 from .grounding import render_evidence
-from .prompt import factual_question
+from .prompt import factual_question, select_context
 
 log = logging.getLogger("rahbar.answer")
 _NO_EVIDENCE = "The available corpus does not contain enough evidence to answer this question."
@@ -130,24 +130,27 @@ def answer_question(
         answer = Answer(reasoning="no passage cleared the relevance floor", answer=_NO_EVIDENCE,
                         citations=[], answered_from_context=False, confidence="low")
     else:
+        context = select_context(query, grounded)
+        log.info("generation context", extra={"chunk_ids": [p.chunk_id for p in context],
+                                              "scores": [round(p.score, 4) for p in context]})
         answer = Answer(reasoning="model output unavailable", answer=_FALLBACK, citations=[],
                         answered_from_context=False, confidence="low")
         for attempt in range(2):  # retry once on invalid JSON, citations or provider failure
             generated_at = time.perf_counter()
             try:
-                result = provider.generate(query, grounded)
+                result = provider.generate(query, context)
                 candidate = result.answer
                 total_input += result.input_tokens
                 total_output += result.output_tokens
                 metrics.TOKENS.labels(provider=provider.name, direction="input").inc(result.input_tokens)
                 metrics.TOKENS.labels(provider=provider.name, direction="output").inc(result.output_tokens)
-                if not _citations_valid(candidate, grounded):
+                if not _citations_valid(candidate, context):
                     raise ValueError("model cited evidence that was not retrieved")
                 if not candidate.answered_from_context:
                     candidate = candidate.model_copy(update={
                         "answer": _NO_EVIDENCE, "confidence": "low",
                     })
-                answer = render_evidence(candidate, grounded, question)
+                answer = render_evidence(candidate, context, question)
                 log.info("generation", extra={"input_tokens": result.input_tokens,
                                               "output_tokens": result.output_tokens})
                 valid_generation = True

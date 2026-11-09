@@ -15,6 +15,22 @@ restore() {
   kubectl --context=minikube -n rahbar rollout status deployment/ui --timeout=180s
 }
 trap restore EXIT
+fetch_version() {
+  expected=$1
+  destination=$2
+  for attempt in $(seq 1 30); do
+    if curl -fsS --max-time 5 -H "Host: $HOST" "http://$INGRESS_IP/" --output "$destination" && grep -Fq "Version $expected" "$destination"; then # NOSONAR: validated private test IP, public version HTML only.
+      date -u +%FT%TZ >> "$evidence/version-probes.txt"
+      printf 'confirmed %s on attempt %s\n' "$expected" "$attempt" >> "$evidence/version-probes.txt"
+      return 0
+    fi
+    date -u +%FT%TZ >> "$evidence/version-probes.txt"
+    printf 'waiting for %s, attempt %s\n' "$expected" "$attempt" >> "$evidence/version-probes.txt"
+    sleep 1
+  done
+  echo "Ingress did not expose Version $expected" >&2
+  return 1
+}
 for color in blue green; do
   image="rahbar-ui:demo-$color-$sha"
   docker build --build-arg "VCS_REF=demo-$color-$sha" -t "$image" ui
@@ -22,12 +38,12 @@ for color in blue green; do
   kubectl --context=minikube -n rahbar set image deployment/ui "ui=$image"
   kubectl --context=minikube -n rahbar rollout status deployment/ui --timeout=180s \
     | tee "$evidence/$color-rollout.txt"
-  curl -fsS -H "Host: $HOST" "http://$INGRESS_IP/" > "$evidence/$color.html" # NOSONAR: private test IP checked above; public version HTML only.
+  fetch_version "demo-$color-$sha" "$evidence/$color.html"
   grep -F "Version demo-$color-$sha" "$evidence/$color.html"
 done
 kubectl --context=minikube -n rahbar rollout undo deployment/ui | tee "$evidence/undo.txt"
 kubectl --context=minikube -n rahbar rollout status deployment/ui --timeout=180s
-curl -fsS -H "Host: $HOST" "http://$INGRESS_IP/" > "$evidence/after-undo.html" # NOSONAR: private test IP checked above; public version HTML only.
+fetch_version "demo-blue-$sha" "$evidence/after-undo.html"
 grep -F "Version demo-blue-$sha" "$evidence/after-undo.html"
 kubectl --context=minikube -n rahbar rollout history deployment/ui > "$evidence/history.txt"
 date -u +%FT%TZ > "$evidence/captured-at.txt"

@@ -12,10 +12,14 @@
   control, explicitly labelled as fixture doubles.
 - `../../eval/fixtures/results.fixture.json`: fresh seven-question fixture results.
 
+- `kubernetes-f583517/`: successful real Minikube/Calico run, 15 questions, concurrent reindex, persistence/recovery, negative network probe, visible update/undo and resource samples.
+- `../../eval/runs/verified-f583517/`: successful real three-configuration model-token, cache and answer measurements.
+- `ci-ingress-576d9a9/`: successful shared CI/CD readiness and revision smoke, using the deterministic integration stack.
+- `validation-provenance.json`: exact audited source-component object hashes and workflow links.
+- `faults/real-scan-ocr-disabled.json`: actual eight-page ORIC extraction failure with OCR deliberately disabled and linked real Tesseract control.
+
 Reproduce with `scripts/verify_local.py`, strict Kustomize/kubeconform, and the
-fixture test's documented output environment variables. These are not live-model
-or cluster evidence. Real cache/token/tuning measurements and new cluster
-rollout/undo captures must be added after actual execution.
+fixture test's documented output environment variables. Local checks and fixture reports are distinct from the separately retained real-model and real-cluster evidence above. Final main CD still awaits reviewed merge; see SUBMISSION.md.
 
 ## Historical November 5–6 release
 

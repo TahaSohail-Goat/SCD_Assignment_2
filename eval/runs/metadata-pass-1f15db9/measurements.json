@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-11-08T19:10:08.640534+00:00",
+  "commit": "1f15db967c7ae5b7ceffbbc4f6f9548029cf322e",
+  "measurements": [
+    {
+      "size": 400,
+      "overlap": 50,
+      "chunks": 669,
+      "original_model_tokens": 51512,
+      "stored_model_tokens": 52720,
+      "amplification": 1.0234508464047212,
+      "recall@3": 0.9230769230769231,
+      "recall@5": 1.0,
+      "gate_failures": []
+    }
+  ],
+  "token_definition": "Ollama /api/embed prompt_eval_count summed per input batch",
+  "model_inventory": {
+    "models": [
+      {
+        "name": "llama3.2:3b",
+        "model": "llama3.2:3b",
+        "modified_at": "2026-11-08T18:56:12.920881184Z",
+        "size": 2019393189,
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "llama",
+          "families": [
+            "llama"
+          ],
+          "parameter_size": "3.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 131072,
+          "embedding_length": 3072,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "completion",
+          "tools"
+        ]
+      },
+      {
+        "name": "nomic-embed-text:latest",
+        "model": "nomic-embed-text:latest",
+        "modified_at": "2026-11-08T18:55:56.523477508Z",
+        "size": 274302450,
+        "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "nomic-bert",
+          "families": [
+            "nomic-bert"
+          ],
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      }
+    ]
+  }
+}

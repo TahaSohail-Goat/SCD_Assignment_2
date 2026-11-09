@@ -1,0 +1,3 @@
+{"BlockIO":"6.59MB / 2.29GB","CPUPerc":"0.01%","Container":"3af0cfae544a","ID":"3af0cfae544a","MemPerc":"63.96%","MemUsage":"4.477GiB / 7GiB","Name":"ollama","NetIO":"2.31GB / 15.1MB","PIDs":"37"}
+{"BlockIO":"0B / 0B","CPUPerc":"0.30%","Container":"456a8473ec2f","ID":"456a8473ec2f","MemPerc":"1.65%","MemUsage":"4.223MiB / 256MiB","Name":"redis","NetIO":"234kB / 1.24MB","PIDs":"6"}
+{"BlockIO":"139kB / 43MB","CPUPerc":"0.00%","Container":"921ada925b37","ID":"921ada925b37","MemPerc":"1.86%","MemUsage":"38.1MiB / 2GiB","Name":"chroma","NetIO":"12.3MB / 210kB","PIDs":"9"}

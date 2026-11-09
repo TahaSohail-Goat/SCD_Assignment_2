@@ -65,13 +65,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: helm/kind-action@v1.14.0
       - name: Install Ingress controller
-        run: |
-          curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' \
-            https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/kind/deploy.yaml \
-            --output /tmp/ingress-nginx-kind.yaml
-          echo '2a3ae008c8786431115502644e77ab398fdebfb721a5d1195ed3089cde3299df  /tmp/ingress-nginx-kind.yaml' | sha256sum --check --strict
-          kubectl apply -f /tmp/ingress-nginx-kind.yaml
-          kubectl rollout status -n ingress-nginx deployment/ingress-nginx-controller --timeout=600s
+        run: bash scripts/install_ingress.sh
       - name: Load exact published images into ephemeral cluster
         env:
           HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -88,18 +82,11 @@ jobs:
       - run: kubectl wait -n rahbar --for=condition=complete job/initial-index --timeout=600s
       - run: kubectl rollout status -n rahbar deployment/api --timeout=600s
       - name: Smoke through the Ingress
-        run: |
-          kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 18080:80 &
-          forward_pid=$!
-          trap 'kill "$forward_pid"' EXIT
-          for attempt in $(seq 1 30); do
-            if curl -fsS -o /dev/null -H 'Host: rahbar.local' http://localhost:18080/; then break; fi
-            sleep 2
-          done
-          curl -fsS -H 'Host: rahbar.local' -X POST http://localhost:18080/api/ask \
-            -H 'Content-Type: application/json' \
-            -d '{"question":"What is the attendance requirement?"}' --output /tmp/rahbar-answer.json
-          python -c 'import json; from pathlib import Path; x=json.loads(Path("/tmp/rahbar-answer.json").read_text()); assert x["citations"] and x["answered_from_context"]'
-          curl -fsS -H 'Host: rahbar.local' http://localhost:18080/readyz \
-            --output /tmp/rahbar-readiness.json
-          python -c 'import json; from pathlib import Path; assert json.loads(Path("/tmp/rahbar-readiness.json").read_text())["status"] == "ready"'
+        env:
+          EXPECTED_REVISION: ${{ github.sha }}
+        run: bash scripts/smoke_ingress.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cd-ingress-smoke
+          path: output/ingress-smoke/
